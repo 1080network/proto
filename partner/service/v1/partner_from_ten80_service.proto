@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package partner.service.v1;
+
+option go_package = "ten80/proto/partner/servicev1";
+option java_package = "network.ten80.partner.service.v1";
+option java_outer_classname = "PartnerServiceProto";
+option objc_class_prefix = "TEN80";
+
+import "partner/user/v1/user.proto";
+import "partner/ping/v1/ping.proto";
+
+service PartnerFrom1080Service {
+    //<editor-fold desc="User Instrument Operations">
+
+    // operation to support reverse onboarding. Instead of the Partner calling 1080, 1080 will call the Partner with a
+    // new enrollment
+    rpc EnrollUserInstrument (user.v1.EnrollUserInstrumentRequest) returns (user.v1.EnrollUserInstrumentResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Admin Operations">
+
+    rpc PingPartner (service.v1.PingPartnerRequest) returns (service.v1.PingPartnerResponse) {
+    }
+    //</editor-fold>
+}
+

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package common.enums.accounttype.v1;
+
+option go_package = "ten80/proto/common/enums/accounttypev1";
+option java_package = "network.ten80.common.enums.v1";
+option java_outer_classname = "AccountTypeEnumProto";
+option objc_class_prefix = "TEN80";
+
+enum AccountType {
+    ACCOUNT_TYPE_UNSPECIFIED = 0;
+
+    ACCOUNT_TYPE_REVENUE = 1;
+}

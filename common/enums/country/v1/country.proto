@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package common.enums.country.v1;
+
+option go_package = "ten80/proto/common/enums/countryv1";
+option java_package = "network.ten80.common.enums.v1";
+option java_outer_classname = "CountryEnumProto";
+option objc_class_prefix = "TEN80";
+
+enum Country {
+    COUNTRY_UNSPECIFIED = 0;
+
+    //ISO 3166-2
+    COUNTRY_US = 1; // United States
+}

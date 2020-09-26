@@ -1,0 +1,194 @@
+service:
+  title: "Service implemented by Partner"
+  version: "0.1"
+  description: >-
+    <p></p>
+  contact:
+    name: "1080"
+    url: "https://dev.1080payments.com"
+    email: "info@1080payments.com"
+
+operations:
+  - rpc: "Authenticate"
+    operationId: "Authenticate"
+    post: "/ten80/authenticate"
+    description: >-
+      <p>Most 1080 services require the caller to authenticate themselves. This operation allows the caller to do so.</p>
+    tags: "authenticate"
+
+  - rpc: "GetPartner"
+    operationId: "Get Partner"
+    post: "/partner/partner/get"
+    description: >-
+      <p>Retrieves the details of the Partner at 1080.</p>
+    tags: "partner"
+    security: "Authenticate"
+
+  - rpc: "CreateServiceAccount"
+    operationId: "Create Service Account"
+    post: "/partner/service-account/create"
+    description: >-
+      Create a service account that it used by a person or system to authenticate against 1080.
+    tags: "service-account"
+    security: "Authenticate"
+  - rpc: "GetServiceAccount"
+    operationId: "Get Service Account"
+    post: "/partner/service-account/get"
+    description: >-
+      Retrieve a service account based on its key.
+    tags: "service-account"
+    security: "Authenticate"
+  - rpc: "UpdateServiceAccount"
+    operationId: "Update Service Account"
+    post: "/partner/service-account/update"
+    description: >-
+      <p>Update a service account based on its key.</p>
+    tags: "service-account"
+    security: "Authenticate"
+  - rpc: "SearchServiceAccount"
+    operationId: "Search Service Account"
+    post: "/partner/service-account/search"
+    description: >-
+      <p>Like GetServiceAccount, can be used to retrieve Service Accounts based on the criteria in the
+      request.</p>
+    tags: "service-account"
+    security: "Authenticate"
+
+  - rpc: "GetOrganization"
+    operationId: "Get Organization"
+    post: "/partner/organization/get"
+    description: >-
+      <p>Retrieve an organization based on it's key.</p>
+    tags: "organization"
+    security: "Authenticate"
+  - rpc: "SearchOrganization"
+    operationId: "Search Organization"
+    post: "/partner/organization/search"
+    description: >-
+      <p>Like GetOrganization, can be used to retrieve Organizations based on the criteria in the
+      request.</p>
+    tags: "organization"
+    security: "Authenticate"
+
+  - rpc: "CreateStore"
+    operationId: "Create Store"
+    post: "/partner/store/create"
+    description: >-
+      <p>Create a store that sits under an Organization.</p>
+    tags: "store"
+    security: "Authenticate"
+  - rpc: "GetStore"
+    operationId: "Get Store"
+    post: "/partner/store/get"
+    description: >-
+      <p>Retrieve a store based on it's key.
+    tags: "store"
+    security: "Authenticate"
+  - rpc: "UpdateStore"
+    operationId: "Update Store"
+    post: "/partner/store/update"
+    description: >-
+      <p>Update the store number and address of a Store.</p>
+    tags: "store"
+    security: "Authenticate"
+  - rpc: "RemoveStore"
+    operationId: "Remove Store"
+    post: "/partner/store/remove"
+    description: >-
+      <p>Remove an existing Store.</p>
+    tags: "store"
+    security: "Authenticate"
+  - rpc: "SearchStore"
+    operationId: "Search Store"
+    post: "/partner/store/search"
+    description: >-
+      <p>Like GetStore, can be used to retrieve Stores based on the criteria in the request.</p>
+    tags: "store"
+    security: "Authenticate"
+
+  - rpc: "SearchFI"
+    operationId: "Search FI"
+    post: "/partner/fi/search"
+    description: >-
+      <p>Used to retrieve FIs based on the criteria in the request.</p>
+    tags: "fi"
+    security: "Authenticate"
+
+  - rpc: "RegisterInstrumentInitiate"
+    operationId: "Register Instrument Initiate"
+    post: "/partner/instrument/register/initiate"
+    description: >-
+      <p>Start the registration process of a user after they have selected the desired FI. The
+      caller supplies 1080 with the users demographic data, the FI and optionally the last 4 of the
+      users instrument (account) at the FI.</p>
+    tags: "instrument"
+    security: "Authenticate"
+  - rpc: "RegisterInstrumentComplete"
+    operationId: "Register Instrument Complete"
+    post: "/partner/instrument/register/complete"
+    description: >-
+      <p>The second and final step in enrolling a user. It requires the user to present the matching
+      code that they received from their FI.</p>
+    tags: "instrument"
+    security: "Authenticate"
+  - rpc: "ClosePaymentToken"
+    operationId: "Close Payment Token"
+    post: "/partner/payment-token/close"
+    description: >-
+      <p>When a user no longer wishes to use their payment tokens this operation can remove them
+      from 1080.</p>
+    tags: "instrument"
+    security: "Authenticate"
+  - rpc: "ReplacePaymentToken"
+    operationId: "Replace Payment Token"
+    post: "/partner/payment-token/replace"
+    description: >-
+      <p>A Partner can proactively replace a payment token with a new one for future use.</p>
+    tags: "instrument"
+    security: "Authenticate"
+  - rpc: "SearchPartnerPaymentToken"
+    operationId: "Search Partner Payment Token"
+    post: "/partner/payment-token/search"
+    description: >-
+      <p>Search for Payment Tokens that the Partner has created.</p>
+    tags: "instrument"
+    security: "Authenticate"
+
+  - rpc: "SearchUserInstrument"
+    operationId: "Search User Instrument"
+    post: "/partner/user/search"
+    description: >-
+      <p>Search for User Instruments that the Partner has registered.</p>
+    tags: "user"
+    security: "Authenticate"
+
+  - rpc: "ObtainFunds"
+    operationId: "Obtain Funds"
+    post: "/partner/funds/obtain"
+    description: >-
+      <p>An operation to obtain funds from a user in order to pay for goods or services rendered to
+      the user.</p>
+    tags: "funds"
+    security: "Authenticate"
+  - rpc: "ReturnFunds"
+    operationId: "Return Funds"
+    post: "/partner/funds/return"
+    description: >-
+      <p>An operation to return funds to a user in order to refund them for goods or services.</p>
+    tags: "funds"
+    security: "Authenticate"
+  - rpc: "SearchFunds"
+    operationId: "Search Funds"
+    post: "/partner/funds/search"
+    description: >-
+      <p>An operation to search for Funds operations either Obtain or Return that the Partner has
+      requested of 1080.</p>
+    tags: "funds"
+    security: "Authenticate"
+
+  - rpc: "Ping"
+    operationId: "Ping"
+    post: "/admin/ping"
+    description: >-
+      <p>An operation to ping the server to ensure it's up and running and that the connection is good.</p>
+    tags: "funds"

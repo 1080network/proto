@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package fi.service.v1;
+
+option go_package = "ten80/proto/fi/servicev1";
+option java_package = "network.ten80.service.v1";
+option java_outer_classname = "FIServiceProto";
+option objc_class_prefix = "TEN80";
+
+import "fi/funds/v1/funds.proto";
+import "fi/instrument/v1/instrument.proto";
+import "fi/user/v1/user.proto";
+import "fi/ping/v1/ping.proto";
+
+service FIFrom1080Service {
+    rpc EnrollUserInstrument (user.v1.EnrollUserInstrumentRequest) returns (user.v1.EnrollUserInstrumentResponse) {
+    }
+
+    rpc RetrieveTransaction (instrument.v1.RetrieveTransactionRequest) returns (instrument.v1.RetrieveTransactionResponse) {
+    }
+
+    //<editor-fold desc="Funds Operations">
+
+    rpc ObtainFunds (funds.v1.ObtainFundsRequest) returns (funds.v1.ObtainFundsResponse) {
+    }
+
+    rpc ReturnFunds (funds.v1.ReturnFundsRequest) returns (funds.v1.ReturnFundsResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Admin Operations">
+
+    rpc PingFI (service.v1.PingFIRequest) returns (service.v1.PingFIResponse) {
+    }
+
+    //</editor-fold>
+}
+

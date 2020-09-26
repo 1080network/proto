@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package common.enums.realm.v1;
+
+option go_package = "ten80/proto/common/enums/realmv1";
+option java_package = "network.ten80.common.enums.v1";
+option java_outer_classname = "RealmEnumProto";
+option objc_class_prefix = "TEN80";
+
+enum Realm {
+    REALM_UNSPECIFIED = 0;
+
+    REALM_ADMIN = 1;
+
+    REALM_FINANCIAL_INSTITUTION = 2;
+
+    REALM_PARTNER = 3;
+
+    REALM_SERVICE = 4;
+
+    REALM_USER = 5;
+
+    REALM_PROGRAM_ADMIN = 6;
+}

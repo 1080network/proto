@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package common.enums.ebttype.v1;
+
+option go_package = "ten80/proto/common/enums/ebttypev1";
+option java_package = "network.ten80.common.enums.v1";
+option java_outer_classname = "EbtTypeEnumProto";
+option objc_class_prefix = "TEN80";
+
+enum EbtType {
+    EBT_TYPE_UNSPECIFIED = 0;
+
+    // US only - Supplemental Nutrition Assistance Program
+    EBT_TYPE_SNAP = 1;
+
+    // US only - Temporary Assistance for Needy Families
+    EBT_TYPE_TANF = 2;
+
+    // US only - Special Supplemental Nutrition Program for Women, Infants, and Children
+    EBT_TYPE_WIC = 3;
+}

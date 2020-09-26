@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package fi.organization.v1;
+
+option go_package = "ten80/proto/fi/organizationv1";
+option java_package = "network.ten80.fi.organization.v1";
+option java_outer_classname = "OrganizationProto";
+option objc_class_prefix = "TEN80";
+
+import "common/enums/organizationcategory/v1/organization_category.proto";
+import "common/v1/error.proto";
+import "common/v1/organization.proto";
+
+message GetOrganizationRequest {
+    string organization_key = 1;
+}
+
+message GetOrganizationResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_INVALID_PARTNER_ID = 3;
+        STATUS_NOT_FOUND = 4;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    common.v1.Organization organization = 3;
+}
+
+message SearchOrganizationRequest {
+    // The partner who owns this organization.
+    string partner_key = 1;
+
+    // The name of this organization.
+    string name = 2;
+
+    // The category of this organization (used by FI's to as part of their processing rules).
+    common.enums.organizationcategory.v1.OrganizationCategory category = 3;
+}
+
+message SearchOrganizationResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_INVALID_PARTNER_ID = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    repeated common.v1.Organization organizations = 3;
+}

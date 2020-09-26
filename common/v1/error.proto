@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package common.v1;
+
+option go_package = "ten80/proto/common/v1;commonv1";
+option java_package = "network.ten80.common.v1";
+option java_outer_classname = "ErrorProto";
+option objc_class_prefix = "TEN80";
+
+message Error {
+    string message = 1;
+}

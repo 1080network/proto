@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package partner.instrument.v1;
+
+option go_package = "ten80/proto/partner/instrumentv1";
+option java_package = "network.ten80.partner.instrument.v1";
+option java_outer_classname = "InstrumentProto";
+option objc_class_prefix = "TEN80";
+
+import "common/v1/address.proto";
+import "common/v1/date.proto";
+import "common/v1/error.proto";
+
+message RegisterInstrumentInitiateRequest {
+    // Primary key on the external system.
+    string partner_instrument_ref = 1;
+
+    // The financial institution which holds this account/instrument.
+    string fi_key = 2;
+
+    // The first name of the user.
+    string first_name = 3;
+
+    // The last name of the user.
+    string last_name = 4;
+
+    // The email of the user.
+    string email = 5;
+
+    // The street address of the user.
+    common.v1.Address address = 6;
+
+    // The birthday of the user.
+    common.v1.Date birthday = 7;
+
+    // E.164 format
+    string phone = 8;
+
+    // Last 4 digits of this instrument.
+    string last_four = 9;
+
+    // The username for this person at the users FI
+    string username = 10;
+
+    // The password for this person at the users FI
+    string password = 11;
+}
+
+message RegisterInstrumentInitiateResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        // generic error that's not one of the following
+        STATUS_ERROR = 2;
+        // The FI that holds this instrument is temporarily unavailable
+        STATUS_FI_UNAVAILABLE = 3;
+        // this is the second attempt to register this instrument
+        STATUS_DUPLICATE = 4;
+        // the FI the user selected doesn't exist
+        STATUS_FI_NOT_FOUND = 5;
+        // the instrument was not found
+        STATUS_NOT_FOUND = 6;
+        // the instrument was closed at the FI
+        STATUS_CLOSED = 7;
+        // the instrument is in a temporary FI risk/fraud state
+        STATUS_RISK_FRAUD = 8;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    // The matching code sent to the Financial Institution. Only returned in non-production environments.
+    string matching_code = 3;
+}
+
+message RegisterInstrumentCompleteRequest {
+    // The matching code sent from the users Financial Institution and given by the user.
+    string matching_code = 1;
+}
+
+message RegisterInstrumentCompleteResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_MATCHING_CODE_MISMATCH = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    // The payment token that the Partner can use to obtain or return funds for this user.
+    string partner_payment_token = 3;
+}
+

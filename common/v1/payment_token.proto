@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package common.v1;
+
+option go_package = "ten80/proto/common/v1;commonv1";
+option java_package = "network.ten80.common.v1";
+option java_outer_classname = "PaymentTokenProto";
+option objc_class_prefix = "TEN80";
+
+import "common/enums/currency/v1/currency.proto";
+import "common/enums/paymenttokentype/v1/payment_token_type.proto";
+import "google/protobuf/timestamp.proto";
+
+message CommonPaymentToken {
+    common.enums.paymenttokentype.v1.PaymentTokenType payment_token_type = 1;
+
+    string payment_token = 2;
+
+    // version of the payment token record, used for optimistic locking
+    int64 version = 3;
+
+    // Date that the payment token was created at 1080.
+    google.protobuf.Timestamp created = 4;
+
+    // Date that the payment token was last updated at 1080.
+    google.protobuf.Timestamp updated = 5;
+
+    google.protobuf.Timestamp expiration_date = 7;
+
+    // The 3-letter currency code defined in ISO 4217.
+    common.enums.currency.v1.Currency currency = 8;
+}

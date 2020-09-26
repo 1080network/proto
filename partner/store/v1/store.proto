@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package partner.store.v1;
+
+option go_package = "ten80/proto/partner/storev1";
+option java_package = "network.ten80.partner.store.v1";
+option java_outer_classname = "StoreProto";
+option objc_class_prefix = "TEN80";
+
+import "common/v1/address.proto";
+import "common/v1/error.proto";
+import "common/v1/store.proto";
+
+message CreateStoreRequest {
+    // The organization that this store is in.
+    string organization_key = 1;
+
+    // The primary key for this store at the Partner/Organization.
+    string store_ref = 2;
+
+    // The number of this store (an alternative unique value)
+    string store_number = 3;
+
+    // The street address of this store.
+    common.v1.Address address = 4;
+}
+
+message CreateStoreResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_DUPLICATE = 3;
+        STATUS_INVALID_PARTNER = 4;
+        STATUS_ORGANIZATION_NOT_FOUND = 5;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    // The primary key of this store within 1080.
+    string store_key = 3;
+
+    int64 version = 4;
+}
+
+message GetStoreRequest {
+    string store_key = 1;
+}
+
+message GetStoreResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_INVALID_PARTNER_ID = 3;
+        STATUS_NOT_FOUND = 4;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    common.v1.Store store = 3;
+}
+
+message SearchStoreRequest {
+    // The organization that this store is in.
+    string organization_key = 1;
+
+    // The primary key for this store at the Partner/Organization.
+    string store_ref = 2;
+
+    // The number of this store (an alternative unique value)
+    string store_number = 3;
+}
+
+message SearchStoreResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_INVALID_PARTNER_ID = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    repeated common.v1.Store stores = 3;
+}
+
+message StoreRef {
+    string organization_key = 1;
+
+    string store_ref = 2;
+}
+
+message UpdateStoreRequest {
+    oneof criteria {
+        // The primary key for this store at the Partner/Organization.
+        StoreRef store_ref = 1;
+
+        // The primary key of this store within 1080.
+        string store_key = 2;
+    }
+
+    int64 version = 3;
+
+    // The number of this store (an alternative unique value)
+    string store_number = 4;
+
+    // The street address of this store.
+    common.v1.Address address = 5;
+}
+
+message UpdateStoreResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+        STATUS_VERSION_MISMATCH = 4;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    int64 version = 3;
+}
+
+message RemoveStoreRequest {
+    oneof criteria {
+        // The primary key for this store at the Partner/Organization.
+        StoreRef store_ref = 1;
+
+        // The primary key of this store within 1080.
+        string store_key = 2;
+    }
+}
+
+message RemoveStoreResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+}

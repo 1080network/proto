@@ -1,0 +1,232 @@
+syntax = "proto3";
+
+package partner.funds.v1;
+
+option go_package = "ten80/proto/partner/fundsv1";
+option java_package = "network.ten80.partner.funds.v1";
+option java_outer_classname = "FundsProto";
+option objc_class_prefix = "TEN80";
+
+import "common/v1/amount.proto";
+import "common/enums/approvaltype/v1/approval_type.proto";
+import "common/enums/channel/v1/channel.proto";
+import "common/enums/fundsoperationtype/v1/funds_operation_type.proto";
+import "common/enums/currency/v1/currency.proto";
+import "common/enums/lineitemstatus/v1/line_item_status.proto";
+import "common/enums/organizationcategory/v1/organization_category.proto";
+import "common/v1/error.proto";
+import "common/v1/line_item.proto";
+import "google/protobuf/timestamp.proto";
+
+message Funds {
+    // 1080's transaction record primary key.
+    string transaction_key = 1;
+
+    // version of the user record, used for optimistic locking
+    int64 version = 2;
+
+    // Date that the Store was created at 1080.
+    google.protobuf.Timestamp created = 3;
+
+    // Date that the Store was last updated at 1080.
+    google.protobuf.Timestamp updated = 4;
+
+    common.enums.fundsoperationtype.v1.FundsOperationType operation_type = 5;
+
+    // The payment token of the instrument either one specific to the partner or one provisioned by an FI.
+    string payment_token = 6;
+
+    // A unique identifier at the Partner for this transaction.
+    string partner_transaction_ref = 7;
+
+    // How this transaction should be processed.
+    common.enums.channel.v1.Channel channel = 8;
+
+    // The 3-letter currency code defined in ISO 4217. Note all amounts are in this currency.
+    common.enums.currency.v1.Currency currency = 9;
+
+    // The organization this operation is being processed for.
+    string organization_key = 10;
+
+    // Organization category
+    common.enums.organizationcategory.v1.OrganizationCategory category = 11;
+
+    // The store where this operation occurred.
+    string store_key = 12;
+
+    // The clerk that processed this operation.
+    string clerk_identifier = 13;
+
+    // Total amount for this transaction.
+    //
+    // When Items are present then: `total_amount` = sum(`items.amount + items.tax_amount`)
+    common.v1.Amount total_amount = 14;
+
+    common.v1.Amount requested_amount = 15;
+
+    common.v1.Amount approved_amount = 16;
+
+    string order_number = 17;
+
+    // List of items bought or returned.
+    repeated LineItem line_items = 18;
+}
+
+message LineItem {
+    // unique number in a list of items that can be used to refer to a specific item
+    int32 sequence = 1;
+
+    string product_code = 2;
+
+    string description = 3;
+
+    // The total amount for this line item excluding tax.
+    common.v1.Amount amount = 4;
+
+    // The amount of tax for this line item.
+    common.v1.Amount tax_amount = 5;
+
+    common.enums.lineitemstatus.v1.LineItemStatus status = 6;
+}
+
+// Type that represents the details of the funds request (either to obtain or return).
+message FundsRequest {
+    // The payment token of the instrument either one specific to the partner or one provisioned by an FI.
+    string payment_token = 1;
+
+    // A unique identifier at the Partner for this transaction.
+    string partner_transaction_ref = 2;
+
+    // How this transaction should be processed.
+    common.enums.channel.v1.Channel channel = 3;
+
+    // The 3-letter currency code defined in ISO 4217. Note all amounts are in this currency.
+    common.enums.currency.v1.Currency currency = 4;
+
+    // The organization this operation is being processed for.
+    string organization_key = 5;
+
+    // Organization category
+    common.enums.organizationcategory.v1.OrganizationCategory category = 6;
+
+    // The store where this operation occurred.
+    string store_key = 7;
+
+    // The clerk that processed this operation.
+    string clerk_identifier = 8;
+
+    // Total amount for this transaction.
+    //
+    // When Items are present then: `total_amount` = sum(`items.amount + items.tax_amount`)
+    common.v1.Amount total_amount = 9;
+
+    string order_number = 10;
+
+    // List of items bought or returned.
+    repeated common.v1.LineItemRequest line_items = 11;
+}
+
+message ObtainFundsRequest {
+    common.enums.approvaltype.v1.ApprovalType approval_type = 1;
+
+    FundsRequest funds = 2;
+}
+
+message ObtainFundsResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        // An approval for the full amount
+        STATUS_APPROVED = 1;
+        // An error occurred when processing the request
+        STATUS_ERROR = 2;
+        // An approval was given for a partial amount
+        STATUS_PARTIAL_APPROVAL = 3;
+        // User instrument doesn't have sufficient funds to cover the transaction
+        STATUS_INSUFFICIENT_FUNDS = 4;
+        // When all products are either ineligible or age restricted
+        STATUS_INELIGIBLE_PRODUCTS = 5;
+        // Instrument/account not found
+        STATUS_NOT_FOUND = 6;
+        // User instrument is closed
+        STATUS_INSTRUMENT_CLOSED = 7;
+        // Request triggered a risk or fraud check resulting in a decline
+        STATUS_RISK_FRAUD = 8;
+        // The user needs to call the FI to resolve an issue
+        STATUS_USER_CALL_FI = 9;
+        // The operation isn't supported by the FI
+        STATUS_UNSUPPORTED = 10;
+        // The Fi is unavailable at this time
+        STATUS_FI_UNAVAILABLE = 11;
+        // The payment token sent is invalid or not found
+        STATUS_INVALID_TOKEN = 12;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    string transaction_key = 3;
+
+    common.v1.Amount approved_amount = 4;
+
+    repeated common.v1.LineItemResponse line_items = 5;
+}
+
+message ReturnFundsRequest {
+    FundsRequest funds = 1;
+}
+
+message ReturnFundsResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        // An approval for the full amount
+        STATUS_APPROVED = 1;
+        // An error occurred when processing the request
+        STATUS_ERROR = 2;
+        // User instrument is closed
+        STATUS_INSTRUMENT_CLOSED = 3;
+        // Instrument/account not found
+        STATUS_NOT_FOUND = 4;
+        // Request triggered a risk or fraud check resulting in a decline
+        STATUS_RISK_FRAUD = 5;
+        // The user needs to call the FI to resolve an issue
+        STATUS_USER_CALL_FI = 6;
+        // The operation isn't supported by the FI
+        STATUS_UNSUPPORTED = 7;
+        // The Fi is unavailable at this time
+        STATUS_FI_UNAVAILABLE = 8;
+        // The payment token sent is invalid or not found
+        STATUS_INVALID_TOKEN = 9;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    string transaction_key = 3;
+
+    common.v1.Amount approved_amount = 4;
+}
+
+message SearchFundsRequest {
+    // the paymentToken to find Funds operations for
+    string payment_token = 1;
+
+    // filter based on created date from (inclusive)
+    google.protobuf.Timestamp from = 2;
+
+    // filter based on created date to (exclusive)
+    google.protobuf.Timestamp to = 3;
+}
+
+message SearchFundsResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    // List of instruments that matched the search criteria.
+    repeated Funds funds = 3;
+}

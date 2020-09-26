@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package fi.fiaccount.v1;
+
+option go_package = "ten80/proto/fi/fiaccountv1";
+option java_package = "network.ten80.fi.fiaccount.v1";
+option java_outer_classname = "FIAccountProto";
+option objc_class_prefix = "TEN80";
+
+import "common/enums/accounttype/v1/account_type.proto";
+import "common/enums/currency/v1/currency.proto";
+import "common/v1/error.proto";
+import "google/protobuf/timestamp.proto";
+
+message FIAccount {
+    string fi_account_key = 1;
+
+    google.protobuf.Timestamp created = 2;
+
+    google.protobuf.Timestamp updated = 3;
+
+    int64 version = 4;
+
+    string fi_key = 5;
+
+    common.enums.accounttype.v1.AccountType account_type = 6;
+
+    common.enums.currency.v1.Currency currency = 7;
+}
+
+message GetFIAccountRequest {
+    string fi_account_key = 1;
+}
+
+message GetFIAccountResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    FIAccount fi_account = 3;
+}
+
+message SearchFIAccountRequest {
+    string fi_key = 1;
+
+    common.enums.accounttype.v1.AccountType account_type = 2;
+
+    common.enums.currency.v1.Currency currency = 3;
+}
+
+message SearchFIAccountResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    repeated FIAccount fi_accounts = 3;
+}

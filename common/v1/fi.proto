@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package common.v1;
+
+option go_package = "ten80/proto/common/v1;commonv1";
+option java_package = "network.ten80.common.v1";
+option java_outer_classname = "FIProto";
+option objc_class_prefix = "TEN80";
+
+import "google/protobuf/timestamp.proto";
+
+message FI {
+    // Primary key of this institution
+    string fi_key = 1;
+
+    // Date that the Store was created at 1080.
+    google.protobuf.Timestamp created = 2;
+
+    // Date that the Store was last updated at 1080.
+    google.protobuf.Timestamp updated = 3;
+
+    // Name of the Financial Institution.
+    string name = 4;
+}

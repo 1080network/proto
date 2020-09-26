@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+package fi.instrument.v1;
+
+option go_package = "ten80/proto/fi/instrumentv1";
+option java_package = "network.ten80.fi.instrument.v1";
+option java_outer_classname = "InstrumentProto";
+option objc_class_prefix = "TEN80";
+
+import "common/v1/amount.proto";
+import "common/v1/error.proto";
+import "common/enums/currency/v1/currency.proto";
+import "common/enums/instrumenttype/v1/instrument_type.proto";
+import "google/protobuf/timestamp.proto";
+
+message RegisterInstrumentRequest {
+    // The key representing this user in 1080.
+    string fi_user_key = 1;
+
+    // Primary key on the external system.
+    string fi_instrument_ref = 2;
+
+    common.enums.instrumenttype.v1.InstrumentType instrument_type = 3;
+
+    // The 3-letter currency code defined in ISO 4217.
+    common.enums.currency.v1.Currency currency = 4;
+
+    // Last 4 digits of this instrument.
+    string last_four = 5;
+
+    // List of previous settled transactions
+    repeated Transaction settled_transactions = 6;
+}
+
+message Transaction {
+    google.protobuf.Timestamp created = 1;
+
+    common.v1.Amount amount = 2;
+
+    string merchant_name = 3;
+}
+
+message RegisterInstrumentResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_DUPLICATE = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    // The key representing this instrument in 1080.
+    string fi_instrument_key = 3;
+
+    int64 version = 4;
+}
+
+message GetInstrumentRequest {
+    oneof criteria {
+        // The key representing this instrument in 1080.
+        string fi_instrument_key = 1;
+
+        // Primary key on the external system.
+        string fi_instrument_ref = 2;
+    }
+}
+
+message Instrument {
+    // The primary key that represents this instrument at 1080.
+    string fi_instrument_key = 1;
+
+    // version of the user record, used for optimistic locking
+    int64 version = 2;
+
+    // Date that the Store was created at 1080.
+    google.protobuf.Timestamp created = 3;
+
+    // Date that the Store was last updated at 1080.
+    google.protobuf.Timestamp updated = 4;
+
+    // Primary key on the external system.
+    string fi_instrument_ref = 5;
+
+    // The key that represents this user.
+    string fi_user_key = 6;
+
+    // Primary key on the external system.
+    string fi_user_ref = 7;
+
+    common.enums.instrumenttype.v1.InstrumentType instrument_type = 8;
+
+    // The 3-letter currency code defined in ISO 4217.
+    common.enums.currency.v1.Currency currency = 9;
+
+    // Last for characters of this instrument.
+    string last_four = 10;
+}
+
+message GetInstrumentResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    Instrument instrument = 3;
+}
+
+message RemoveInstrumentRequest {
+    oneof criteria {
+        // The key representing this instrument in 1080.
+        string fi_instrument_key = 1;
+
+        // Primary key on the external system.
+        string fi_instrument_ref = 2;
+    }
+}
+
+message RemoveInstrumentResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+}
+
+message SearchInstrumentRequest {
+    oneof criteria {
+        // The key representing this user in 1080.
+        string fi_user_key = 1;
+    }
+}
+
+message SearchInstrumentResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    // List of instruments that matched the search criteria.
+    repeated Instrument instruments = 3;
+}
+
+message RetrieveTransactionRequest {
+    // Primary key on the external system.
+    string fi_instrument_ref = 2;
+
+    // Transactions that occurred after this date (inclusive).
+    google.protobuf.Timestamp date_from = 4;
+
+    // Transactions that occurred before this date (exclusive).
+    google.protobuf.Timestamp date_to = 5;
+}
+
+message RetrieveTransactionResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_INSTRUMENT_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    // List of instruments that matched the search criteria.
+    repeated Transaction transactions = 3;
+}

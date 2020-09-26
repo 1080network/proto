@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package common.enums.paymenttokentype.v1;
+
+option go_package = "ten80/proto/common/enums/paymenttokentypev1";
+option java_package = "network.ten80.common.enums.v1";
+option java_outer_classname = "PaymentTokenTypeEnumProto";
+option objc_class_prefix = "TEN80";
+
+enum PaymentTokenType {
+    PAYMENT_TOKEN_TYPE_UNSPECIFIED = 0;
+    PAYMENT_TOKEN_TYPE_PARTNER = 1;
+    PAYMENT_TOKEN_TYPE_FI = 2;
+}

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package common.enums.channel.v1;
+
+option go_package = "ten80/proto/common/enums/channelv1";
+option java_package = "network.ten80.common.enums.v1";
+option java_outer_classname = "ChannelEnumProto";
+option objc_class_prefix = "TEN80";
+
+enum Channel {
+    CHANNEL_UNSPECIFIED = 0;
+
+    CHANNEL_DOMESTIC_ACH = 1;
+
+    CHANNEL_INTERNATIONAL_ACH = 2;
+
+    CHANNEL_WIRE_TRANSFER = 3;
+
+    CHANNEL_SWIFT_TRANSFER = 4;
+}

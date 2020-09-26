@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package fi.service.v1;
+
+option go_package = "ten80/proto/fi/servicev1";
+option java_package = "network.ten80.service.v1";
+option java_outer_classname = "FIServiceProto";
+option objc_class_prefix = "TEN80";
+
+import "fi/authenticate/v1/authenticate.proto";
+import "fi/fi/v1/fi.proto";
+import "fi/instrument/v1/instrument.proto";
+import "fi/organization/v1/organization.proto";
+import "fi/paymenttoken/v1/payment_token.proto";
+import "fi/ping/v1/ping.proto";
+import "fi/serviceaccount/v1/service_account.proto";
+import "fi/user/v1/user.proto";
+
+service FITo1080Service {
+    rpc Authenticate (authenticate.v1.AuthenticateRequest) returns (authenticate.v1.AuthenticateResponse) {
+    }
+
+    //<editor-fold desc="FI Operations">
+
+    rpc GetFI (fi.v1.GetFIRequest) returns (fi.v1.GetFIResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="User Operations">
+
+    rpc RegisterUser (user.v1.RegisterUserRequest) returns (user.v1.RegisterUserResponse) {
+    }
+
+    rpc GetUser (user.v1.GetUserRequest) returns (user.v1.GetUserResponse) {
+    }
+
+    rpc UpdateUser (user.v1.UpdateUserRequest) returns (user.v1.UpdateUserResponse) {
+    }
+
+    rpc RemoveUser (user.v1.RemoveUserRequest) returns (user.v1.RemoveUserResponse) {
+    }
+
+    rpc SearchUser (user.v1.SearchUserRequest) returns (user.v1.SearchUserResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Instrument Operations">
+
+    rpc RegisterInstrument (instrument.v1.RegisterInstrumentRequest) returns (instrument.v1.RegisterInstrumentResponse) {
+    }
+
+    rpc GetInstrument (instrument.v1.GetInstrumentRequest) returns (instrument.v1.GetInstrumentResponse) {
+    }
+
+    rpc RemoveInstrument (instrument.v1.RemoveInstrumentRequest) returns (instrument.v1.RemoveInstrumentResponse) {
+    }
+
+    rpc SearchInstrument (instrument.v1.SearchInstrumentRequest) returns (instrument.v1.SearchInstrumentResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Organization Operations">
+
+    rpc GetOrganization (organization.v1.GetOrganizationRequest) returns (organization.v1.GetOrganizationResponse) {
+    }
+
+    rpc SearchOrganization (organization.v1.SearchOrganizationRequest) returns (organization.v1.SearchOrganizationResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Payment Token Operations">
+
+    rpc ProvisionFIPaymentToken (paymenttoken.v1.ProvisionFIPaymentTokenRequest) returns (paymenttoken.v1.ProvisionFIPaymentTokenResponse) {
+    }
+
+    rpc RemoveFIPaymentToken (paymenttoken.v1.RemoveFIPaymentTokenRequest) returns (paymenttoken.v1.RemoveFIPaymentTokenResponse) {
+    }
+
+    rpc SearchFIPaymentToken (paymenttoken.v1.SearchFIPaymentTokenRequest) returns (paymenttoken.v1.SearchFIPaymentTokenResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Service Account Operations">
+
+    rpc CreateServiceAccount (serviceaccount.v1.CreateServiceAccountRequest) returns (serviceaccount.v1.CreateServiceAccountResponse) {
+    }
+
+    rpc GetServiceAccount (serviceaccount.v1.GetServiceAccountRequest) returns (serviceaccount.v1.GetServiceAccountResponse) {
+    }
+
+    rpc UpdateServiceAccount (serviceaccount.v1.UpdateServiceAccountRequest) returns (serviceaccount.v1.UpdateServiceAccountResponse) {
+    }
+
+    rpc SearchServiceAccount (serviceaccount.v1.SearchServiceAccountRequest) returns (serviceaccount.v1.SearchServiceAccountResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Admin Operations">
+
+    rpc Ping (service.v1.PingRequest) returns (service.v1.PingResponse) {
+    }
+
+    //</editor-fold>
+}
+

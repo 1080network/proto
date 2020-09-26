@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package partner.partneraccount.v1;
+
+option go_package = "ten80/proto/partner/partneraccountv1";
+option java_package = "network.ten80.partner.partneraccount.v1";
+option java_outer_classname = "PartnerAccountProto";
+option objc_class_prefix = "TEN80";
+
+import "common/enums/accounttype/v1/account_type.proto";
+import "common/enums/currency/v1/currency.proto";
+import "common/v1/error.proto";
+import "google/protobuf/timestamp.proto";
+
+message PartnerAccount {
+    string partner_account_key = 1;
+
+    google.protobuf.Timestamp created = 2;
+
+    google.protobuf.Timestamp updated = 3;
+
+    int64 version = 4;
+
+    string partner_key = 5;
+
+    common.enums.accounttype.v1.AccountType account_type = 6;
+
+    common.enums.currency.v1.Currency currency = 7;
+}
+
+message GetPartnerAccountRequest {
+    string partner_account_key = 1;
+}
+
+message GetPartnerAccountResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    PartnerAccount partner_account = 3;
+}
+
+message SearchPartnerAccountRequest {
+    common.enums.accounttype.v1.AccountType account_type = 1;
+
+    common.enums.currency.v1.Currency currency = 2;
+}
+
+message SearchPartnerAccountResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    repeated PartnerAccount partner_accounts = 3;
+}

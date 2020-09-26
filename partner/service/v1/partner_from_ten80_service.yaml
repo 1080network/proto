@@ -1,0 +1,29 @@
+service:
+  title: "Service implemented by Partner"
+  version: "0.1"
+  description: >-
+    <p>This service is implemented by the Partner which can be called by 1080. It provides a way for
+    a user of 1080 to make a direct enrollment with a Partner rather than going to the partner first
+    to do the enrollment.</p>
+  contact:
+    name: "1080"
+    url: "https://dev.1080payments.com"
+    email: "info@1080payments.com"
+
+operations:
+  - rpc: "EnrollUserInstrument"
+    operationId: "Enroll User Instrument"
+    post: "/partner/user/enroll"
+    description: >-
+      <p>Provide a way for a User to directly enroll with a Partner without having to do so at the
+      Partner. For example, a User starting at the 1080 user website could sign up for Netflix
+      assuming that Netflix supported 1080 and have implemented this API.</p>
+    tags: "enroll"
+    security: "Authenticate"
+
+  - rpc: "PingPartner"
+    operationId: "Ping Partner"
+    post: "/admin/ping"
+    description: >-
+      <p>An operation to ping the server to ensure it's up and running and that the connection is good.</p>
+    tags: "funds"
