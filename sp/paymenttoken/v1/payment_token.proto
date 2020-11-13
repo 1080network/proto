@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package sp.paymenttoken.v1;
+
+option go_package = "ten80/proto/sp/paymenttokenv1";
+option java_package = "network.ten80.sp.paymenttoken.v1";
+option java_outer_classname = "ProvisionSPPaymentTokenProto";
+option objc_class_prefix = "TEN80";
+
+import "common/v1/error.proto";
+import "common/v1/payment_token.proto";
+
+message PaymentToken {
+    // 1080 generated key for the user that owns this token
+    string sp_user_key = 1;
+
+    // the primary key of this user at the SP
+    string sp_user_ref = 2;
+
+    // 1080 generated key for the instrument that this token represents
+    string sp_instrument_key = 3;
+
+    // the primary key of this instrument at the SP
+    string sp_instrument_ref = 4;
+
+    common.v1.CommonPaymentToken payment_token = 5;
+}
+
+// to 1080
+message ProvisionSPPaymentTokenRequest {
+    oneof criteria {
+        // The key representing this instrument in 1080.
+        string sp_instrument_key = 1;
+
+        // Primary key on the external system.
+        string sp_instrument_ref = 2;
+    }
+}
+
+message ProvisionSPPaymentTokenResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_INSTRUMENT_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    // A payment token that can be used at all partners.
+    string sp_payment_token = 3;
+}
+
+message RemoveSPPaymentTokenRequest {
+    oneof criteria {
+        // The key representing this instrument in 1080.
+        string sp_instrument_key = 1;
+
+        // Primary key on the external system.
+        string sp_instrument_ref = 2;
+
+        // A payment token that can be used at all partners.
+        string sp_payment_token = 3;
+    }
+}
+
+message RemoveSPPaymentTokenResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    repeated string sp_payment_tokens = 3;
+}
+
+message SearchSPPaymentTokenRequest {
+    string sp_user_key = 1;
+
+    string sp_instrument_key = 2;
+}
+
+message SearchSPPaymentTokenResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    repeated PaymentToken payment_tokens = 3;
+}

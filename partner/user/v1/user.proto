@@ -28,7 +28,7 @@ message EnrollUserInstrumentRequest {
     // The payment token that the Partner can use to obtain or return funds for this user.
     string partner_payment_token = 1;
 
-    common.v1.UserDemographic user = 2;
+    common.v1.UserDemographic user_demographic = 2;
 }
 
 message EnrollUserInstrumentResponse {
@@ -47,22 +47,4 @@ message EnrollUserInstrumentResponse {
 
     // Primary key on the external system.
     string partner_instrument_ref = 3;
-}
-
-message SearchUserInstrumentRequest {
-    // Primary key on the external system.
-    string partner_instrument_ref = 1;
-}
-
-message SearchUserInstrumentResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-    }
-    Status status = 1;
-
-    common.v1.Error error = 2;
-
-    repeated User users = 3;
 }

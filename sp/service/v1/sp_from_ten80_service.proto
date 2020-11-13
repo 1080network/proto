@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package sp.service.v1;
+
+option go_package = "ten80/proto/sp/servicev1";
+option java_package = "network.ten80.service.v1";
+option java_outer_classname = "SPServiceProto";
+option objc_class_prefix = "TEN80";
+
+import "sp/funds/v1/funds.proto";
+import "sp/instrument/v1/instrument.proto";
+import "sp/user/v1/user.proto";
+import "sp/ping/v1/ping.proto";
+
+service SPFrom1080Service {
+    rpc EnrollUserInstrument (user.v1.EnrollUserInstrumentRequest) returns (user.v1.EnrollUserInstrumentResponse) {
+    }
+
+    rpc RetrieveTransaction (instrument.v1.RetrieveTransactionRequest) returns (instrument.v1.RetrieveTransactionResponse) {
+    }
+
+    //<editor-fold desc="Funds Operations">
+
+    rpc ObtainFunds (funds.v1.ObtainFundsRequest) returns (funds.v1.ObtainFundsResponse) {
+    }
+
+    rpc ReturnFunds (funds.v1.ReturnFundsRequest) returns (funds.v1.ReturnFundsResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Admin Operations">
+
+    rpc PingSP (service.v1.PingSPRequest) returns (service.v1.PingSPResponse) {
+    }
+
+    //</editor-fold>
+}
+

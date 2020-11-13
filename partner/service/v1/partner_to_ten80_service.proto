@@ -8,7 +8,6 @@ option java_outer_classname = "PartnerServiceProto";
 option objc_class_prefix = "TEN80";
 
 import "partner/authenticate/v1/authenticate.proto";
-import "partner/fi/v1/fi.proto";
 import "partner/funds/v1/funds.proto";
 import "partner/instrument/v1/instrument.proto";
 import "partner/organization/v1/organization.proto";
@@ -16,8 +15,9 @@ import "partner/partner/v1/partner.proto";
 import "partner/paymenttoken/v1/payment_token.proto";
 import "partner/ping/v1/ping.proto";
 import "partner/serviceaccount/v1/service_account.proto";
+import "partner/sp/v1/sp.proto";
 import "partner/store/v1/store.proto";
-import "partner/user/v1/user.proto";
+import "partner/widget/v1/widget.proto";
 
 service PartnerTo1080Service {
     rpc Authenticate (authenticate.v1.AuthenticateRequest) returns (authenticate.v1.AuthenticateResponse) {
@@ -71,9 +71,9 @@ service PartnerTo1080Service {
     }
     //</editor-fold>
 
-    //<editor-fold desc="FI Operations">
+    //<editor-fold desc="SP Operations">
 
-    rpc SearchFI (fi.v1.SearchFIRequest) returns (fi.v1.SearchFIResponse) {
+    rpc SearchSP (sp.v1.SearchSPRequest) returns (sp.v1.SearchSPResponse) {
     }
     //</editor-fold>
 
@@ -91,13 +91,7 @@ service PartnerTo1080Service {
     rpc ReplacePaymentToken (paymenttoken.v1.ExchangePaymentTokenRequest) returns (paymenttoken.v1.ExchangePaymentTokenResponse) {
     }
 
-    rpc SearchPartnerPaymentToken (paymenttoken.v1.SearchPartnerPaymentTokenRequest) returns (paymenttoken.v1.SearchPartnerPaymentTokenResponse) {
-    }
-    //</editor-fold>
-
-    //<editor-fold desc="User Operations">
-
-    rpc SearchUserInstrument (user.v1.SearchUserInstrumentRequest) returns (user.v1.SearchUserInstrumentResponse) {
+    rpc SearchPaymentToken (paymenttoken.v1.SearchPaymentTokenRequest) returns (paymenttoken.v1.SearchPaymentTokenResponse) {
     }
     //</editor-fold>
 
@@ -117,7 +111,11 @@ service PartnerTo1080Service {
 
     rpc Ping (service.v1.PingRequest) returns (service.v1.PingResponse) {
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Widget Operations">
+
+    rpc InitializeWidget (widget.v1.InitializeWidgetRequest) returns (widget.v1.InitializeWidgetResponse) {
+    }
     //</editor-fold>
 }
-

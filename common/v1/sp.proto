@@ -4,24 +4,21 @@ package common.v1;
 
 option go_package = "ten80/proto/common/v1;commonv1";
 option java_package = "network.ten80.common.v1";
-option java_outer_classname = "ServiceAccountProto";
+option java_outer_classname = "SPProto";
 option objc_class_prefix = "TEN80";
 
 import "google/protobuf/timestamp.proto";
 
-message ServiceAccount {
-    string service_account_key = 1;
+message SP {
+    // Primary key of this institution
+    string sp_key = 1;
 
+    // Date that the Store was created at 1080.
     google.protobuf.Timestamp created = 2;
 
+    // Date that the Store was last updated at 1080.
     google.protobuf.Timestamp updated = 3;
 
-    int64 version = 4;
-
-    string username = 5;
-
-    string partner_key = 6;
-
-    string sp_key = 7;
+    // Name of the Service Provider.
+    string name = 4;
 }
-

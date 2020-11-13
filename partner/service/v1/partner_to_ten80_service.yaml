@@ -106,21 +106,21 @@ operations:
     tags: "store"
     security: "Authenticate"
 
-  - rpc: "SearchFI"
-    operationId: "Search FI"
-    post: "/partner/fi/search"
+  - rpc: "SearchSP"
+    operationId: "Search SP"
+    post: "/partner/sp/search"
     description: >-
-      <p>Used to retrieve FIs based on the criteria in the request.</p>
-    tags: "fi"
+      <p>Used to retrieve SPs based on the criteria in the request.</p>
+    tags: "sp"
     security: "Authenticate"
 
   - rpc: "RegisterInstrumentInitiate"
     operationId: "Register Instrument Initiate"
     post: "/partner/instrument/register/initiate"
     description: >-
-      <p>Start the registration process of a user after they have selected the desired FI. The
-      caller supplies 1080 with the users demographic data, the FI and optionally the last 4 of the
-      users instrument (account) at the FI.</p>
+      <p>Start the registration process of a user after they have selected the desired SP. The
+      caller supplies 1080 with the users demographic data, the SP and optionally the last 4 of the
+      users instrument (account) at the SP.</p>
     tags: "instrument"
     security: "Authenticate"
   - rpc: "RegisterInstrumentComplete"
@@ -128,7 +128,7 @@ operations:
     post: "/partner/instrument/register/complete"
     description: >-
       <p>The second and final step in enrolling a user. It requires the user to present the matching
-      code that they received from their FI.</p>
+      code that they received from their SP.</p>
     tags: "instrument"
     security: "Authenticate"
   - rpc: "ClosePaymentToken"

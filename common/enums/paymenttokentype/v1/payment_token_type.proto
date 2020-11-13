@@ -10,5 +10,5 @@ option objc_class_prefix = "TEN80";
 enum PaymentTokenType {
     PAYMENT_TOKEN_TYPE_UNSPECIFIED = 0;
     PAYMENT_TOKEN_TYPE_PARTNER = 1;
-    PAYMENT_TOKEN_TYPE_FI = 2;
+    PAYMENT_TOKEN_TYPE_SP = 2;
 }

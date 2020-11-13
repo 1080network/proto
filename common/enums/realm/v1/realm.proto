@@ -12,7 +12,7 @@ enum Realm {
 
     REALM_ADMIN = 1;
 
-    REALM_FINANCIAL_INSTITUTION = 2;
+    REALM_SERVICE_PROVIDER = 2;
 
     REALM_PARTNER = 3;
 

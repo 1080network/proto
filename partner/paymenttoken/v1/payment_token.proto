@@ -56,11 +56,11 @@ message ExchangePaymentTokenResponse {
     string partner_payment_token = 3;
 }
 
-message SearchPartnerPaymentTokenRequest {
+message SearchPaymentTokenRequest {
     string partner_instrument_ref = 1;
 }
 
-message SearchPartnerPaymentTokenResponse {
+message SearchPaymentTokenResponse {
     enum Status {
         STATUS_UNSPECIFIED = 0;
         STATUS_SUCCESS = 1;
