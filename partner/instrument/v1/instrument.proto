@@ -1,3 +1,11 @@
+// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of 1080 Network, Inc. and are [should this be is?] protected by
+// copyright, trademark and other intellectual property laws (collective “1080 Software”). You may not use, copy,
+// reproduce, download, store, post, broadcast, transmit, modify, sell or make available to the public content from the
+// 1080 Software without the prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of 1080 Network, Inc. and may not be used without
+// permission.
+
 syntax = "proto3";
 
 package partner.instrument.v1;
@@ -8,80 +16,16 @@ option java_outer_classname = "InstrumentProto";
 option objc_class_prefix = "TEN80";
 
 import "common/v1/error.proto";
-import "common/v1/user.proto";
 
-message RegisterInstrumentInitiateRequest {
+message ExchangeSessionKeyRequest {
+    // The session key that was established when the Widget was initialized
+    string session_key = 1;
+
     // Primary key on the external system.
-    string partner_instrument_ref = 1;
-
-    // The financial institution which holds this account/instrument.
-    string sp_key = 2;
-
-    // Details of the user.
-    common.v1.UserDemographic user_demographic = 3;
-
-    oneof account_identifier {
-        ConnectDetails connect_details = 4;
-
-        AccountCredentials account_credentials = 5;
-
-        AccountNumber account_number = 6;
-    }
+    string partner_instrument_ref = 2;
 }
 
-message ConnectDetails {
-    // Last 4 digits of this instrument.
-    string last_four = 1;
-}
-
-message AccountCredentials {
-    // The username for this person at the users SP
-    string username = 1;
-
-    // The password for this person at the users SP
-    string password = 2;
-}
-
-message AccountNumber {
-    string routing_number = 1;
-
-    string account_number = 2;
-}
-
-message RegisterInstrumentInitiateResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-
-        STATUS_SUCCESS = 1;
-        // generic error that's not one of the following
-        STATUS_ERROR = 2;
-        // The SP that holds this instrument is temporarily unavailable
-        STATUS_SP_UNAVAILABLE = 3;
-        // this is the second attempt to register this instrument
-        STATUS_DUPLICATE = 4;
-        // the SP the user selected doesn't exist
-        STATUS_SP_NOT_FOUND = 5;
-        // the instrument was not found
-        STATUS_NOT_FOUND = 6;
-        // the instrument was closed at the SP
-        STATUS_CLOSED = 7;
-        // the instrument is in a temporary SP risk/fraud state
-        STATUS_RISK_FRAUD = 8;
-    }
-    Status status = 1;
-
-    common.v1.Error error = 2;
-
-    // The matching code sent to the Service Provider. Only returned in non-production environments.
-    string matching_code = 3;
-}
-
-message RegisterInstrumentCompleteRequest {
-    // The matching code sent from the users Service Provider and given by the user.
-    string matching_code = 1;
-}
-
-message RegisterInstrumentCompleteResponse {
+message ExchangeSessionKeyResponse {
     enum Status {
         STATUS_UNSPECIFIED = 0;
         STATUS_SUCCESS = 1;
@@ -95,4 +39,3 @@ message RegisterInstrumentCompleteResponse {
     // The payment token that the Partner can use to obtain or return funds for this user.
     string partner_payment_token = 3;
 }
-

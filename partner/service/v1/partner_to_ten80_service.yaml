@@ -146,8 +146,8 @@ operations:
       <p>A Partner can proactively replace a payment token with a new one for future use.</p>
     tags: "instrument"
     security: "Authenticate"
-  - rpc: "SearchPartnerPaymentToken"
-    operationId: "Search Partner Payment Token"
+  - rpc: "SearchPaymentToken"
+    operationId: "Search  Payment Token"
     post: "/partner/payment-token/search"
     description: >-
       <p>Search for Payment Tokens that the Partner has created.</p>
@@ -192,3 +192,18 @@ operations:
     description: >-
       <p>An operation to ping the server to ensure it's up and running and that the connection is good.</p>
     tags: "funds"
+
+  - rpc: "InitializeWidget"
+    operationId: "Initialize Widget"
+    post: "/partner/widget/initialize"
+    description: >-
+      <todo>
+    tags: "widget"
+    security: "Authenticate"
+  - rpc: "ExchangeSessionKey"
+    operationId: "Exchange Session Key"
+    post: "/partner/widget/session-key/exchange"
+    description: >-
+      <todo>
+    tags: "widget"
+    security: "Authenticate"

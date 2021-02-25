@@ -1,0 +1,53 @@
+// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of 1080 Network, Inc. and are [should this be is?] protected by
+// copyright, trademark and other intellectual property laws (collective “1080 Software”). You may not use, copy,
+// reproduce, download, store, post, broadcast, transmit, modify, sell or make available to the public content from the
+// 1080 Software without the prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of 1080 Network, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package connect.service.v1;
+
+option go_package = "ten80/proto/connect/servicev1";
+
+import "connect/instrument/v1/instrument.proto";
+import "common/ping/v1/ping.proto";
+import "connect/staticdata/v1/static_data.proto";
+import "connect/serviceprovider/v1/service_provider.proto";
+
+// Legacy Connect and Connect
+service ConnectService {
+    rpc GetStaticData (staticdata.v1.GetStaticDataRequest) returns (staticdata.v1.GetStaticDataResponse) {
+    }
+
+    //<editor-fold desc="SP Operations">
+
+    rpc SearchServiceProvider (serviceprovider.v1.SearchServiceProviderRequest) returns (serviceprovider.v1.SearchServiceProviderResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Instrument Operations">
+
+    rpc WidgetRegisterInstrumentInitiate (instrument.v1.WidgetRegisterInstrumentInitiateRequest) returns (instrument.v1.WidgetRegisterInstrumentInitiateResponse) {
+    }
+
+    // optional call required when user uses username/password and they have more than one account at the service
+    // provider
+    rpc WidgetRegisterInstrumentWithAccount (instrument.v1.WidgetRegisterInstrumentWithAccountRequest) returns (instrument.v1.WidgetRegisterInstrumentWithAccountResponse) {
+    }
+
+    rpc WidgetRegisterInstrumentComplete (instrument.v1.WidgetRegisterInstrumentCompleteRequest) returns (instrument.v1.WidgetRegisterInstrumentCompleteResponse) {
+    }
+
+    rpc WidgetRibbitRegisterInstrumentInitiate (instrument.v1.WidgetRibbitRegisterInstrumentInitiateRequest) returns (instrument.v1.WidgetRibbitRegisterInstrumentInitiateResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Admin Operations">
+
+    rpc Ping (common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {
+    }
+    //</editor-fold>
+}

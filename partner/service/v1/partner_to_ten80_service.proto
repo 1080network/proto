@@ -1,3 +1,11 @@
+// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of 1080 Network, Inc. and are [should this be is?] protected by
+// copyright, trademark and other intellectual property laws (collective “1080 Software”). You may not use, copy,
+// reproduce, download, store, post, broadcast, transmit, modify, sell or make available to the public content from the
+// 1080 Software without the prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of 1080 Network, Inc. and may not be used without
+// permission.
+
 syntax = "proto3";
 
 package partner.service.v1;
@@ -7,20 +15,20 @@ option java_package = "network.ten80.partner.service.v1";
 option java_outer_classname = "PartnerServiceProto";
 option objc_class_prefix = "TEN80";
 
-import "partner/authenticate/v1/authenticate.proto";
+import "common/authenticate/v1/authenticate.proto";
+import "common/ping/v1/ping.proto";
 import "partner/funds/v1/funds.proto";
 import "partner/instrument/v1/instrument.proto";
 import "partner/organization/v1/organization.proto";
 import "partner/partner/v1/partner.proto";
 import "partner/paymenttoken/v1/payment_token.proto";
-import "partner/ping/v1/ping.proto";
 import "partner/serviceaccount/v1/service_account.proto";
 import "partner/sp/v1/sp.proto";
 import "partner/store/v1/store.proto";
 import "partner/widget/v1/widget.proto";
 
 service PartnerTo1080Service {
-    rpc Authenticate (authenticate.v1.AuthenticateRequest) returns (authenticate.v1.AuthenticateResponse) {
+    rpc Authenticate (common.authenticate.v1.AuthenticateRequest) returns (common.authenticate.v1.AuthenticateResponse) {
     }
 
     //<editor-fold desc="Partner Operations">
@@ -77,13 +85,7 @@ service PartnerTo1080Service {
     }
     //</editor-fold>
 
-    //<editor-fold desc="Instrument Operations">
-
-    rpc RegisterInstrumentInitiate (instrument.v1.RegisterInstrumentInitiateRequest) returns (instrument.v1.RegisterInstrumentInitiateResponse) {
-    }
-
-    rpc RegisterInstrumentComplete (instrument.v1.RegisterInstrumentCompleteRequest) returns (instrument.v1.RegisterInstrumentCompleteResponse) {
-    }
+    //<editor-fold desc="Payment Token Operations">
 
     rpc ClosePaymentToken (paymenttoken.v1.RemovePaymentTokenRequest) returns (paymenttoken.v1.RemovePaymentTokenResponse) {
     }
@@ -109,13 +111,16 @@ service PartnerTo1080Service {
 
     //<editor-fold desc="Admin Operations">
 
-    rpc Ping (service.v1.PingRequest) returns (service.v1.PingResponse) {
+    rpc Ping (common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {
     }
     //</editor-fold>
 
     //<editor-fold desc="Widget Operations">
 
     rpc InitializeWidget (widget.v1.InitializeWidgetRequest) returns (widget.v1.InitializeWidgetResponse) {
+    }
+
+    rpc ExchangeSessionKey (instrument.v1.ExchangeSessionKeyRequest) returns (instrument.v1.ExchangeSessionKeyResponse) {
     }
     //</editor-fold>
 }

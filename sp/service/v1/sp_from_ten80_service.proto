@@ -1,3 +1,11 @@
+// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of 1080 Network, Inc. and are [should this be is?] protected by
+// copyright, trademark and other intellectual property laws (collective “1080 Software”). You may not use, copy,
+// reproduce, download, store, post, broadcast, transmit, modify, sell or make available to the public content from the
+// 1080 Software without the prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of 1080 Network, Inc. and may not be used without
+// permission.
+
 syntax = "proto3";
 
 package sp.service.v1;
@@ -7,10 +15,10 @@ option java_package = "network.ten80.service.v1";
 option java_outer_classname = "SPServiceProto";
 option objc_class_prefix = "TEN80";
 
+import "common/ping/v1/ping.proto";
 import "sp/funds/v1/funds.proto";
 import "sp/instrument/v1/instrument.proto";
 import "sp/user/v1/user.proto";
-import "sp/ping/v1/ping.proto";
 
 service SPFrom1080Service {
     rpc EnrollUserInstrument (user.v1.EnrollUserInstrumentRequest) returns (user.v1.EnrollUserInstrumentResponse) {
@@ -30,9 +38,8 @@ service SPFrom1080Service {
 
     //<editor-fold desc="Admin Operations">
 
-    rpc PingSP (service.v1.PingSPRequest) returns (service.v1.PingSPResponse) {
+    rpc Ping (common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {
     }
-
     //</editor-fold>
 }
 

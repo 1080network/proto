@@ -1,0 +1,30 @@
+// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of 1080 Network, Inc. and are [should this be is?] protected by
+// copyright, trademark and other intellectual property laws (collective “1080 Software”). You may not use, copy,
+// reproduce, download, store, post, broadcast, transmit, modify, sell or make available to the public content from the
+// 1080 Software without the prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of 1080 Network, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package common.v1;
+
+option go_package = "ten80/proto/common/v1;commonv1";
+option java_package = "network.ten80.common.v1";
+option java_outer_classname = "ConnectProto";
+option objc_class_prefix = "TEN80";
+
+message BankAccountCredentials {
+    // The username for this person at the users SP
+    string username = 1;
+
+    // The password for this person at the users SP
+    string password = 2;
+}
+
+message BankAccountNumber {
+    string routing_number = 1;
+
+    string account_number = 2;
+}

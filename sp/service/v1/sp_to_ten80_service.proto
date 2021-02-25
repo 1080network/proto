@@ -1,3 +1,11 @@
+// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of 1080 Network, Inc. and are [should this be is?] protected by
+// copyright, trademark and other intellectual property laws (collective “1080 Software”). You may not use, copy,
+// reproduce, download, store, post, broadcast, transmit, modify, sell or make available to the public content from the
+// 1080 Software without the prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of 1080 Network, Inc. and may not be used without
+// permission.
+
 syntax = "proto3";
 
 package sp.service.v1;
@@ -7,16 +15,16 @@ option java_package = "network.ten80.service.v1";
 option java_outer_classname = "SPServiceProto";
 option objc_class_prefix = "TEN80";
 
-import "sp/authenticate/v1/authenticate.proto";
-import "sp/sp/v1/sp.proto";
+import "common/authenticate/v1/authenticate.proto";
+import "common/ping/v1/ping.proto";
 import "sp/instrument/v1/instrument.proto";
 import "sp/paymenttoken/v1/payment_token.proto";
-import "sp/ping/v1/ping.proto";
 import "sp/serviceaccount/v1/service_account.proto";
+import "sp/sp/v1/sp.proto";
 import "sp/user/v1/user.proto";
 
 service SPTo1080Service {
-    rpc Authenticate (authenticate.v1.AuthenticateRequest) returns (authenticate.v1.AuthenticateResponse) {
+    rpc Authenticate (common.authenticate.v1.AuthenticateRequest) returns (common.authenticate.v1.AuthenticateResponse) {
     }
 
     //<editor-fold desc="SP Operations">
@@ -87,9 +95,8 @@ service SPTo1080Service {
 
     //<editor-fold desc="Admin Operations">
 
-    rpc Ping (service.v1.PingRequest) returns (service.v1.PingResponse) {
+    rpc Ping (common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {
     }
-
     //</editor-fold>
 }
 

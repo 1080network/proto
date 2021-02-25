@@ -1,0 +1,42 @@
+// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of 1080 Network, Inc. and are [should this be is?] protected by
+// copyright, trademark and other intellectual property laws (collective “1080 Software”). You may not use, copy,
+// reproduce, download, store, post, broadcast, transmit, modify, sell or make available to the public content from the
+// 1080 Software without the prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of 1080 Network, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package common.authenticate.v1;
+
+option go_package = "ten80/proto/common/authenticatev1";
+option java_package = "network.ten80.common.authenticate.v1";
+option java_outer_classname = "AuthenticateProto";
+option objc_class_prefix = "TEN80";
+
+import "common/v1/error.proto";
+import "common/enums/realm/v1/realm.proto";
+
+message AuthenticateRequest {
+    common.enums.realm.v1.Realm realm = 1;
+
+    string username = 2;
+
+    string password = 3;
+}
+
+message AuthenticateResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_ACCOUNT_CLOSED = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    // JWT
+    string token = 3;
+}

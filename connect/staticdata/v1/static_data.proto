@@ -1,0 +1,41 @@
+// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of 1080 Network, Inc. and are [should this be is?] protected by
+// copyright, trademark and other intellectual property laws (collective “1080 Software”). You may not use, copy,
+// reproduce, download, store, post, broadcast, transmit, modify, sell or make available to the public content from the
+// 1080 Software without the prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of 1080 Network, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package connect.staticdata.v1;
+
+option go_package = "ten80/proto/connect/staticdatav1";
+option java_package = "network.connect.connect.staticdata.v1";
+option java_outer_classname = "StaticDataProto";
+option objc_class_prefix = "TEN80";
+
+import "common/enums/serviceprovidertype/v1/service_provider_type.proto";
+import "common/v1/error.proto";
+
+message GetStaticDataRequest {
+}
+
+message GetStaticDataResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    repeated ServiceProviderTypeMetadata service_provider_type_metadata = 3;
+}
+
+message ServiceProviderTypeMetadata {
+    common.enums.serviceprovidertype.v1.ServiceProviderType service_provider_type = 1;
+
+    string public_key = 2;
+}

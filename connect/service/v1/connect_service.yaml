@@ -1,0 +1,67 @@
+service:
+  title: "1080 Internal Connect Service"
+  version: "0.1"
+  description: >-
+    Description needed
+  contact:
+    name: "1080"
+    url: "https://dev.1080payments.com"
+    email: "info@1080payments.com"
+
+operations:
+  - rpc: "GetStaticData"
+    operationId: "Get Static Data"
+    post: "/connect/static-data/get"
+    description: >-
+      Retrieve systems static data which is used to drive UI behavior. This includes the public keys for the various
+      service provider types. Called from Widget.
+    tags: "static"
+
+  - rpc: "SearchServiceProvider"
+    operationId: "Search Service Provider"
+    post: "/connect/service-provider/search"
+    description: >-
+      Find Service Providers that match a given name. This includes pagination. Called by the 1080 Widget to populate
+      the list of Service Providers the user can choose from. Called from Widget.
+    tags: "service-provider"
+    security: "Authenticate"
+
+  - rpc: "WidgetRegisterInstrumentInitiate"
+    operationId: "Widget Register Instrument Initiate"
+    post: "/connect/widget/register-instrument/initiate"
+    description: >-
+      Following the call from Partner to InitializeWidget, this call is the first one that the Widget makes after the
+      user has provided the necessary details to determine their identity. It returns a list of instruments that the
+      user has. Called from Widget.
+    tags: "widget"
+    security: "Authenticate"
+  - rpc: "WidgetRegisterInstrumentWithAccount"
+    operationId: "Widget Register Instrument With Account"
+    post: "/connect/widget/register-instrument/with-account"
+    description: >-
+      In cases where the user has more than on instrument with a given Service Provider this call is needed to identify
+      which one the user wants to enroll. Called from Widget.
+    tags: "widget"
+    security: "Authenticate"
+  - rpc: "WidgetRegisterInstrumentComplete"
+    operationId: "Widget Register Instrument Complete"
+    post: "/connect/widget/register-instrument/complete"
+    description: >-
+      The final call the Widget makes for either the 1080 Matching Code or Ribbit's Account Token. Called from Widget.
+    tags: "widget"
+    security: "Authenticate"
+  - rpc: "WidgetRibbitRegisterInstrumentInitiate"
+    operationId: "Widget Register Instrument Complete"
+    post: "/connect/widget/ribbit/register-instrument/initiate"
+    description: >-
+      When a user chooses a Ribbit Service Provider, this call is used to initialize the Ribbit Widget. It returns the
+      JavaScript script along with the Ribbit Institution ID. Called from Widget.
+    tags: "widget"
+    security: "Authenticate"
+
+  - rpc: "Ping"
+    operationId: "Ping"
+    post: "/admin/ping"
+    description: >-
+      <p>An operation to ping the server to ensure it's up and running and that the connection is good.</p>
+    tags: "funds"
