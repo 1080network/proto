@@ -1,18 +1,19 @@
-// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
-// code and object code, is the intellectual property of 1080 Network, Inc. and are protected by copyright, trademark
-// and other intellectual property laws (collective “1080 Software”). You may not use, copy, reproduce, download, store,
-// post, broadcast, transmit, modify, sell or make available to the public content from the 1080 Software without the
-// prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines, products, feature names, and
-// other trademarks are trademarks of 1080 Network, Inc. and may not be used without permission.
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
 
 syntax = "proto3";
 
 package sp.user.v1;
 
-option go_package = "ten80/proto/sp/userv1";
-option java_package = "network.ten80.sp.user.v1";
+option go_package = "mica/proto/sp/userv1";
+option java_package = "network.mica.sp.user.v1";
 option java_outer_classname = "UserProto";
-option objc_class_prefix = "TEN80";
+option objc_class_prefix = "MICA";
 
 import "common/v1/error.proto";
 import "common/v1/user.proto";
@@ -22,13 +23,13 @@ message User {
     // version of the user record, used for optimistic locking
     int64 version = 1;
 
-    // Date that the Store was created at 1080.
+    // Date that the Store was created at Mica.
     google.protobuf.Timestamp created = 2;
 
-    // Date that the Store was last updated at 1080.
+    // Date that the Store was last updated at Mica.
     google.protobuf.Timestamp updated = 3;
 
-    // The key representing this user in 1080.
+    // The key representing this user in Mica.
     string sp_user_key = 4;
 
     // Primary key on the external system.
@@ -37,7 +38,7 @@ message User {
     common.v1.UserDemographic user_demographic = 6;
 }
 
-// to 1080
+// to Mica
 
 message RegisterUserRequest {
     // Primary key on the external system.
@@ -57,14 +58,14 @@ message RegisterUserResponse {
 
     common.v1.Error error = 2;
 
-    // The key representing this user in 1080.
+    // The key representing this user in Mica.
     string sp_user_key = 3;
 
     int64 version = 4;
 }
 
 message UpdateUserRequest {
-    // The key representing this user in 1080.
+    // The key representing this user in Mica.
     string sp_user_key = 1;
 
     int64 version = 2;
@@ -88,7 +89,7 @@ message UpdateUserResponse {
 }
 
 message RemoveUserRequest {
-    // The key representing this user in 1080.
+    // The key representing this user in Mica.
     string sp_user_key = 1;
 }
 
@@ -106,7 +107,7 @@ message RemoveUserResponse {
 
 message GetUserRequest {
     oneof criteria {
-        // The key representing this user in 1080.
+        // The key representing this user in Mica.
         string sp_user_key = 1;
 
         // Primary key on the external system.
@@ -129,7 +130,7 @@ message GetUserResponse {
 }
 
 message SearchUserRequest {
-    // The key representing this user in 1080.
+    // The key representing this user in Mica.
     string sp_user_key = 1;
 
     string first_name = 2;
@@ -152,16 +153,16 @@ message SearchUserResponse {
     repeated User users = 3;
 }
 
-// from 1080
+// from Mica
 
 message EnrollUserInstrumentRequest {
-    // The key representing this user in 1080.
+    // The key representing this user in Mica.
     string sp_user_key = 1;
 
     // Primary key on the external system.
     string sp_user_ref = 2;
 
-    // The key representing this instrument in 1080.
+    // The key representing this instrument in Mica.
     string sp_instrument_key = 3;
 
     // Primary key on the external system.

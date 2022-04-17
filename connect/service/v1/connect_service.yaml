@@ -1,12 +1,12 @@
 service:
-  title: "1080 Internal Connect Service"
+  title: "mica Internal Connect Service"
   version: "0.1"
   description: >-
     Description needed
   contact:
-    name: "1080"
-    url: "https://dev.1080payments.com"
-    email: "info@1080payments.com"
+    name: "mica"
+    url: "https://dev.mica.io"
+    email: "info@mica.io"
 
 operations:
   - rpc: "GetStaticData"
@@ -21,7 +21,7 @@ operations:
     operationId: "Search Service Provider"
     post: "/connect/service-provider/search"
     description: >-
-      Find Service Providers that match a given name. This includes pagination. Called by the 1080 Widget to populate
+      Find Service Providers that match a given name. This includes pagination. Called by the mica Widget to populate
       the list of Service Providers the user can choose from. Called from Widget.
     tags: "service-provider"
     security: "Authenticate"
@@ -47,7 +47,7 @@ operations:
     operationId: "Widget Register Instrument Complete"
     post: "/connect/widget/register-instrument/complete"
     description: >-
-      The final call the Widget makes for either the 1080 Matching Code or Ribbit's Account Token. Called from Widget.
+      The final call the Widget makes for either the mica Matching Code or Ribbit's Account Token. Called from Widget.
     tags: "widget"
     security: "Authenticate"
   - rpc: "WidgetRibbitRegisterInstrumentInitiate"

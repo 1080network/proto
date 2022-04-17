@@ -1,41 +1,41 @@
-// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
-// code and object code, is the intellectual property of 1080 Network, Inc. and are protected by copyright, trademark
-// and other intellectual property laws (collective “1080 Software”). You may not use, copy, reproduce, download, store,
-// post, broadcast, transmit, modify, sell or make available to the public content from the 1080 Software without the
-// prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines, products, feature names, and
-// other trademarks are trademarks of 1080 Network, Inc. and may not be used without permission.
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
 
 syntax = "proto3";
 
 package partner.funds.v1;
 
-option go_package = "ten80/proto/partner/fundsv1";
-option java_package = "network.ten80.partner.funds.v1";
-option java_outer_classname = "FundsProto";
-option objc_class_prefix = "TEN80";
-
-import "common/v1/amount.proto";
 import "common/enums/approvaltype/v1/approval_type.proto";
 import "common/enums/channel/v1/channel.proto";
-import "common/enums/fundsoperationtype/v1/funds_operation_type.proto";
 import "common/enums/currency/v1/currency.proto";
+import "common/enums/fundsoperationtype/v1/funds_operation_type.proto";
 import "common/enums/lineitemstatus/v1/line_item_status.proto";
 import "common/enums/organizationcategory/v1/organization_category.proto";
 import "common/v1/error.proto";
 import "common/v1/line_item.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "mica/proto/partner/fundsv1";
+option java_package = "network.mica.partner.funds.v1";
+option java_outer_classname = "FundsProto";
+option objc_class_prefix = "MICA";
+
 message Funds {
-    // 1080's transaction record primary key.
+    // Mica's transaction record primary key.
     string transaction_key = 1;
 
     // version of the user record, used for optimistic locking
     int64 version = 2;
 
-    // Date that the Store was created at 1080.
+    // Date that the Store was created at Mica.
     google.protobuf.Timestamp created = 3;
 
-    // Date that the Store was last updated at 1080.
+    // Date that the Store was last updated at Mica.
     google.protobuf.Timestamp updated = 4;
 
     common.enums.fundsoperationtype.v1.FundsOperationType operation_type = 5;
@@ -67,11 +67,14 @@ message Funds {
     // Total amount for this transaction.
     //
     // When Items are present then: `total_amount` = sum(`items.amount + items.tax_amount`)
-    common.v1.Amount total_amount = 14;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string total_amount = 14;
 
-    common.v1.Amount requested_amount = 15;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string requested_amount = 15;
 
-    common.v1.Amount approved_amount = 16;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string approved_amount = 16;
 
     string order_number = 17;
 
@@ -88,10 +91,12 @@ message LineItem {
     string description = 3;
 
     // The total amount for this line item excluding tax.
-    common.v1.Amount amount = 4;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string amount = 4;
 
     // The amount of tax for this line item.
-    common.v1.Amount tax_amount = 5;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string tax_amount = 5;
 
     common.enums.lineitemstatus.v1.LineItemStatus status = 6;
 }
@@ -125,7 +130,8 @@ message FundsRequest {
     // Total amount for this transaction.
     //
     // When Items are present then: `total_amount` = sum(`items.amount + items.tax_amount`)
-    common.v1.Amount total_amount = 9;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string total_amount = 9;
 
     string order_number = 10;
 
@@ -173,7 +179,8 @@ message ObtainFundsResponse {
 
     string transaction_key = 3;
 
-    common.v1.Amount approved_amount = 4;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string approved_amount = 4;
 
     repeated common.v1.LineItemResponse line_items = 5;
 }
@@ -210,7 +217,8 @@ message ReturnFundsResponse {
 
     string transaction_key = 3;
 
-    common.v1.Amount approved_amount = 4;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string approved_amount = 4;
 }
 
 message SearchFundsRequest {

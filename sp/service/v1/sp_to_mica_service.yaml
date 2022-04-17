@@ -9,23 +9,23 @@ service:
     provision it's own Payment Tokens which it can distribute to it's own users.</p>
     <p>The SP starts by authenticating themselves after which they can call the other operations in
     this service. At a minimum, the SP will need to call RegisterUser and RegisterInstrument for
-    each user and instrument they want to make available for their users at 1080. For both Users and
+    each user and instrument they want to make available for their users at mica. For both Users and
     Instruments the SP can retrieve, update and remove them.</p>
-    <p>When 1080 calls the SP with either FundsObtain or FundsReturn 1080 will include the
+    <p>When mica calls the SP with either FundsObtain or FundsReturn mica will include the
     organizationKey and the specific category being used for this request. If the SP wants to get
     more information about the organization (e.g. name, all categories, and it's address) they can
     use the GetOrganization and SearchOrganization calls.</p>
   contact:
-    name: "1080"
-    url: "https://dev.1080payments.com"
-    email: "info@1080payments.com"
+    name: "mica"
+    url: "https://dev.mica.io"
+    email: "info@mica.io"
 
 operations:
   - rpc: "Authenticate"
     operationId: "Authenticate"
-    post: "/ten80/authenticate"
+    post: "/mica/authenticate"
     description: >-
-      <p>Most 1080 services require the caller to authenticate themselves. This operation allows the
+      <p>Most mica services require the caller to authenticate themselves. This operation allows the
       caller to do so</p>
     tags: "authenticate"
 
@@ -33,7 +33,7 @@ operations:
     operationId: "Get SP"
     post: "/sp/sp/get"
     description: >-
-      <p>Retrieves the details of the SP at 1080.</p>
+      <p>Retrieves the details of the SP at mica.</p>
     tags: "user"
     security: "Authenticate"
 
@@ -41,7 +41,7 @@ operations:
     operationId: "Register User"
     post: "/sp/user/register"
     description: >-
-      <p>Called when the Service Provider wants to register one of their users for 1080. Note that
+      <p>Called when the Service Provider wants to register one of their users for mica. Note that
       this does only the user and not the instrument (account).</p>
     tags: "user"
     security: "Authenticate"
@@ -56,21 +56,21 @@ operations:
     operationId: "Update User"
     post: "/sp/user/update"
     description: >-
-      <p>Update the User demographic data held at 1080.</p>
+      <p>Update the User demographic data held at mica.</p>
     tags: "user"
     security: "Authenticate"
   - rpc: "SearchUser"
     operationId: "Search User"
     post: "/sp/user/search"
     description: >-
-      <p>Searches for Users held at 1080..</p>
+      <p>Searches for Users held at mica..</p>
     tags: "user"
     security: "Authenticate"
   - rpc: "RemoveUser"
     operationId: "Remove User"
     post: "/sp/user/remove"
     description: >-
-      <p>Remove a User from 1080. Typically called when a User ends their relationship with the SP.</p>
+      <p>Remove a User from mica. Typically called when a User ends their relationship with the SP.</p>
     tags: "user"
     security: "Authenticate"
 
@@ -78,7 +78,7 @@ operations:
     operationId: "Register Instrument"
     post: "/sp/instrument/register"
     description: >-
-      <p>Called to register a Users instrument (account) for use at 1080. This requires a user to
+      <p>Called to register a Users instrument (account) for use at mica. This requires a user to
       already have been registered.</p>
     tags: "instrument"
     security: "Authenticate"
@@ -93,7 +93,7 @@ operations:
     operationId: "Remove Instrument"
     post: "/sp/instrument/remove"
     description: >-
-      <p>Remove an instrument (and any SP or Partner Payment Tokens) from 1080. This renders any
+      <p>Remove an instrument (and any SP or Partner Payment Tokens) from mica. This renders any
       existing Payment Tokens as inoperative.</p>
     tags: "instrument"
     security: "Authenticate"
@@ -111,14 +111,14 @@ operations:
     post: "/sp/payment-token/provision"
     description: >-
       <p>Used to create a payment token that can be given to the SP's users in order to transact at
-      Partners (merhants) that support 1080.</p>
+      Partners (merhants) that support mica.</p>
     tags: "payment-token"
     security: "Authenticate"
   - rpc: "RemoveSPPaymentToken"
     operationId: "Remove Payment Token"
     post: "/sp/payment-token/remove"
     description: >-
-      <p>Used to remove an existing Payment Token from 1080 rendering it inoperable.</p>
+      <p>Used to remove an existing Payment Token from mica rendering it inoperable.</p>
     tags: "payment-token"
     security: "Authenticate"
   - rpc: "SearchSPPaymentToken"
@@ -133,7 +133,7 @@ operations:
     operationId: "Create Service Account"
     post: "/sp/service-account/create"
     description: >-
-      Create a service account that it used by a person or system to authenticate against 1080.
+      Create a service account that it used by a person or system to authenticate against mica.
     tags: "service-account"
     security: "Authenticate"
   - rpc: "GetServiceAccount"

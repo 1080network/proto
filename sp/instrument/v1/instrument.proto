@@ -1,27 +1,27 @@
-// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
-// code and object code, is the intellectual property of 1080 Network, Inc. and are protected by copyright, trademark
-// and other intellectual property laws (collective “1080 Software”). You may not use, copy, reproduce, download, store,
-// post, broadcast, transmit, modify, sell or make available to the public content from the 1080 Software without the
-// prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines, products, feature names, and
-// other trademarks are trademarks of 1080 Network, Inc. and may not be used without permission.
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
 
 syntax = "proto3";
 
 package sp.instrument.v1;
 
-option go_package = "ten80/proto/sp/instrumentv1";
-option java_package = "network.ten80.sp.instrument.v1";
-option java_outer_classname = "InstrumentProto";
-option objc_class_prefix = "TEN80";
-
-import "common/v1/amount.proto";
-import "common/v1/error.proto";
 import "common/enums/currency/v1/currency.proto";
 import "common/enums/instrumenttype/v1/instrument_type.proto";
+import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "mica/proto/sp/instrumentv1";
+option java_package = "network.mica.sp.instrument.v1";
+option java_outer_classname = "InstrumentProto";
+option objc_class_prefix = "MICA";
+
 message RegisterInstrumentRequest {
-    // The key representing this user in 1080.
+    // The key representing this user in Mica.
     string sp_user_key = 1;
 
     // Primary key on the external system.
@@ -42,7 +42,8 @@ message RegisterInstrumentRequest {
 message Transaction {
     google.protobuf.Timestamp created = 1;
 
-    common.v1.Amount amount = 2;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string amount = 2;
 
     string organization_name = 3;
 }
@@ -58,7 +59,7 @@ message RegisterInstrumentResponse {
 
     common.v1.Error error = 2;
 
-    // The key representing this instrument in 1080.
+    // The key representing this instrument in Mica.
     string sp_instrument_key = 3;
 
     int64 version = 4;
@@ -66,7 +67,7 @@ message RegisterInstrumentResponse {
 
 message GetInstrumentRequest {
     oneof criteria {
-        // The key representing this instrument in 1080.
+        // The key representing this instrument in Mica.
         string sp_instrument_key = 1;
 
         // Primary key on the external system.
@@ -75,16 +76,16 @@ message GetInstrumentRequest {
 }
 
 message Instrument {
-    // The primary key that represents this instrument at 1080.
+    // The primary key that represents this instrument at Mica.
     string sp_instrument_key = 1;
 
     // version of the user record, used for optimistic locking
     int64 version = 2;
 
-    // Date that the Store was created at 1080.
+    // Date that the Store was created at Mica.
     google.protobuf.Timestamp created = 3;
 
-    // Date that the Store was last updated at 1080.
+    // Date that the Store was last updated at Mica.
     google.protobuf.Timestamp updated = 4;
 
     // Primary key on the external system.
@@ -121,7 +122,7 @@ message GetInstrumentResponse {
 
 message RemoveInstrumentRequest {
     oneof criteria {
-        // The key representing this instrument in 1080.
+        // The key representing this instrument in Mica.
         string sp_instrument_key = 1;
 
         // Primary key on the external system.
@@ -143,7 +144,7 @@ message RemoveInstrumentResponse {
 
 message SearchInstrumentRequest {
     oneof criteria {
-        // The key representing this user in 1080.
+        // The key representing this user in Mica.
         string sp_user_key = 1;
     }
 }
@@ -160,6 +161,78 @@ message SearchInstrumentResponse {
 
     // List of instruments that matched the search criteria.
     repeated Instrument instruments = 3;
+}
+
+message SetPINRequest {
+    oneof criteria {
+        // The key representing this instrument in Mica.
+        string sp_instrument_key = 1;
+
+        // Primary key on the external system.
+        string sp_instrument_ref = 2;
+    }
+
+    string pin = 3;
+}
+
+message SetPINResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+}
+
+message ResetPINRequest {
+    oneof criteria {
+        // The key representing this instrument in Mica.
+        string sp_instrument_key = 1;
+
+        // Primary key on the external system.
+        string sp_instrument_ref = 2;
+    }
+
+    string old_pin = 3;
+
+    string new_pin = 4;
+}
+
+message ResetPINResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+}
+
+message RemovePINRequest {
+    oneof criteria {
+        // The key representing this instrument in Mica.
+        string sp_instrument_key = 1;
+
+        // Primary key on the external system.
+        string sp_instrument_ref = 2;
+    }
+}
+
+message RemovePINResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+        STATUS_NOT_FOUND = 3;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
 }
 
 message RetrieveTransactionRequest {

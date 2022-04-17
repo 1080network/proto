@@ -4,23 +4,23 @@ service:
   description: >-
     <p></p>
   contact:
-    name: "1080"
-    url: "https://dev.1080payments.com"
-    email: "info@1080payments.com"
+    name: "mica"
+    url: "https://dev.mica.io"
+    email: "info@mica.io"
 
 operations:
   - rpc: "Authenticate"
     operationId: "Authenticate"
-    post: "/ten80/authenticate"
+    post: "/mica/authenticate"
     description: >-
-      <p>Most 1080 services require the caller to authenticate themselves. This operation allows the caller to do so.</p>
+      <p>Most mica services require the caller to authenticate themselves. This operation allows the caller to do so.</p>
     tags: "authenticate"
 
   - rpc: "GetPartner"
     operationId: "Get Partner"
     post: "/partner/partner/get"
     description: >-
-      <p>Retrieves the details of the Partner at 1080.</p>
+      <p>Retrieves the details of the Partner at mica.</p>
     tags: "partner"
     security: "Authenticate"
 
@@ -28,7 +28,7 @@ operations:
     operationId: "Create Service Account"
     post: "/partner/service-account/create"
     description: >-
-      Create a service account that it used by a person or system to authenticate against 1080.
+      Create a service account that it used by a person or system to authenticate against mica.
     tags: "service-account"
     security: "Authenticate"
   - rpc: "GetServiceAccount"
@@ -59,6 +59,13 @@ operations:
     post: "/partner/organization/get"
     description: >-
       <p>Retrieve an organization based on it's key.</p>
+    tags: "organization"
+    security: "Authenticate"
+  - rpc: "UpdateOrganization"
+    operationId: "Update Organization"
+    post: "/partner/organization/update"
+    description: >-
+      <p>Update a given organization.</p>
     tags: "organization"
     security: "Authenticate"
   - rpc: "SearchOrganization"
@@ -119,7 +126,7 @@ operations:
     post: "/partner/instrument/register/initiate"
     description: >-
       <p>Start the registration process of a user after they have selected the desired SP. The
-      caller supplies 1080 with the users demographic data, the SP and optionally the last 4 of the
+      caller supplies mica with the users demographic data, the SP and optionally the last 4 of the
       users instrument (account) at the SP.</p>
     tags: "instrument"
     security: "Authenticate"
@@ -136,7 +143,7 @@ operations:
     post: "/partner/payment-token/close"
     description: >-
       <p>When a user no longer wishes to use their payment tokens this operation can remove them
-      from 1080.</p>
+      from mica.</p>
     tags: "instrument"
     security: "Authenticate"
   - rpc: "ReplacePaymentToken"
@@ -182,7 +189,7 @@ operations:
     post: "/partner/funds/search"
     description: >-
       <p>An operation to search for Funds operations either Obtain or Return that the Partner has
-      requested of 1080.</p>
+      requested of mica.</p>
     tags: "funds"
     security: "Authenticate"
 

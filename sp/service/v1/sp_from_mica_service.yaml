@@ -2,7 +2,7 @@ service:
   title: "Service implemented by Service Providers"
   version: "0.1"
   description: >-
-    <p>The operations in this service are called by 1080 to facilitate the user enrollment process
+    <p>The operations in this service are called by mica to facilitate the user enrollment process
     at a Partner, to process transactions and optionally to retrieve a list of Users
     transactions. With the exception of RetrieveTransactions all the other operations are
     required.</p>
@@ -12,16 +12,16 @@ service:
     the currency, the organization and store the transation occured in and optionally a list of
     items the user is purchasing or returning.</p>
   contact:
-    name: "1080"
-    url: "https://dev.1080payments.com"
-    email: "info@1080payments.com"
+    name: "mica"
+    url: "https://dev.mica.io"
+    email: "info@mica.io"
 
 operations:
   - rpc: "EnrollUserInstrument"
     operationId: "Enroll User Instrument"
     post: "/sp/user/enroll"
     description: >-
-      <p>When a User initiates an enrollment at a Partner, 1080 will call this operation in order to
+      <p>When a User initiates an enrollment at a Partner, mica will call this operation in order to
       pass the SP the matching code. The SP will then send the matching code to their User through
       whatever channel they already use to message their users.</p>
     tags: "enroll"

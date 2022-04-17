@@ -1,35 +1,35 @@
-// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
-// code and object code, is the intellectual property of 1080 Network, Inc. and are protected by copyright, trademark
-// and other intellectual property laws (collective “1080 Software”). You may not use, copy, reproduce, download, store,
-// post, broadcast, transmit, modify, sell or make available to the public content from the 1080 Software without the
-// prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines, products, feature names, and
-// other trademarks are trademarks of 1080 Network, Inc. and may not be used without permission.
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
 
 syntax = "proto3";
 
 package sp.funds.v1;
 
-option go_package = "ten80/proto/sp/fundsv1";
-option java_package = "network.ten80.sp.funds.v1";
-option java_outer_classname = "FundsProto";
-option objc_class_prefix = "TEN80";
-
-import "common/v1/address.proto";
-import "common/v1/amount.proto";
 import "common/enums/approvaltype/v1/approval_type.proto";
 import "common/enums/channel/v1/channel.proto";
 import "common/enums/currency/v1/currency.proto";
 import "common/enums/lineitemstatus/v1/line_item_status.proto";
 import "common/enums/organizationcategory/v1/organization_category.proto";
+import "common/v1/address.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "mica/proto/sp/fundsv1";
+option java_package = "network.mica.sp.funds.v1";
+option java_outer_classname = "FundsProto";
+option objc_class_prefix = "MICA";
+
 // Type that represents the details of the funds request (either to obtain or return).
 message Funds {
-    // 1080's transaction record primary key.
+    // Mica's transaction record primary key.
     string transaction_key = 1;
 
-    // The 1080 generated key for this instrument.
+    // The Mica generated key for this instrument.
     string sp_instrument_key = 2;
 
     // Service Provider's primary key for their instrument.
@@ -68,15 +68,23 @@ message Funds {
     // Total amount for this transaction.
     //
     // When Items are present then: `total_amount` = sum(`items.amount + items.tax_amount`)
-    common.v1.Amount total_amount = 14;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string total_amount = 14;
 
     // The amount requested for this transaction. Note that this will be the same as total_amount if all products are eligible
-    common.v1.Amount requested_amount = 15;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string requested_amount = 15;
 
     string order_number = 16;
 
     // List of items bought or returned.
     repeated LineItemRequest line_items = 17;
+}
+
+enum PINStatus {
+    PIN_STATUS_UNSPECIFIED = 0;
+
+    PIN_STATUS_MATCH = 1;
 }
 
 message LineItemRequest {
@@ -88,10 +96,12 @@ message LineItemRequest {
     string description = 3;
 
     // The total amount for this line item excluding tax.
-    common.v1.Amount amount = 4;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string amount = 4;
 
     // The amount of tax for this line item.
-    common.v1.Amount tax_amount = 5;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string tax_amount = 5;
 
     common.enums.lineitemstatus.v1.LineItemStatus status = 6;
 }
@@ -129,6 +139,8 @@ enum FundsStatus {
     FUNDS_STATUS_SP_UNAVAILABLE = 11;
     // The payment token sent is invalid or not found
     FUNDS_STATUS_INVALID_PAYMENT_TOKEN = 12;
+    // A valid PIN is required for this transaction
+    FUNDS_STATUS_PIN_REQUIRED = 13;
 }
 
 message ObtainFundsResponse {
@@ -158,6 +170,8 @@ message ObtainFundsResponse {
         STATUS_SP_UNAVAILABLE = 11;
         // The payment token sent is invalid or not found
         STATUS_INVALID_PAYMENT_TOKEN = 12;
+        // A valid PIN is required for this transaction
+        STATUS_PIN_REQUIRED = 13;
     }
     Status status = 1;
 
@@ -165,7 +179,8 @@ message ObtainFundsResponse {
 
     string transaction_ref = 3;
 
-    common.v1.Amount approved_amount = 4;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string approved_amount = 4;
 }
 
 message ReturnFundsRequest {
@@ -194,6 +209,8 @@ message ReturnFundsResponse {
         STATUS_SP_UNAVAILABLE = 11;
         // The payment token sent is invalid or not found
         STATUS_INVALID_PAYMENT_TOKEN = 12;
+        // A valid PIN is required for this transaction
+        STATUS_PIN_REQUIRED = 13;
     }
     Status status = 1;
 
@@ -201,12 +218,59 @@ message ReturnFundsResponse {
 
     string transaction_ref = 3;
 
-    common.v1.Amount approved_amount = 4;
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string approved_amount = 4;
+}
+
+message From {
+    // the sender payment_token
+    string payment_token = 4;
+
+    // The first name of the sender.
+    string first_name = 5;
+
+    // The last name of the sender.
+    string last_name = 6;
+
+    // The email of the sender.
+    string email = 7;
+
+    // name of sending service provider
+    string sp_name = 8;
+}
+
+message ReceiveFundsRequest {
+    // The Mica generated key for this instrument.
+    string to_sp_instrument_key = 1;
+
+    // Service Provider's primary key for their instrument.
+    string to_sp_instrument_ref = 2;
+
+    common.enums.currency.v1.Currency currency = 3;
+
+    // the amount that's being received
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string amount = 4;
+
+    sp.funds.v1.From from = 5;
+}
+
+message ReceiveFundsResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    string transaction_ref = 3;
 }
 
 message SearchFundsRequest {
     oneof criteria {
-        // 1080's transaction record primary key.
+        // Mica's transaction record primary key.
         string transaction_key = 1;
 
         // The payment token of the user.
@@ -235,3 +299,32 @@ message SearchFundsResponse {
 
     repeated Funds funds = 3;
 }
+
+//<editor-fold desc="Person to Person Operations">
+
+message SendFundsRequest {
+    string from_sp_user_key = 1;
+
+    string from_sp_instrument_key = 2;
+
+    string to_payment_token = 3;
+
+    common.enums.currency.v1.Currency currency = 4;
+
+    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+    string amount = 5;
+}
+
+message SendFundsResponse {
+    enum Status {
+        STATUS_UNSPECIFIED = 0;
+        STATUS_SUCCESS = 1;
+        STATUS_ERROR = 2;
+    }
+    Status status = 1;
+
+    common.v1.Error error = 2;
+
+    string transaction_key = 3;
+}
+//</editor-fold>

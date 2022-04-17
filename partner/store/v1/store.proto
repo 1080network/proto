@@ -1,18 +1,19 @@
-// Copyright (c) 2021 1080 Network, Inc. All rights reserved. All software, including, without limitation, all source
-// code and object code, is the intellectual property of 1080 Network, Inc. and are protected by copyright, trademark
-// and other intellectual property laws (collective “1080 Software”). You may not use, copy, reproduce, download, store,
-// post, broadcast, transmit, modify, sell or make available to the public content from the 1080 Software without the
-// prior written approval of 1080 Network, Inc. 1080 Network, its logos, slogans, taglines, products, feature names, and
-// other trademarks are trademarks of 1080 Network, Inc. and may not be used without permission.
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
 
 syntax = "proto3";
 
 package partner.store.v1;
 
-option go_package = "ten80/proto/partner/storev1";
-option java_package = "network.ten80.partner.store.v1";
+option go_package = "mica/proto/partner/storev1";
+option java_package = "network.mica.partner.store.v1";
 option java_outer_classname = "StoreProto";
-option objc_class_prefix = "TEN80";
+option objc_class_prefix = "MICA";
 
 import "common/v1/address.proto";
 import "common/v1/error.proto";
@@ -45,7 +46,7 @@ message CreateStoreResponse {
 
     common.v1.Error error = 2;
 
-    // The primary key of this store within 1080.
+    // The primary key of this store within Mica.
     string store_key = 3;
 
     int64 version = 4;
@@ -106,11 +107,13 @@ message UpdateStoreRequest {
         // The primary key for this store at the Partner/Organization.
         StoreRef store_ref = 1;
 
-        // The primary key of this store within 1080.
+        // The primary key of this store within Mica.
         string store_key = 2;
     }
 
     int64 version = 3;
+
+    // TODO(tim): allow update of store_ref?
 
     // The number of this store (an alternative unique value)
     string store_number = 4;
@@ -139,7 +142,7 @@ message RemoveStoreRequest {
         // The primary key for this store at the Partner/Organization.
         StoreRef store_ref = 1;
 
-        // The primary key of this store within 1080.
+        // The primary key of this store within Mica.
         string store_key = 2;
     }
 }

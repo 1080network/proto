@@ -1,0 +1,36 @@
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package partner.service.v1;
+
+option go_package = "mica/proto/partner/servicev1";
+option java_package = "network.mica.partner.service.v1";
+option java_outer_classname = "PartnerFromMicaServiceProto";
+option objc_class_prefix = "MICA";
+
+import "common/ping/v1/ping.proto";
+import "partner/user/v1/user.proto";
+
+service PartnerFromMicaService {
+    //<editor-fold desc="User Instrument Operations">
+
+    // operation to support reverse onboarding. Instead of the Partner calling Mica, Mica will call the Partner with a
+    // new enrollment
+    rpc EnrollUserInstrument (user.v1.EnrollUserInstrumentRequest) returns (user.v1.EnrollUserInstrumentResponse) {
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Admin Operations">
+
+    rpc Ping (common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {
+    }
+    //</editor-fold>
+}
+
