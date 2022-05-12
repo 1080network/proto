@@ -10,49 +10,49 @@ syntax = "proto3";
 
 package common.v1;
 
-option go_package = "mica/proto/common/v1;commonv1";
-option java_package = "network.mica.common.v1";
-option java_outer_classname = "OrganizationProto";
-option objc_class_prefix = "MICA";
-
-import "common/v1/address.proto";
 import "common/enums/organizationcategory/v1/organization_category.proto";
+import "common/v1/address.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "mica/proto/common/v1;commonv1";
+option java_outer_classname = "OrganizationProto";
+option java_package = "io.mica.common.v1";
+option objc_class_prefix = "MICA";
+
 message Organization {
-    // The primary key of the organization in Mica.
-    string organization_key = 1;
+  // The primary key of the organization in Mica.
+  string organization_key = 1;
 
-    // Date that the Store was created at Mica.
-    google.protobuf.Timestamp created = 2;
+  // Date that the Store was created at Mica.
+  google.protobuf.Timestamp created = 2;
 
-    // Date that the Store was last updated at Mica.
-    google.protobuf.Timestamp updated = 3;
+  // Date that the Store was last updated at Mica.
+  google.protobuf.Timestamp updated = 3;
 
-    // The partner who owns this organization.
-    string partner_key = 4;
+  // The partner who owns this organization.
+  string partner_key = 4;
 
-    // The name of this organization.
-    string name = 6;
+  // The name of this organization.
+  string name = 6;
 
-    // The list of categories of this organization (used by SP's to as part of their processing rules).
-    repeated common.enums.organizationcategory.v1.OrganizationCategory categories = 5;
+  // The list of categories of this organization (used by Service Provider's to as part of their processing rules).
+  repeated common.enums.organizationcategory.v1.OrganizationCategory categories = 5;
 
-    // The street address of the organization.
-    common.v1.Address address = 8;
+  // The street address of the organization.
+  common.v1.Address address = 8;
 
-    // The organizations domestic ACH routing number (9 characters)
-    string domestic_ach_routing_number = 9;
+  // The organizations domestic ACH routing number (9 characters)
+  string domestic_ach_routing_number = 9;
 
-    // The organizations international ACH routing number (9 characters)
-    string international_ach_routing_number = 10;
+  // The organizations international ACH routing number (9 characters)
+  string international_ach_routing_number = 10;
 
-    // The organizations wire routing number (9 characters)
-    string wire_routing_number = 11;
+  // The organizations wire routing number (9 characters)
+  string wire_routing_number = 11;
 
-    // The organizations swift routing number (9 characters)
-    string swift_routing_number = 12;
+  // The organizations swift routing number (9 characters)
+  string swift_routing_number = 12;
 
-    // The organizations bank account number (14 digits)
-    string bank_account_number = 13;
+  // The organizations bank account number (14 digits)
+  string bank_account_number = 13;
 }

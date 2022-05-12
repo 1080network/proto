@@ -11,18 +11,18 @@ syntax = "proto3";
 package common.enums.channel.v1;
 
 option go_package = "mica/proto/common/enums/channelv1";
-option java_package = "network.mica.common.enums.v1";
 option java_outer_classname = "ChannelEnumProto";
+option java_package = "io.mica.common.enums.v1";
 option objc_class_prefix = "MICA";
 
 enum Channel {
-    CHANNEL_UNSPECIFIED = 0;
+  CHANNEL_UNSPECIFIED = 0;
 
-    CHANNEL_DOMESTIC_ACH = 1;
+  CHANNEL_DOMESTIC_ACH = 1;
 
-    CHANNEL_INTERNATIONAL_ACH = 2;
+  CHANNEL_INTERNATIONAL_ACH = 2;
 
-    CHANNEL_WIRE_TRANSFER = 3;
+  CHANNEL_WIRE_TRANSFER = 3;
 
-    CHANNEL_SWIFT_TRANSFER = 4;
+  CHANNEL_SWIFT_TRANSFER = 4;
 }

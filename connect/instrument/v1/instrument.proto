@@ -10,138 +10,137 @@ syntax = "proto3";
 
 package connect.instrument.v1;
 
-option go_package = "mica/proto/connect/instrumentv1";
-option java_package = "network.mica.connect.instrument.v1";
-option java_outer_classname = "InstrumentProto";
-option objc_class_prefix = "MICA";
-
 import "common/enums/currency/v1/currency.proto";
 import "common/enums/instrumenttype/v1/instrument_type.proto";
 import "common/v1/connect.proto";
 import "common/v1/error.proto";
 
+option go_package = "mica/proto/connect/instrumentv1";
+option java_outer_classname = "InstrumentProto";
+option java_package = "io.mica.connect.instrument.v1";
+option objc_class_prefix = "MICA";
+
 message WidgetRegisterInstrumentInitiateRequest {
-    string session_key = 1;
+  string session_key = 1;
 
-    // The financial institution which holds this account/instrument.
-    string sp_key = 2;
+  // The financial institution which holds this account/instrument.
+  string service_provider_key = 2;
 
-    oneof instrument_identifier {
-        common.v1.BankAccountCredentials bank_account_credentials = 4;
+  oneof instrument_identifier {
+    common.v1.BankAccountCredentials bank_account_credentials = 4;
 
-        common.v1.BankAccountNumber bank_account_number = 5;
+    common.v1.BankAccountNumber bank_account_number = 5;
 
-        ConnectDetails connect_details = 3;
-    }
+    ConnectDetails connect_details = 3;
+  }
 }
 
-message ConnectDetails {
-}
+message ConnectDetails {}
 
 message WidgetRegisterInstrumentInitiateResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
 
-        STATUS_SUCCESS = 1;
+    STATUS_SUCCESS = 1;
 
-        // generic error that's not one of the following
-        STATUS_ERROR = 2;
+    // generic error that's not one of the following
+    STATUS_ERROR = 2;
 
-        STATUS_UNSUPPORTED_SERVICE_PROVIDER = 3;
-    }
-    Status status = 1;
+    STATUS_UNSUPPORTED_SERVICE_PROVIDER = 3;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 
-    // list of possible instruments the user can choose from
-    repeated Instrument instruments = 3;
+  // list of possible instruments the user can choose from
+  repeated Instrument instruments = 3;
 }
 
 message Instrument {
-    common.enums.instrumenttype.v1.InstrumentType instrument_type = 1;
+  common.enums.instrumenttype.v1.InstrumentType instrument_type = 1;
 
-    common.enums.currency.v1.Currency currency = 3;
+  common.enums.currency.v1.Currency currency = 3;
 
-    string instrument_identifier = 2;
+  string instrument_identifier = 2;
 
-    // other fields from Ribbit
+// other fields from Ribbit
 }
 
 message WidgetRegisterInstrumentWithAccountRequest {
-    string session_key = 1;
+  string session_key = 1;
 
-    Instrument instrument = 3;
+  Instrument instrument = 3;
 }
 
 message WidgetRegisterInstrumentWithAccountResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 
-    // The matching code sent to the client. Only returned in non-production environments.
-    string matching_code = 3;
+  // The matching code sent to the client. Only returned in non-production environments.
+  string matching_code = 3;
 }
 
 message WidgetRegisterInstrumentCompleteRequest {
-    string session_key = 1;
+  string session_key = 1;
 
-    oneof details {
-        Connect connect = 2;
+  oneof details {
+    Connect connect = 2;
 
-        Ribbit ribbit = 3;
-    }
+    Ribbit ribbit = 3;
+  }
 }
 
 message Connect {
-    // The matching code sent from the users Service Provider and given by the user.
-    string matching_code = 1;
+  // The matching code sent from the users Service Provider and given by the user.
+  string matching_code = 1;
 }
 
 message Ribbit {
-    string account_token = 1;
+  string account_token = 1;
 }
 
 message WidgetRegisterInstrumentCompleteResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-        STATUS_MATCHING_CODE_MISMATCH = 3;
-        STATUS_INVALID_REGISTRATION_STATE = 4;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_MATCHING_CODE_MISMATCH = 3;
+    STATUS_INVALID_REGISTRATION_STATE = 4;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 }
 
 message WidgetRibbitRegisterInstrumentInitiateRequest {
-    string session_key = 1;
+  string session_key = 1;
 
-    // The financial institution which holds this account/instrument.
-    string sp_key = 2;
+  // The financial institution which holds this account/instrument.
+  string service_provider_key = 2;
 }
 
 message WidgetRibbitRegisterInstrumentInitiateResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
 
-        STATUS_SUCCESS = 1;
+    STATUS_SUCCESS = 1;
 
-        // generic error that's not one of the following
-        STATUS_ERROR = 2;
+    // generic error that's not one of the following
+    STATUS_ERROR = 2;
 
-        STATUS_UNSUPPORTED_SERVICE_PROVIDER = 3;
-    }
-    Status status = 1;
+    STATUS_UNSUPPORTED_SERVICE_PROVIDER = 3;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 
-    string script = 3;
+  string script = 3;
 
-    int64 ribbit_institution_id = 4;
+  int64 ribbit_institution_id = 4;
 }

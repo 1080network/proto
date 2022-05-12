@@ -11,27 +11,27 @@ syntax = "proto3";
 package common.enums.instrumenttype.v1;
 
 option go_package = "mica/proto/common/enums/instrumenttypev1";
-option java_package = "network.mica.common.enums.v1";
 option java_outer_classname = "InstrumentTypeEnumProto";
+option java_package = "io.mica.common.enums.v1";
 option objc_class_prefix = "MICA";
 
 enum InstrumentType {
-    INSTRUMENT_TYPE_UNSPECIFIED = 0;
+  INSTRUMENT_TYPE_UNSPECIFIED = 0;
 
-    INSTRUMENT_TYPE_CHECKING = 1;
+  INSTRUMENT_TYPE_CHECKING = 1;
 
-    INSTRUMENT_TYPE_SAVINGS = 2;
+  INSTRUMENT_TYPE_SAVINGS = 2;
 
-    INSTRUMENT_TYPE_MONEY_MARKET = 3;
+  INSTRUMENT_TYPE_MONEY_MARKET = 3;
 
-    INSTRUMENT_TYPE_LINE_OF_CREDIT = 4;
+  INSTRUMENT_TYPE_LINE_OF_CREDIT = 4;
 
-    // US only - Supplemental Nutrition Assistance Program
-    INSTRUMENT_TYPE_SNAP = 5;
+  // US only - Supplemental Nutrition Assistance Program
+  INSTRUMENT_TYPE_SNAP = 5;
 
-    // US only - Temporary Assistance for Needy Families
-    INSTRUMENT_TYPE_TANF = 6;
+  // US only - Temporary Assistance for Needy Families
+  INSTRUMENT_TYPE_TANF = 6;
 
-    // US only - Special Supplemental Nutrition Program for Women, Infants, and Children
-    INSTRUMENT_TYPE_WIC = 7;
+  // US only - Special Supplemental Nutrition Program for Women, Infants, and Children
+  INSTRUMENT_TYPE_WIC = 7;
 }

@@ -10,27 +10,27 @@ syntax = "proto3";
 
 package common.v1;
 
-option go_package = "mica/proto/common/v1;commonv1";
-option java_package = "network.mica.common.v1";
-option java_outer_classname = "AddressProto";
-option objc_class_prefix = "MICA";
-
 import "common/enums/country/v1/country.proto";
 import "common/enums/region/v1/region.proto";
 
+option go_package = "mica/proto/common/v1;commonv1";
+option java_outer_classname = "AddressProto";
+option java_package = "io.mica.common.v1";
+option objc_class_prefix = "MICA";
+
 message Address {
-    repeated string street_lines = 1;
+  repeated string street_lines = 1;
 
-    // typically city
-    string locality = 2;
+  // typically city
+  string locality = 2;
 
-    // this would be state in the US (ISO 3166-2:US), prefecture in Japan (ISO 3166-2:JP) or
-    // territory in Australia (ISO 3166-2:AU)
-    common.enums.region.v1.Region region = 3;
+  // this would be state in the US (ISO 3166-2:US), prefecture in Japan (ISO 3166-2:JP) or
+  // territory in Australia (ISO 3166-2:AU)
+  common.enums.region.v1.Region region = 3;
 
-    // postal code, in the US this would be zip code
-    string postal_code = 4;
+  // postal code, in the US this would be zip code
+  string postal_code = 4;
 
-    // https://en.wikipedia.org/wiki/ISO_3166-2
-    common.enums.country.v1.Country country = 5;
+  // https://en.wikipedia.org/wiki/ISO_3166-2
+  common.enums.country.v1.Country country = 5;
 }

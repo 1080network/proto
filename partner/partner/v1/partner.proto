@@ -10,66 +10,65 @@ syntax = "proto3";
 
 package partner.partner.v1;
 
-option go_package = "mica/proto/partner/partnerv1";
-option java_package = "network.mica.partner.partner.v1";
-option java_outer_classname = "PartnerProto";
-option objc_class_prefix = "MICA";
-
 import "common/enums/accounttype/v1/account_type.proto";
 import "common/enums/currency/v1/currency.proto";
 import "common/v1/address.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "mica/proto/partner/partnerv1";
+option java_outer_classname = "PartnerProto";
+option java_package = "io.mica.partner.partner.v1";
+option objc_class_prefix = "MICA";
+
 message PartnerAccount {
-    string partner_account_key = 1;
+  string partner_account_key = 1;
 
-    google.protobuf.Timestamp created = 2;
+  google.protobuf.Timestamp created = 2;
 
-    google.protobuf.Timestamp updated = 3;
+  google.protobuf.Timestamp updated = 3;
 
-    int64 version = 4;
+  int64 version = 4;
 
-    string partner_key = 5;
+  string partner_key = 5;
 
-    common.enums.accounttype.v1.AccountType account_type = 6;
+  common.enums.accounttype.v1.AccountType account_type = 6;
 
-    common.enums.currency.v1.Currency currency = 7;
+  common.enums.currency.v1.Currency currency = 7;
 }
 
 message Partner {
-    string partner_key = 1;
+  string partner_key = 1;
 
-    google.protobuf.Timestamp created = 2;
+  google.protobuf.Timestamp created = 2;
 
-    google.protobuf.Timestamp updated = 3;
+  google.protobuf.Timestamp updated = 3;
 
-    int64 version = 4;
+  int64 version = 4;
 
-    string name = 5;
+  string name = 5;
 
-    string tax_identifier = 6;
+  string tax_identifier = 6;
 
-    common.v1.Address address = 7;
+  common.v1.Address address = 7;
 
-    string partner_url = 8;
+  string partner_url = 8;
 
-    repeated PartnerAccount partner_accounts = 9;
+  repeated PartnerAccount partner_accounts = 9;
 }
 
-message GetPartnerRequest {
-}
+message GetPartnerRequest {}
 
 message GetPartnerResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-        STATUS_NOT_FOUND = 3;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 
-    Partner partner = 3;
+  Partner partner = 3;
 }

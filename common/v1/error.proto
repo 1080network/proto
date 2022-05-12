@@ -11,16 +11,16 @@ syntax = "proto3";
 package common.v1;
 
 option go_package = "mica/proto/common/v1;commonv1";
-option java_package = "network.mica.common.v1";
 option java_outer_classname = "ErrorProto";
+option java_package = "io.mica.common.v1";
 option objc_class_prefix = "MICA";
 
 message Error {
-    string message = 1;
+  string message = 1;
 
-    string cid = 2;
+  string cid = 2;
 
-    string service_type = 3;
+  string service_type = 3;
 
-    string full_method = 4;
+  string full_method = 4;
 }

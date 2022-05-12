@@ -11,13 +11,13 @@ syntax = "proto3";
 package common.enums.country.v1;
 
 option go_package = "mica/proto/common/enums/countryv1";
-option java_package = "network.mica.common.enums.v1";
 option java_outer_classname = "CountryEnumProto";
+option java_package = "io.mica.common.enums.v1";
 option objc_class_prefix = "MICA";
 
 enum Country {
-    COUNTRY_UNSPECIFIED = 0;
+  COUNTRY_UNSPECIFIED = 0;
 
-    //ISO 3166-2
-    COUNTRY_US = 1; // United States
+  //ISO 3166-2
+  COUNTRY_US = 1; // United States
 }

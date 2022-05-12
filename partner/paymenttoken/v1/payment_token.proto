@@ -10,73 +10,73 @@ syntax = "proto3";
 
 package partner.paymenttoken.v1;
 
-option go_package = "mica/proto/partner/paymenttokenv1";
-option java_package = "network.mica.partner.paymenttoken.v1";
-option java_outer_classname = "PaymentTokenProto";
-option objc_class_prefix = "MICA";
-
 import "common/v1/error.proto";
 import "common/v1/payment_token.proto";
 
-message PaymentToken {
-    string partner_instrument_ref = 1;
+option go_package = "mica/proto/partner/paymenttokenv1";
+option java_outer_classname = "PaymentTokenProto";
+option java_package = "io.mica.partner.paymenttoken.v1";
+option objc_class_prefix = "MICA";
 
-    common.v1.CommonPaymentToken payment_token = 2;
+message PaymentToken {
+  string partner_instrument_ref = 1;
+
+  common.v1.CommonPaymentToken payment_token = 2;
 }
 
 message RemovePaymentTokenRequest {
-    // The payment token that the Partner can use to obtain or return funds for this user.
-    string partner_payment_token = 2;
+  // The payment token that the Partner can use to obtain or return funds for this user.
+  string partner_payment_token = 2;
 }
 
 message RemovePaymentTokenResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-        STATUS_NOT_FOUND = 3;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 }
 
 message ExchangePaymentTokenRequest {
-    // The payment token that the Partner can use to obtain or return funds for this user.
-    string partner_payment_token = 1;
+  // The payment token that the Partner can use to obtain or return funds for this user.
+  string partner_payment_token = 1;
 
-    // flag to indicate what to do with the payment token that's being replaced
-    bool remove_existing = 2;
+  // flag to indicate what to do with the payment token that's being replaced
+  bool remove_existing = 2;
 }
 
 message ExchangePaymentTokenResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-        STATUS_NOT_FOUND = 3;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 
-    // The payment token that the Partner can use to obtain or return funds for this user.
-    string partner_payment_token = 3;
+  // The payment token that the Partner can use to obtain or return funds for this user.
+  string partner_payment_token = 3;
 }
 
 message SearchPaymentTokenRequest {
-    string partner_instrument_ref = 1;
+  string partner_instrument_ref = 1;
 }
 
 message SearchPaymentTokenResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 
-    repeated PaymentToken payment_tokens = 3;
+  repeated PaymentToken payment_tokens = 3;
 }

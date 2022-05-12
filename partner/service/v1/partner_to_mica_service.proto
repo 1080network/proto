@@ -10,11 +10,6 @@ syntax = "proto3";
 
 package partner.service.v1;
 
-option go_package = "mica/proto/partner/servicev1";
-option java_package = "network.mica.partner.service.v1";
-option java_outer_classname = "PartnerToMicaServiceProto";
-option objc_class_prefix = "MICA";
-
 import "common/authenticate/v1/authenticate.proto";
 import "common/ping/v1/ping.proto";
 import "partner/funds/v1/funds.proto";
@@ -23,107 +18,96 @@ import "partner/organization/v1/organization.proto";
 import "partner/partner/v1/partner.proto";
 import "partner/paymenttoken/v1/payment_token.proto";
 import "partner/serviceaccount/v1/service_account.proto";
-import "partner/sp/v1/sp.proto";
+import "partner/serviceprovider/v1/service_provider.proto";
 import "partner/store/v1/store.proto";
 import "partner/widget/v1/widget.proto";
 
+option go_package = "mica/proto/partner/servicev1";
+option java_outer_classname = "PartnerToMicaServiceProto";
+option java_package = "io.mica.partner.service.v1";
+option objc_class_prefix = "MICA";
+
 service PartnerToMicaService {
-    rpc Authenticate (common.authenticate.v1.AuthenticateRequest) returns (common.authenticate.v1.AuthenticateResponse) {
-    }
+  rpc Authenticate(common.authenticate.v1.AuthenticateRequest) returns (common.authenticate.v1.AuthenticateResponse) {}
 
-    //<editor-fold desc="Partner Operations">
+  //<editor-fold desc="Partner Operations">
 
-    rpc GetPartner (partner.v1.GetPartnerRequest) returns (partner.v1.GetPartnerResponse) {
-    }
-    //</editor-fold>
+  rpc GetPartner(partner.v1.GetPartnerRequest) returns (partner.v1.GetPartnerResponse) {}
+  //</editor-fold>
 
-    //<editor-fold desc="Service Account Operations">
 
-    rpc CreateServiceAccount (serviceaccount.v1.CreateServiceAccountRequest) returns (serviceaccount.v1.CreateServiceAccountResponse) {
-    }
+  //<editor-fold desc="Service Account Operations">
 
-    rpc GetServiceAccount (serviceaccount.v1.GetServiceAccountRequest) returns (serviceaccount.v1.GetServiceAccountResponse) {
-    }
+  rpc CreateServiceAccount(serviceaccount.v1.CreateServiceAccountRequest) returns (serviceaccount.v1.CreateServiceAccountResponse) {}
 
-    rpc UpdateServiceAccount (serviceaccount.v1.UpdateServiceAccountRequest) returns (serviceaccount.v1.UpdateServiceAccountResponse) {
-    }
+  rpc GetServiceAccount(serviceaccount.v1.GetServiceAccountRequest) returns (serviceaccount.v1.GetServiceAccountResponse) {}
 
-    rpc SearchServiceAccount (serviceaccount.v1.SearchServiceAccountRequest) returns (serviceaccount.v1.SearchServiceAccountResponse) {
-    }
-    //</editor-fold>
+  rpc UpdateServiceAccount(serviceaccount.v1.UpdateServiceAccountRequest) returns (serviceaccount.v1.UpdateServiceAccountResponse) {}
 
-    //<editor-fold desc="Organization Operations">
+  rpc SearchServiceAccount(serviceaccount.v1.SearchServiceAccountRequest) returns (serviceaccount.v1.SearchServiceAccountResponse) {}
+  //</editor-fold>
 
-    rpc GetOrganization (organization.v1.GetOrganizationRequest) returns (organization.v1.GetOrganizationResponse) {
-    }
 
-    rpc UpdateOrganization (organization.v1.UpdateOrganizationRequest) returns (organization.v1.UpdateOrganizationResponse) {
-    }
+  //<editor-fold desc="Organization Operations">
 
-    rpc SearchOrganization (organization.v1.SearchOrganizationRequest) returns (organization.v1.SearchOrganizationResponse) {
-    }
-    //</editor-fold>
+  rpc GetOrganization(organization.v1.GetOrganizationRequest) returns (organization.v1.GetOrganizationResponse) {}
 
-    //<editor-fold desc="Store Operations">
+  rpc UpdateOrganization(organization.v1.UpdateOrganizationRequest) returns (organization.v1.UpdateOrganizationResponse) {}
 
-    rpc CreateStore (store.v1.CreateStoreRequest) returns (store.v1.CreateStoreResponse) {
-    }
+  rpc SearchOrganization(organization.v1.SearchOrganizationRequest) returns (organization.v1.SearchOrganizationResponse) {}
+  //</editor-fold>
 
-    rpc GetStore (store.v1.GetStoreRequest) returns (store.v1.GetStoreResponse) {
-    }
 
-    rpc UpdateStore (store.v1.UpdateStoreRequest) returns (store.v1.UpdateStoreResponse) {
-    }
+  //<editor-fold desc="Store Operations">
 
-    rpc RemoveStore (store.v1.RemoveStoreRequest) returns (store.v1.RemoveStoreResponse) {
-    }
+  rpc CreateStore(store.v1.CreateStoreRequest) returns (store.v1.CreateStoreResponse) {}
 
-    rpc SearchStore (store.v1.SearchStoreRequest) returns (store.v1.SearchStoreResponse) {
-    }
-    //</editor-fold>
+  rpc GetStore(store.v1.GetStoreRequest) returns (store.v1.GetStoreResponse) {}
 
-    //<editor-fold desc="SP Operations">
+  rpc UpdateStore(store.v1.UpdateStoreRequest) returns (store.v1.UpdateStoreResponse) {}
 
-    rpc SearchSP (sp.v1.SearchSPRequest) returns (sp.v1.SearchSPResponse) {
-    }
-    //</editor-fold>
+  rpc RemoveStore(store.v1.RemoveStoreRequest) returns (store.v1.RemoveStoreResponse) {}
 
-    //<editor-fold desc="Payment Token Operations">
+  rpc SearchStore(store.v1.SearchStoreRequest) returns (store.v1.SearchStoreResponse) {}
+  //</editor-fold>
 
-    rpc ClosePaymentToken (paymenttoken.v1.RemovePaymentTokenRequest) returns (paymenttoken.v1.RemovePaymentTokenResponse) {
-    }
 
-    rpc ReplacePaymentToken (paymenttoken.v1.ExchangePaymentTokenRequest) returns (paymenttoken.v1.ExchangePaymentTokenResponse) {
-    }
+  //<editor-fold desc="Service Provider Operations">
 
-    rpc SearchPaymentToken (paymenttoken.v1.SearchPaymentTokenRequest) returns (paymenttoken.v1.SearchPaymentTokenResponse) {
-    }
-    //</editor-fold>
+  rpc SearchServiceProvider(serviceprovider.v1.SearchServiceProviderRequest) returns (serviceprovider.v1.SearchServiceProviderResponse) {}
+  //</editor-fold>
 
-    //<editor-fold desc="Funds Operations">
 
-    rpc ObtainFunds (funds.v1.ObtainFundsRequest) returns (funds.v1.ObtainFundsResponse) {
-    }
+  //<editor-fold desc="Payment Token Operations">
 
-    rpc ReturnFunds (funds.v1.ReturnFundsRequest) returns (funds.v1.ReturnFundsResponse) {
-    }
+  rpc ClosePaymentToken(paymenttoken.v1.RemovePaymentTokenRequest) returns (paymenttoken.v1.RemovePaymentTokenResponse) {}
 
-    rpc SearchFunds (funds.v1.SearchFundsRequest) returns (funds.v1.SearchFundsResponse) {
-    }
-    //</editor-fold>
+  rpc ReplacePaymentToken(paymenttoken.v1.ExchangePaymentTokenRequest) returns (paymenttoken.v1.ExchangePaymentTokenResponse) {}
 
-    //<editor-fold desc="Admin Operations">
+  rpc SearchPaymentToken(paymenttoken.v1.SearchPaymentTokenRequest) returns (paymenttoken.v1.SearchPaymentTokenResponse) {}
+  //</editor-fold>
 
-    rpc Ping (common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {
-    }
-    //</editor-fold>
 
-    //<editor-fold desc="Widget Operations">
+  //<editor-fold desc="Funds Operations">
 
-    rpc InitializeWidget (widget.v1.InitializeWidgetRequest) returns (widget.v1.InitializeWidgetResponse) {
-    }
+  rpc ObtainFunds(funds.v1.ObtainFundsRequest) returns (funds.v1.ObtainFundsResponse) {}
 
-    rpc ExchangeSessionKey (instrument.v1.ExchangeSessionKeyRequest) returns (instrument.v1.ExchangeSessionKeyResponse) {
-    }
-    //</editor-fold>
+  rpc ReturnFunds(funds.v1.ReturnFundsRequest) returns (funds.v1.ReturnFundsResponse) {}
+
+  rpc SearchFunds(funds.v1.SearchFundsRequest) returns (funds.v1.SearchFundsResponse) {}
+  //</editor-fold>
+
+
+  //<editor-fold desc="Admin Operations">
+
+  rpc Ping(common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {}
+  //</editor-fold>
+
+
+  //<editor-fold desc="Widget Operations">
+
+  rpc InitializeWidget(widget.v1.InitializeWidgetRequest) returns (widget.v1.InitializeWidgetResponse) {}
+
+  rpc ExchangeSessionKey(instrument.v1.ExchangeSessionKeyRequest) returns (instrument.v1.ExchangeSessionKeyResponse) {}
+  //</editor-fold>
 }

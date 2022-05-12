@@ -10,49 +10,49 @@ syntax = "proto3";
 
 package partner.user.v1;
 
-option go_package = "mica/proto/partner/userv1";
-option java_package = "network.mica.partner.user.v1";
-option java_outer_classname = "UserProto";
-option objc_class_prefix = "MICA";
-
 import "common/v1/error.proto";
 import "common/v1/user.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "mica/proto/partner/userv1";
+option java_outer_classname = "UserProto";
+option java_package = "io.mica.partner.user.v1";
+option objc_class_prefix = "MICA";
+
 message User {
-    string user_key = 1;
+  string user_key = 1;
 
-    google.protobuf.Timestamp created = 2;
+  google.protobuf.Timestamp created = 2;
 
-    google.protobuf.Timestamp updated = 3;
+  google.protobuf.Timestamp updated = 3;
 
-    int64 version = 4;
+  int64 version = 4;
 
-    // Details of the user.
-    common.v1.UserDemographic user_demographic = 5;
+  // Details of the user.
+  common.v1.UserDemographic user_demographic = 5;
 }
 
 message EnrollUserInstrumentRequest {
-    // The payment token that the Partner can use to obtain or return funds for this user.
-    string partner_payment_token = 1;
+  // The payment token that the Partner can use to obtain or return funds for this user.
+  string partner_payment_token = 1;
 
-    common.v1.UserDemographic user_demographic = 2;
+  common.v1.UserDemographic user_demographic = 2;
 }
 
 message EnrollUserInstrumentResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-        STATUS_PARTIAL_APPROVAL = 3;
-        STATUS_INSUFFICIENT_FUNDS = 4;
-        STATUS_INELIGIBLE_PRODUCTS = 5;
-        STATUS_USER_CLOSED = 6;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_PARTIAL_APPROVAL = 3;
+    STATUS_INSUFFICIENT_FUNDS = 4;
+    STATUS_INELIGIBLE_PRODUCTS = 5;
+    STATUS_USER_CLOSED = 6;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 
-    // Primary key on the external system.
-    string partner_instrument_ref = 3;
+  // Primary key on the external system.
+  string partner_instrument_ref = 3;
 }

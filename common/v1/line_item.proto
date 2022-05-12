@@ -13,34 +13,34 @@ package common.v1;
 import "common/enums/lineitemstatus/v1/line_item_status.proto";
 
 option go_package = "mica/proto/common/v1;commonv1";
-option java_package = "network.mica.common.v1";
 option java_outer_classname = "LineItemProto";
+option java_package = "io.mica.common.v1";
 option objc_class_prefix = "MICA";
 
 message LineItemRequest {
-    // unique number in a list of items that can be used to refer to a specific item
-    int32 sequence = 1;
+  // unique number in a list of items that can be used to refer to a specific item
+  int32 sequence = 1;
 
-    string product_code = 2;
+  string product_code = 2;
 
-    string description = 3;
+  string description = 3;
 
-    // The total amount for this line item excluding tax.
-    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
-    string amount = 4;
+  // The total amount for this line item excluding tax.
+  // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+  string amount = 4;
 
-    // The amount of tax for this line item.
-    // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
-    string tax_amount = 5;
+  // The amount of tax for this line item.
+  // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+  string tax_amount = 5;
 }
 
 message LineItemResponse {
-    // unique number in a list of items that can be used to refer to a specific item
-    int32 sequence = 1;
+  // unique number in a list of items that can be used to refer to a specific item
+  int32 sequence = 1;
 
-    common.enums.lineitemstatus.v1.LineItemStatus status = 2;
+  common.enums.lineitemstatus.v1.LineItemStatus status = 2;
 }
 
 message LineItemResponseValue {
-    repeated LineItemResponse line_item_responses = 1;
+  repeated LineItemResponse line_item_responses = 1;
 }

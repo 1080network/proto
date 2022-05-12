@@ -11,19 +11,19 @@ syntax = "proto3";
 package common.enums.ebttype.v1;
 
 option go_package = "mica/proto/common/enums/ebttypev1";
-option java_package = "network.mica.common.enums.v1";
 option java_outer_classname = "EbtTypeEnumProto";
+option java_package = "io.mica.common.enums.v1";
 option objc_class_prefix = "MICA";
 
 enum EbtType {
-    EBT_TYPE_UNSPECIFIED = 0;
+  EBT_TYPE_UNSPECIFIED = 0;
 
-    // US only - Supplemental Nutrition Assistance Program
-    EBT_TYPE_SNAP = 1;
+  // US only - Supplemental Nutrition Assistance Program
+  EBT_TYPE_SNAP = 1;
 
-    // US only - Temporary Assistance for Needy Families
-    EBT_TYPE_TANF = 2;
+  // US only - Temporary Assistance for Needy Families
+  EBT_TYPE_TANF = 2;
 
-    // US only - Special Supplemental Nutrition Program for Women, Infants, and Children
-    EBT_TYPE_WIC = 3;
+  // US only - Special Supplemental Nutrition Program for Women, Infants, and Children
+  EBT_TYPE_WIC = 3;
 }

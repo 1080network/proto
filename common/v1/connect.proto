@@ -11,20 +11,20 @@ syntax = "proto3";
 package common.v1;
 
 option go_package = "mica/proto/common/v1;commonv1";
-option java_package = "network.mica.common.v1";
 option java_outer_classname = "ConnectProto";
+option java_package = "io.mica.common.v1";
 option objc_class_prefix = "MICA";
 
 message BankAccountCredentials {
-    // The username for this person at the users SP
-    string username = 1;
+  // The username for this person at the users Service Provider
+  string username = 1;
 
-    // The password for this person at the users SP
-    string password = 2;
+  // The password for this person at the users Service Provider
+  string password = 2;
 }
 
 message BankAccountNumber {
-    string routing_number = 1;
+  string routing_number = 1;
 
-    string account_number = 2;
+  string account_number = 2;
 }

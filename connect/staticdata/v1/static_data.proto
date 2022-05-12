@@ -10,32 +10,31 @@ syntax = "proto3";
 
 package connect.staticdata.v1;
 
-option go_package = "mica/proto/connect/staticdatav1";
-option java_package = "network.mica.connect.staticdata.v1";
-option java_outer_classname = "StaticDataProto";
-option objc_class_prefix = "MICA";
-
 import "common/enums/serviceprovidertype/v1/service_provider_type.proto";
 import "common/v1/error.proto";
 
-message GetStaticDataRequest {
-}
+option go_package = "mica/proto/connect/staticdatav1";
+option java_outer_classname = "StaticDataProto";
+option java_package = "io.mica.connect.staticdata.v1";
+option objc_class_prefix = "MICA";
+
+message GetStaticDataRequest {}
 
 message GetStaticDataResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 
-    repeated ServiceProviderTypeMetadata service_provider_type_metadata = 3;
+  repeated ServiceProviderTypeMetadata service_provider_type_metadata = 3;
 }
 
 message ServiceProviderTypeMetadata {
-    common.enums.serviceprovidertype.v1.ServiceProviderType service_provider_type = 1;
+  common.enums.serviceprovidertype.v1.ServiceProviderType service_provider_type = 1;
 
-    string public_key = 2;
+  string public_key = 2;
 }

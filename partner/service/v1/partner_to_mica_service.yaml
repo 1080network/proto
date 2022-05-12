@@ -115,10 +115,10 @@ operations:
 
   - rpc: "SearchSP"
     operationId: "Search SP"
-    post: "/partner/sp/search"
+    post: "/partner/serviceprovider/search"
     description: >-
       <p>Used to retrieve SPs based on the criteria in the request.</p>
-    tags: "sp"
+    tags: "serviceprovider"
     security: "Authenticate"
 
   - rpc: "RegisterInstrumentInitiate"

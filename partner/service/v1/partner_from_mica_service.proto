@@ -10,27 +10,25 @@ syntax = "proto3";
 
 package partner.service.v1;
 
-option go_package = "mica/proto/partner/servicev1";
-option java_package = "network.mica.partner.service.v1";
-option java_outer_classname = "PartnerFromMicaServiceProto";
-option objc_class_prefix = "MICA";
-
 import "common/ping/v1/ping.proto";
 import "partner/user/v1/user.proto";
 
+option go_package = "mica/proto/partner/servicev1";
+option java_outer_classname = "PartnerFromMicaServiceProto";
+option java_package = "io.mica.partner.service.v1";
+option objc_class_prefix = "MICA";
+
 service PartnerFromMicaService {
-    //<editor-fold desc="User Instrument Operations">
+  //<editor-fold desc="User Instrument Operations">
 
-    // operation to support reverse onboarding. Instead of the Partner calling Mica, Mica will call the Partner with a
-    // new enrollment
-    rpc EnrollUserInstrument (user.v1.EnrollUserInstrumentRequest) returns (user.v1.EnrollUserInstrumentResponse) {
-    }
-    //</editor-fold>
+  // operation to support reverse onboarding. Instead of the Partner calling Mica, Mica will call the Partner with a
+  // new enrollment
+  rpc EnrollUserInstrument(user.v1.EnrollUserInstrumentRequest) returns (user.v1.EnrollUserInstrumentResponse) {}
+  //</editor-fold>
 
-    //<editor-fold desc="Admin Operations">
 
-    rpc Ping (common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {
-    }
-    //</editor-fold>
+  //<editor-fold desc="Admin Operations">
+
+  rpc Ping(common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {}
+  //</editor-fold>
 }
-

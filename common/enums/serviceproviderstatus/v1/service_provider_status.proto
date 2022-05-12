@@ -11,14 +11,14 @@ syntax = "proto3";
 package common.enums.serviceproviderstatus.v1;
 
 option go_package = "mica/proto/common/enums/serviceproviderstatusv1";
-option java_package = "network.mica.common.enums.v1";
 option java_outer_classname = "ServiceProviderStatusEnumProto";
+option java_package = "io.mica.common.enums.v1";
 option objc_class_prefix = "MICA";
 
 enum ServiceProviderStatus {
-    SERVICE_PROVIDER_STATUS_UNSPECIFIED = 0;
+  SERVICE_PROVIDER_STATUS_UNSPECIFIED = 0;
 
-    SERVICE_PROVIDER_STATUS_ACTIVE = 1;
+  SERVICE_PROVIDER_STATUS_ACTIVE = 1;
 
-    SERVICE_PROVIDER_STATUS_INACTIVE = 2;
+  SERVICE_PROVIDER_STATUS_INACTIVE = 2;
 }

@@ -1,0 +1,67 @@
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package serviceprovider.serviceprovider.v1;
+
+import "common/enums/accounttype/v1/account_type.proto";
+import "common/enums/currency/v1/currency.proto";
+import "common/v1/error.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "mica/proto/serviceprovider/serviceproviderv1";
+option java_outer_classname = "SPProto";
+option java_package = "io.mica.serviceprovider.serviceprovider.v1";
+option objc_class_prefix = "MICA";
+
+message ServiceProviderAccount {
+  string service_provider_account_key = 1;
+
+  google.protobuf.Timestamp created = 2;
+
+  google.protobuf.Timestamp updated = 3;
+
+  int64 version = 4;
+
+  common.enums.accounttype.v1.AccountType account_type = 5;
+
+  common.enums.currency.v1.Currency currency = 6;
+}
+
+message ServiceProvider {
+  string service_provider_key = 1;
+
+  google.protobuf.Timestamp created = 2;
+
+  google.protobuf.Timestamp updated = 3;
+
+  int64 version = 4;
+
+  string name = 5;
+
+  string service_provider_url = 6;
+
+  repeated ServiceProviderAccount service_provider_accounts = 7;
+}
+
+message GetServiceProviderRequest {}
+
+message GetServiceProviderResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  ServiceProvider service_provider = 3;
+}

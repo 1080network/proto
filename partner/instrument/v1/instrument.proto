@@ -10,32 +10,33 @@ syntax = "proto3";
 
 package partner.instrument.v1;
 
-option go_package = "mica/proto/partner/instrumentv1";
-option java_package = "network.mica.partner.instrument.v1";
-option java_outer_classname = "InstrumentProto";
-option objc_class_prefix = "MICA";
-
 import "common/v1/error.proto";
 
-message ExchangeSessionKeyRequest {
-    // The session key that was established when the Widget was initialized
-    string session_key = 1;
+option go_package = "mica/proto/partner/instrumentv1";
+option java_outer_classname = "InstrumentProto";
+option java_package = "io.mica.partner.instrument.v1";
+option objc_class_prefix = "MICA";
 
-    // Primary key on the external system.
-    string partner_instrument_ref = 2;
+message ExchangeSessionKeyRequest {
+  // The session key that was established when the Widget was initialized
+  string session_key = 1;
+
+  // Primary key on the external system.
+  string partner_instrument_ref = 2;
 }
 
 message ExchangeSessionKeyResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-        STATUS_ERROR = 2;
-        STATUS_MATCHING_CODE_MISMATCH = 3;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_MATCHING_CODE_MISMATCH = 3;
+    STATUS_NOT_FOUND = 4;
+  }
+  Status status = 1;
 
-    common.v1.Error error = 2;
+  common.v1.Error error = 2;
 
-    // The payment token that the Partner can use to obtain or return funds for this user.
-    string partner_payment_token = 3;
+  // The payment token that the Partner can use to obtain or return funds for this user.
+  string partner_payment_token = 3;
 }

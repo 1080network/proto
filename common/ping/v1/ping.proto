@@ -10,32 +10,31 @@ syntax = "proto3";
 
 package common.ping.v1;
 
-option go_package = "mica/proto/common/pingv1";
-option java_package = "network.mica.common.ping.v1";
-option java_outer_classname = "PingProto";
-option objc_class_prefix = "MICA";
-
 import "google/protobuf/timestamp.proto";
 
-message PingRequest {
-}
+option go_package = "mica/proto/common/pingv1";
+option java_outer_classname = "PingProto";
+option java_package = "io.mica.common.ping.v1";
+option objc_class_prefix = "MICA";
+
+message PingRequest {}
 
 message PingResponse {
-    enum Status {
-        STATUS_UNSPECIFIED = 0;
-        STATUS_SUCCESS = 1;
-    }
-    Status status = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+  }
+  Status status = 1;
 
-    google.protobuf.Timestamp server_time = 2;
+  google.protobuf.Timestamp server_time = 2;
 
-    google.protobuf.Timestamp server_start_time = 7;
+  google.protobuf.Timestamp server_start_time = 7;
 
-    string build_version = 3;
+  string build_version = 3;
 
-    string build_sha = 4;
+  string build_sha = 4;
 
-    string build_time = 5;
+  string build_time = 5;
 
-    string service_type = 6;
+  string service_type = 6;
 }

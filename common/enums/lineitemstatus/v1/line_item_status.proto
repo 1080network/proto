@@ -11,18 +11,18 @@ syntax = "proto3";
 package common.enums.lineitemstatus.v1;
 
 option go_package = "mica/proto/common/enums/lineitemstatusv1";
-option java_package = "network.mica.common.enums.v1";
 option java_outer_classname = "LineItemStatusEnumProto";
+option java_package = "io.mica.common.enums.v1";
 option objc_class_prefix = "MICA";
 
 enum LineItemStatus {
-    LINE_ITEM_STATUS_UNSPECIFIED = 0;
+  LINE_ITEM_STATUS_UNSPECIFIED = 0;
 
-    LINE_ITEM_STATUS_NOT_ASSESSED = 1;
+  LINE_ITEM_STATUS_NOT_ASSESSED = 1;
 
-    LINE_ITEM_STATUS_ELIGIBLE = 2;
+  LINE_ITEM_STATUS_ELIGIBLE = 2;
 
-    LINE_ITEM_STATUS_INELIGIBLE = 3;
+  LINE_ITEM_STATUS_INELIGIBLE = 3;
 
-    LINE_ITEM_STATUS_AGE_RESTRICTED = 4;
+  LINE_ITEM_STATUS_AGE_RESTRICTED = 4;
 }

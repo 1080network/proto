@@ -11,14 +11,14 @@ syntax = "proto3";
 package common.enums.fundsoperationtype.v1;
 
 option go_package = "mica/proto/common/enums/fundsoperationtypev1";
-option java_package = "network.mica.common.enums.v1";
 option java_outer_classname = "FundsOperationTypeEnumProto";
+option java_package = "io.mica.common.enums.v1";
 option objc_class_prefix = "MICA";
 
 enum FundsOperationType {
-    FUNDS_OPERATION_TYPE_UNSPECIFIED = 0;
+  FUNDS_OPERATION_TYPE_UNSPECIFIED = 0;
 
-    FUNDS_OPERATION_TYPE_OBTAIN = 1;
+  FUNDS_OPERATION_TYPE_OBTAIN = 1;
 
-    FUNDS_OPERATION_TYPE_RETURN = 2;
+  FUNDS_OPERATION_TYPE_RETURN = 2;
 }

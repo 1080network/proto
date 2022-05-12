@@ -1,0 +1,167 @@
+service:
+  title: "Service called by Service Providers"
+  version: "0.1"
+  description: >-
+    <p>The operations in this service allow the Service Provider to register their users and
+    the user's instruments (accounts).  In addition there are operations to update, retrieve, search
+    and delete those users and instruments. The SP can retrieve/search Organizations to retrieve
+    information about them that is not passed via FundsObtain or FundsReturn. Finally the SP can
+    provision it's own Payment Tokens which it can distribute to it's own users.</p>
+    <p>The SP starts by authenticating themselves after which they can call the other operations in
+    this service. At a minimum, the SP will need to call RegisterUser and RegisterInstrument for
+    each user and instrument they want to make available for their users at mica. For both Users and
+    Instruments the SP can retrieve, update and remove them.</p>
+    <p>When mica calls the SP with either FundsObtain or FundsReturn mica will include the
+    organizationKey and the specific category being used for this request. If the SP wants to get
+    more information about the organization (e.g. name, all categories, and it's address) they can
+    use the GetOrganization and SearchOrganization calls.</p>
+  contact:
+    name: "mica"
+    url: "https://dev.mica.io"
+    email: "info@mica.io"
+
+operations:
+  - rpc: "Authenticate"
+    operationId: "Authenticate"
+    post: "/mica/authenticate"
+    description: >-
+      <p>Most mica services require the caller to authenticate themselves. This operation allows the
+      caller to do so</p>
+    tags: "authenticate"
+
+  - rpc: "GetSP"
+    operationId: "Get SP"
+    post: "/serviceprovider/serviceprovider/get"
+    description: >-
+      <p>Retrieves the details of the SP at mica.</p>
+    tags: "user"
+    security: "Authenticate"
+
+  - rpc: "RegisterUser"
+    operationId: "Register User"
+    post: "/serviceprovider/user/register"
+    description: >-
+      <p>Called when the Service Provider wants to register one of their users for mica. Note that
+      this does only the user and not the instrument (account).</p>
+    tags: "user"
+    security: "Authenticate"
+  - rpc: "GetUser"
+    operationId: "Get User"
+    post: "/serviceprovider/user/get"
+    description: >-
+      <p>Retrieve a user based on it's key.</p>
+    tags: "user"
+    security: "Authenticate"
+  - rpc: "UpdateUser"
+    operationId: "Update User"
+    post: "/serviceprovider/user/update"
+    description: >-
+      <p>Update the User demographic data held at mica.</p>
+    tags: "user"
+    security: "Authenticate"
+  - rpc: "SearchUser"
+    operationId: "Search User"
+    post: "/serviceprovider/user/search"
+    description: >-
+      <p>Searches for Users held at mica..</p>
+    tags: "user"
+    security: "Authenticate"
+  - rpc: "RemoveUser"
+    operationId: "Remove User"
+    post: "/serviceprovider/user/remove"
+    description: >-
+      <p>Remove a User from mica. Typically called when a User ends their relationship with the SP.</p>
+    tags: "user"
+    security: "Authenticate"
+
+  - rpc: "RegisterInstrument"
+    operationId: "Register Instrument"
+    post: "/serviceprovider/instrument/register"
+    description: >-
+      <p>Called to register a Users instrument (account) for use at mica. This requires a user to
+      already have been registered.</p>
+    tags: "instrument"
+    security: "Authenticate"
+  - rpc: "GetInstrument"
+    operationId: "Get Instrument"
+    post: "/serviceprovider/instrument/get"
+    description: >-
+      <p>Retrieve an instrument based on it's key.</p>
+    tags: "instrument"
+    security: "Authenticate"
+  - rpc: "RemoveInstrument"
+    operationId: "Remove Instrument"
+    post: "/serviceprovider/instrument/remove"
+    description: >-
+      <p>Remove an instrument (and any SP or Partner Payment Tokens) from mica. This renders any
+      existing Payment Tokens as inoperative.</p>
+    tags: "instrument"
+    security: "Authenticate"
+  - rpc: "SearchInstrument"
+    operationId: "Search Instrument"
+    post: "/serviceprovider/instrument/search"
+    description: >-
+      <p>Like GetInstrument, can be used to retrieve Instruments based on the criteria in the
+      request.</p>
+    tags: "instrument"
+    security: "Authenticate"
+
+  - rpc: "ProvisionSPPaymentToken"
+    operationId: "Provision Payment Token"
+    post: "/serviceprovider/payment-token/provision"
+    description: >-
+      <p>Used to create a payment token that can be given to the SP's users in order to transact at
+      Partners (merhants) that support mica.</p>
+    tags: "payment-token"
+    security: "Authenticate"
+  - rpc: "RemoveSPPaymentToken"
+    operationId: "Remove Payment Token"
+    post: "/serviceprovider/payment-token/remove"
+    description: >-
+      <p>Used to remove an existing Payment Token from mica rendering it inoperable.</p>
+    tags: "payment-token"
+    security: "Authenticate"
+  - rpc: "SearchSPPaymentToken"
+    operationId: "Search Payment Token"
+    post: "/serviceprovider/payment-token/search"
+    description: >-
+      <p>Searches for Payment Tokens by criteria.</p>
+    tags: "payment-token"
+    security: "Authenticate"
+
+  - rpc: "CreateServiceAccount"
+    operationId: "Create Service Account"
+    post: "/serviceprovider/service-account/create"
+    description: >-
+      Create a service account that it used by a person or system to authenticate against mica.
+    tags: "service-account"
+    security: "Authenticate"
+  - rpc: "GetServiceAccount"
+    operationId: "Get Service Account"
+    post: "/serviceprovider/service-account/get"
+    description: >-
+      Retrieve a service account based on its key.
+    tags: "service-account"
+    security: "Authenticate"
+  - rpc: "UpdateServiceAccount"
+    operationId: "Update Service Account"
+    post: "/serviceprovider/service-account/update"
+    description: >-
+      <p>Update a service account based on its key.</p>
+    tags: "service-account"
+    security: "Authenticate"
+  - rpc: "SearchServiceAccount"
+    operationId: "Search Service Account"
+    post: "/serviceprovider/service-account/search"
+    description: >-
+      <p>Like GetServiceAccount, can be used to retrieve Service Accounts based on the criteria in the
+      request.</p>
+    tags: "service-account"
+    security: "Authenticate"
+
+  - rpc: "Ping"
+    operationId: "Ping"
+    post: "/admin/ping"
+    description: >-
+      <p>An operation to ping the server to ensure it's up and running and that the connection is good.</p>
+    tags: "funds"
