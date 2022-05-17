@@ -1,0 +1,47 @@
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package common.v1;
+
+import "common/v1/address.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "mica/proto/common/v1;commonv1";
+option java_outer_classname = "StoreProto";
+option java_package = "io.mica.common.v1";
+option objc_class_prefix = "MICA";
+
+message Store {
+  // The primary key of the store in Mica.
+  string store_key = 1;
+
+  // Date that the Store was created at Mica.
+  google.protobuf.Timestamp created = 2;
+
+  // Date that the Store was last updated at Mica.
+  google.protobuf.Timestamp updated = 3;
+
+  int64 version = 4;
+
+  // The partner who owns this store.
+  string partner_key = 5;
+
+  // The organization that this store is in.
+  string organization_key = 6;
+
+  // The primary key for this store at the Partner/Organization.
+  string store_ref = 7;
+
+  // The number of this store (an alternative unique value)
+  string store_number = 8;
+
+  // The street address of this store.
+  common.v1.Address address = 9;
+}
