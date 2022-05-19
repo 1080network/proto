@@ -1,0 +1,54 @@
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package ebt.funds.v1;
+
+import "common/enums/approvaltype/v1/approval_type.proto";
+import "common/enums/ebtregion/v1/ebt_region.proto";
+import "common/enums/ebttype/v1/ebt_type.proto";
+import "common/v1/date.proto";
+import "common/v1/error.proto";
+import "common/v1/line_item.proto";
+import "serviceprovider/funds/v1/funds.proto";
+
+option go_package = "mica/proto/ebt/fundsv1";
+option java_outer_classname = "FundsProto";
+option java_package = "io.mica.ebt.funds.v1";
+option objc_class_prefix = "MICA";
+
+message FundsLineItemFilterRequest {
+  common.enums.approvaltype.v1.ApprovalType approval_type = 1;
+
+  // Mica's transaction record primary key.
+  string transaction_key = 2;
+
+  common.enums.ebttype.v1.EbtType ebt_type = 3;
+
+  // the region where the user lives
+  common.enums.ebtregion.v1.EbtRegion ebt_region = 4;
+
+  // The birthday of the user.
+  common.v1.Date birthday = 5;
+
+  repeated serviceprovider.funds.v1.LineItemRequest line_items = 6;
+}
+
+message FundsLineItemFilterResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  repeated common.v1.LineItemResponse line_items = 3;
+}

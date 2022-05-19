@@ -28,78 +28,100 @@ option java_package = "io.mica.partner.service.v1";
 option objc_class_prefix = "MICA";
 
 service PartnerToMicaService {
+  // Most mica services require the caller to authenticate themselves. This operation allows the caller to do so.
   rpc Authenticate(common.authenticate.v1.AuthenticateRequest) returns (common.authenticate.v1.AuthenticateResponse) {}
 
   //<editor-fold desc="Partner Operations">
 
+  // Retrieves the details of the Partner at mica.
   rpc GetPartner(partner.v1.GetPartnerRequest) returns (partner.v1.GetPartnerResponse) {}
   //</editor-fold>
 
 
   //<editor-fold desc="Service Account Operations">
 
+  // Create a service account that it used by a person or system to authenticate against mica.
   rpc CreateServiceAccount(serviceaccount.v1.CreateServiceAccountRequest) returns (serviceaccount.v1.CreateServiceAccountResponse) {}
 
+  // Retrieve a service account based on its key.
   rpc GetServiceAccount(serviceaccount.v1.GetServiceAccountRequest) returns (serviceaccount.v1.GetServiceAccountResponse) {}
 
+  // Update a service account based on its key.
   rpc UpdateServiceAccount(serviceaccount.v1.UpdateServiceAccountRequest) returns (serviceaccount.v1.UpdateServiceAccountResponse) {}
 
+  // Like GetServiceAccount, can be used to retrieve Service Accounts based on the criteria in the request.
   rpc SearchServiceAccount(serviceaccount.v1.SearchServiceAccountRequest) returns (serviceaccount.v1.SearchServiceAccountResponse) {}
   //</editor-fold>
 
 
   //<editor-fold desc="Organization Operations">
 
+  // Retrieve an organization based on it's key.
   rpc GetOrganization(organization.v1.GetOrganizationRequest) returns (organization.v1.GetOrganizationResponse) {}
 
+  // Update a given organization.
   rpc UpdateOrganization(organization.v1.UpdateOrganizationRequest) returns (organization.v1.UpdateOrganizationResponse) {}
 
+  // Like GetOrganization, can be used to retrieve Organizations based on the criteria in the request.
   rpc SearchOrganization(organization.v1.SearchOrganizationRequest) returns (organization.v1.SearchOrganizationResponse) {}
   //</editor-fold>
 
 
   //<editor-fold desc="Store Operations">
 
+  // Create a store that sits under an Organization.
   rpc CreateStore(store.v1.CreateStoreRequest) returns (store.v1.CreateStoreResponse) {}
 
+  // Retrieve a store based on it's key.
   rpc GetStore(store.v1.GetStoreRequest) returns (store.v1.GetStoreResponse) {}
 
+  // Update the store number and address of a Store.
   rpc UpdateStore(store.v1.UpdateStoreRequest) returns (store.v1.UpdateStoreResponse) {}
 
+  // Remove an existing Store.
   rpc RemoveStore(store.v1.RemoveStoreRequest) returns (store.v1.RemoveStoreResponse) {}
 
+  // Like GetStore, can be used to retrieve Stores based on the criteria in the request.
   rpc SearchStore(store.v1.SearchStoreRequest) returns (store.v1.SearchStoreResponse) {}
   //</editor-fold>
 
 
   //<editor-fold desc="Service Provider Operations">
 
+  // Used to retrieve SPs based on the criteria in the request.
   rpc SearchServiceProvider(serviceprovider.v1.SearchServiceProviderRequest) returns (serviceprovider.v1.SearchServiceProviderResponse) {}
   //</editor-fold>
 
 
   //<editor-fold desc="Payment Token Operations">
 
+  // When a user no longer wishes to use their payment tokens this operation can remove them from mica.
   rpc ClosePaymentToken(paymenttoken.v1.RemovePaymentTokenRequest) returns (paymenttoken.v1.RemovePaymentTokenResponse) {}
 
+  // A Partner can proactively replace a payment token with a new one for future use.
   rpc ReplacePaymentToken(paymenttoken.v1.ExchangePaymentTokenRequest) returns (paymenttoken.v1.ExchangePaymentTokenResponse) {}
 
+  // Search for Payment Tokens that the Partner has created.
   rpc SearchPaymentToken(paymenttoken.v1.SearchPaymentTokenRequest) returns (paymenttoken.v1.SearchPaymentTokenResponse) {}
   //</editor-fold>
 
 
   //<editor-fold desc="Funds Operations">
 
+  // An operation to obtain funds from a user in order to pay for goods or services rendered to the user.
   rpc ObtainFunds(funds.v1.ObtainFundsRequest) returns (funds.v1.ObtainFundsResponse) {}
 
+  // An operation to return funds to a user in order to refund them for goods or services.
   rpc ReturnFunds(funds.v1.ReturnFundsRequest) returns (funds.v1.ReturnFundsResponse) {}
 
+  // An operation to search for Funds operations either Obtain or Return that the Partner has requested of mica.
   rpc SearchFunds(funds.v1.SearchFundsRequest) returns (funds.v1.SearchFundsResponse) {}
   //</editor-fold>
 
 
   //<editor-fold desc="Admin Operations">
 
+  // An operation to ping the server to ensure it's up and running and that the connection is good.
   rpc Ping(common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {}
   //</editor-fold>
 
