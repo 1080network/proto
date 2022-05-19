@@ -16,7 +16,7 @@ import "serviceprovider/instrument/v1/instrument.proto";
 import "serviceprovider/user/v1/user.proto";
 
 option go_package = "mica/proto/serviceprovider/servicev1";
-option java_outer_classname = "SPFromMicaServiceProto";
+option java_outer_classname = "ServiceProviderFromMicaServiceProto";
 option java_package = "io.mica.serviceprovider.service.v1";
 option objc_class_prefix = "MICA";
 
