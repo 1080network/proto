@@ -177,12 +177,18 @@ message ObtainFundsResponse {
 
   common.v1.Error error = 2;
 
+  // Primary key of created transaction assigned by Mica.
   string transaction_key = 3;
 
-  // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
-  string approved_amount = 4;
+  // Correlation ID of the request assigned by Mica.
+  string cid = 4;
 
-  repeated common.v1.LineItemResponse line_items = 5;
+  // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+  string approved_amount = 5;
+
+  // status of each line item based on processing by Mica. The list will be in the same order as the request and will
+  // will typically have a status of LINE_ITEM_STATUS_ELIGIBLE.
+  repeated common.v1.LineItemResponse line_items = 6;
 }
 
 message ReturnFundsRequest {
@@ -215,10 +221,14 @@ message ReturnFundsResponse {
 
   common.v1.Error error = 2;
 
+  // Primary key of created transaction assigned by Mica.
   string transaction_key = 3;
 
+  // Correlation ID of the request assigned by Mica.
+  string cid = 4;
+
   // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
-  string approved_amount = 4;
+  string approved_amount = 5;
 }
 
 message SearchFundsRequest {
