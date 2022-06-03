@@ -149,7 +149,7 @@ message ObtainFundsResponse {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     // An approval for the full amount
-    STATUS_APPROVED = 1;
+    STATUS_FULL_APPROVAL = 1;
     // An error occurred when processing the request
     STATUS_ERROR = 2;
     // An approval was given for a partial amount
@@ -162,8 +162,14 @@ message ObtainFundsResponse {
     STATUS_NOT_FOUND = 6;
     // User instrument is closed
     STATUS_INSTRUMENT_CLOSED = 7;
-    // Request triggered a risk or fraud check resulting in a decline
-    STATUS_RISK_FRAUD = 8;
+    // Request triggered a transactional risk or fraud check resulting in a decline
+    STATUS_TRANSACTION_RISK_FRAUD = 8;
+    // Request triggered a bad actor risk or fraud check resulting in a decline
+    STATUS_BAD_ACTOR_RISK_FRAUD = 16;
+    // Request triggered a user-based risk or fraud check resulting in a decline
+    STATUS_USER_RISK_FRAUD = 17;
+    // Request triggered a instrument-based risk or fraud check resulting in a decline
+    STATUS_INSTRUMENT_RISK_FRAUD = 18;
     // The user needs to call the Service Provider to resolve an issue
     STATUS_USER_CALL_SERVICE_PROVIDER = 9;
     // The operation isn't supported by the Service Provider
@@ -171,7 +177,15 @@ message ObtainFundsResponse {
     // The Fi is unavailable at this time
     STATUS_SERVICE_PROVIDER_UNAVAILABLE = 11;
     // The payment token sent is invalid or not found
-    STATUS_INVALID_TOKEN = 12;
+    STATUS_INVALID_PAYMENT_TOKEN = 12;
+    // A valid PIN is required for this transaction
+    STATUS_PIN_REQUIRED = 13;
+    // returned when processing an EBT transaction but no line items have been given
+    STATUS_MISSING_LINE_ITEMS = 14;
+    // when partial approval is requested but not supported (i.e. non-EBT payment token passed)
+    STATUS_PARTIAL_APPROVAL_INVALID = 15;
+    // Request resulted in one or more limits being exceeded at the Service Provider
+    STATUS_LIMIT_EXCEEDED = 19;
   }
   Status status = 1;
 
@@ -199,15 +213,21 @@ message ReturnFundsResponse {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     // An approval for the full amount
-    STATUS_APPROVED = 1;
+    STATUS_FULL_APPROVAL = 1;
     // An error occurred when processing the request
     STATUS_ERROR = 2;
     // User instrument is closed
     STATUS_INSTRUMENT_CLOSED = 3;
     // Instrument/account not found
     STATUS_NOT_FOUND = 4;
-    // Request triggered a risk or fraud check resulting in a decline
-    STATUS_RISK_FRAUD = 5;
+    // Request triggered a transactional risk or fraud check resulting in a decline
+    STATUS_TRANSACTION_RISK_FRAUD = 5;
+    // Request triggered a bad actor risk or fraud check resulting in a decline
+    STATUS_BAD_ACTOR_RISK_FRAUD = 16;
+    // Request triggered a user-based risk or fraud check resulting in a decline
+    STATUS_USER_RISK_FRAUD = 17;
+    // Request triggered a instrument-based risk or fraud check resulting in a decline
+    STATUS_INSTRUMENT_RISK_FRAUD = 18;
     // The user needs to call the Service Provider to resolve an issue
     STATUS_USER_CALL_SERVICE_PROVIDER = 6;
     // The operation isn't supported by the Service Provider
@@ -215,7 +235,9 @@ message ReturnFundsResponse {
     // The Fi is unavailable at this time
     STATUS_SERVICE_PROVIDER_UNAVAILABLE = 8;
     // The payment token sent is invalid or not found
-    STATUS_INVALID_TOKEN = 9;
+    STATUS_INVALID_PAYMENT_TOKEN = 9;
+    // Request resulted in one or more limits being exceeded at the Service Provider
+    STATUS_LIMIT_EXCEEDED = 19;
   }
   Status status = 1;
 
