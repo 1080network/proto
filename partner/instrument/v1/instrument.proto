@@ -37,6 +37,6 @@ message ExchangeSessionKeyResponse {
 
   common.v1.Error error = 2;
 
-  // The payment token that the Partner can use to obtain or return funds for this user.
+  // The payment token that the Partner can use to obtain or return value for this user.
   string partner_payment_token = 3;
 }

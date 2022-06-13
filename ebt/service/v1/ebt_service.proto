@@ -12,7 +12,7 @@ package ebt.service.v1;
 
 import "common/authenticate/v1/authenticate.proto";
 import "common/ping/v1/ping.proto";
-import "ebt/funds/v1/funds.proto";
+import "ebt/value/v1/value.proto";
 import "ebt/listitem/v1/list_item.proto";
 import "ebt/program/v1/program.proto";
 import "ebt/serviceaccount/v1/service_account.proto";
@@ -25,7 +25,7 @@ option java_package = "io.mica.ebt.service.v1";
 option objc_class_prefix = "MICA";
 
 // The operations defined for this service are used internally by mica to set up EBT programs and
-// also to filter Funds Items during transaction processing. The operations to maintain EBT list
+// also to filter Value Items during transaction processing. The operations to maintain EBT list
 // items are done through the regular EBT service (may need to reconsider this position later).</p>
 // <p>This service can be used by EBT program managers to create service accounts for their
 // administrators and systems, retrieve and update EBT program details and manage list items. The
@@ -40,7 +40,7 @@ option objc_class_prefix = "MICA";
 // <p>When processing an EBT payment token, mica will send the list of basket items to the EBT
 // service in order to confirm that all the items in the basket are eligible. Any that aren't will
 // be marked as such and the total requested amount from the Partner will be reduced. If the
-// approval type is FULL then mica will decline the funds obtain request. If PARTIAL, mica will
+// approval type is FULL then mica will decline the value obtain request. If PARTIAL, mica will
 // pass the request on to the Service Provider.</p>
 // <p>Regardless of the rules defined for the Program, mica will record the items that wheren't on
 // any list for the program. This will enable the EBT program manager to update the lists based on
@@ -128,10 +128,10 @@ service EBTService {
   //</editor-fold>
 
 
-  //<editor-fold desc="FundsObtain Item filter">
+  //<editor-fold desc="ValueObtain Item filter">
 
-  // Filter a collection of Funds Line Items based on a given EBT type (e.g. SNAP, TANF, WIC) and region (e.g. a US state).
-  rpc FundsLineItemFilter(funds.v1.FundsLineItemFilterRequest) returns (funds.v1.FundsLineItemFilterResponse) {}
+  // Filter a collection of Value Line Items based on a given EBT type (e.g. SNAP, TANF, WIC) and region (e.g. a US state).
+  rpc ValueLineItemFilter(value.v1.ValueLineItemFilterRequest) returns (value.v1.ValueLineItemFilterResponse) {}
   //</editor-fold>
 
 

@@ -1,0 +1,16 @@
+version: v1beta1
+build:
+  roots:
+    - .
+lint:
+  use:
+    - DEFAULT
+  except:
+    - RPC_REQUEST_RESPONSE_UNIQUE
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
+  ignore:
+    - google
+breaking:
+  use:
+    - WIRE_JSON

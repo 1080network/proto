@@ -11,7 +11,7 @@ syntax = "proto3";
 package serviceprovider.service.v1;
 
 import "common/ping/v1/ping.proto";
-import "serviceprovider/funds/v1/funds.proto";
+import "serviceprovider/value/v1/value.proto";
 import "serviceprovider/instrument/v1/instrument.proto";
 import "serviceprovider/user/v1/user.proto";
 
@@ -24,8 +24,8 @@ option objc_class_prefix = "MICA";
 // at a Partner, to process transactions and optionally to retrieve a list of Users
 // transactions. With the exception of RetrieveTransactions all the other operations are
 // required.
-// The two Funds operations, Obtain and Return, have basically the same structure and content.
-// They primarily differ in the status codes they return. The main Funds type includes information
+// The two Value operations, Obtain and Return, have basically the same structure and content.
+// They primarily differ in the status codes they return. The main Value type includes information
 // about the instrument being used, the amount of the transaction (requested and total amounts),
 // the currency, the organization and store the transation occured in and optionally a list of
 // items the user is purchasing or returning.
@@ -39,16 +39,16 @@ service ServiceProviderFromMicaService {
   // instrument and date range.
   rpc RetrieveTransaction(instrument.v1.RetrieveTransactionRequest) returns (instrument.v1.RetrieveTransactionResponse) {}
 
-  //<editor-fold desc="Funds Operations">
+  //<editor-fold desc="Value Operations">
 
-  // Operation to obtain funds from a given instrument. Along with a common Funds object (see
+  // Operation to obtain value from a given instrument. Along with a common Value object (see
   // above), it includes an approval type of either FULL or PARTIAL.
-  rpc ObtainFunds(funds.v1.ObtainFundsRequest) returns (funds.v1.ObtainFundsResponse) {}
+  rpc ObtainValue(value.v1.ObtainValueRequest) returns (value.v1.ObtainValueResponse) {}
 
-  // Operation to return funds to a given instrument.
-  rpc ReturnFunds(funds.v1.ReturnFundsRequest) returns (funds.v1.ReturnFundsResponse) {}
+  // Operation to return value to a given instrument.
+  rpc ReturnValue(value.v1.ReturnValueRequest) returns (value.v1.ReturnValueResponse) {}
 
-  rpc ReceiveFunds(funds.v1.ReceiveFundsRequest) returns (funds.v1.ReceiveFundsResponse) {}
+  rpc ReceiveValue(value.v1.ReceiveValueRequest) returns (value.v1.ReceiveValueResponse) {}
   //</editor-fold>
 
 

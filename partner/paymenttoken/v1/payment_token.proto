@@ -25,7 +25,7 @@ message PaymentToken {
 }
 
 message RemovePaymentTokenRequest {
-  // The payment token that the Partner can use to obtain or return funds for this user.
+  // The payment token that the Partner can use to obtain or return value for this user.
   string partner_payment_token = 2;
 }
 
@@ -42,7 +42,7 @@ message RemovePaymentTokenResponse {
 }
 
 message ExchangePaymentTokenRequest {
-  // The payment token that the Partner can use to obtain or return funds for this user.
+  // The payment token that the Partner can use to obtain or return value for this user.
   string partner_payment_token = 1;
 
   // flag to indicate what to do with the payment token that's being replaced
@@ -60,7 +60,7 @@ message ExchangePaymentTokenResponse {
 
   common.v1.Error error = 2;
 
-  // The payment token that the Partner can use to obtain or return funds for this user.
+  // The payment token that the Partner can use to obtain or return value for this user.
   string partner_payment_token = 3;
 }
 

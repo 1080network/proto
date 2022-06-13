@@ -95,3 +95,45 @@ message SearchOrganizationResponse {
 
   repeated common.v1.Organization organizations = 3;
 }
+
+message GetOrganizationLegacyConfigurationRequest {
+  string organization_key = 1;
+}
+
+message GetOrganizationLegacyConfigurationResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_INVALID_PARTNER_ID = 3;
+    STATUS_NOT_FOUND = 4;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  common.v1.LegacyConfiguration partner_legacy_configuration = 3;
+
+  common.v1.LegacyConfiguration organization_legacy_configuration = 4;
+}
+
+message UpdateOrganizationLegacyConfigurationRequest {
+  string organization_key = 1;
+
+  common.v1.LegacyConfiguration legacy_configuration = 2;
+}
+
+message UpdateOrganizationLegacyConfigurationResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_INVALID_PARTNER_ID = 3;
+    STATUS_NOT_FOUND = 4;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3;
+}

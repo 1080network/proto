@@ -12,7 +12,7 @@ package serviceprovider.service.v1;
 
 import "common/authenticate/v1/authenticate.proto";
 import "common/ping/v1/ping.proto";
-import "serviceprovider/funds/v1/funds.proto";
+import "serviceprovider/value/v1/value.proto";
 import "serviceprovider/instrument/v1/instrument.proto";
 import "serviceprovider/paymenttoken/v1/payment_token.proto";
 import "serviceprovider/serviceaccount/v1/service_account.proto";
@@ -27,13 +27,13 @@ option objc_class_prefix = "MICA";
 // The operations in this service allow the Service Provider to register their users and
 // the user's instruments (accounts).  In addition there are operations to update, retrieve, search
 // and delete those users and instruments. The SP can retrieve/search Organizations to retrieve
-// information about them that is not passed via FundsObtain or FundsReturn. Finally the SP can
+// information about them that is not passed via ValueObtain or ValueReturn. Finally the SP can
 // provision it's own Payment Tokens which it can distribute to it's own users.
 // The SP starts by authenticating themselves after which they can call the other operations in
 // this service. At a minimum, the SP will need to call RegisterUser and RegisterInstrument for
 // each user and instrument they want to make available for their users at mica. For both Users and
 // Instruments the SP can retrieve, update and remove them.
-// When mica calls the SP with either FundsObtain or FundsReturn mica will include the
+// When mica calls the SP with either ValueObtain or ValueReturn mica will include the
 // organizationKey and the specific category being used for this request. If the SP wants to get
 // more information about the organization (e.g. name, all categories, and it's address) they can
 // use the GetOrganization and SearchOrganization calls.
@@ -124,7 +124,7 @@ service ServiceProviderToMicaService {
 
   //<editor-fold desc="Person to Person Operations">
 
-  rpc SendFunds(funds.v1.SendFundsRequest) returns (funds.v1.SendFundsResponse) {}
+  rpc SendValue(value.v1.SendValueRequest) returns (value.v1.SendValueResponse) {}
   //</editor-fold>
 
 

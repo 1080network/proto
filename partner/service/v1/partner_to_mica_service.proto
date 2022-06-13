@@ -12,7 +12,7 @@ package partner.service.v1;
 
 import "common/authenticate/v1/authenticate.proto";
 import "common/ping/v1/ping.proto";
-import "partner/funds/v1/funds.proto";
+import "partner/value/v1/value.proto";
 import "partner/instrument/v1/instrument.proto";
 import "partner/organization/v1/organization.proto";
 import "partner/partner/v1/partner.proto";
@@ -20,6 +20,7 @@ import "partner/paymenttoken/v1/payment_token.proto";
 import "partner/serviceaccount/v1/service_account.proto";
 import "partner/serviceprovider/v1/service_provider.proto";
 import "partner/store/v1/store.proto";
+import "partner/transaction/v1/transaction.proto";
 import "partner/widget/v1/widget.proto";
 
 option go_package = "mica/proto/partner/servicev1";
@@ -35,6 +36,12 @@ service PartnerToMicaService {
 
   // Retrieves the details of the Partner at mica.
   rpc GetPartner(partner.v1.GetPartnerRequest) returns (partner.v1.GetPartnerResponse) {}
+
+  // Retrieve an partner's legacy configuration based on it's key.
+  rpc GetPartnerLegacyConfiguration(partner.v1.GetPartnerLegacyConfigurationRequest) returns (partner.v1.GetPartnerLegacyConfigurationResponse) {}
+
+  // Update a given partner's legacy configuration.
+  rpc UpdatePartnerLegacyConfiguration(partner.v1.UpdatePartnerLegacyConfigurationRequest) returns (partner.v1.UpdatePartnerLegacyConfigurationResponse) {}
   //</editor-fold>
 
 
@@ -64,6 +71,12 @@ service PartnerToMicaService {
 
   // Like GetOrganization, can be used to retrieve Organizations based on the criteria in the request.
   rpc SearchOrganization(organization.v1.SearchOrganizationRequest) returns (organization.v1.SearchOrganizationResponse) {}
+
+  // Retrieve an organization's legacy configuration based on it's key.
+  rpc GetOrganizationLegacyConfiguration(organization.v1.GetOrganizationLegacyConfigurationRequest) returns (organization.v1.GetOrganizationLegacyConfigurationResponse) {}
+
+  // Update a given organization's legacy configuration.
+  rpc UpdateOrganizationLegacyConfiguration(organization.v1.UpdateOrganizationLegacyConfigurationRequest) returns (organization.v1.UpdateOrganizationLegacyConfigurationResponse) {}
   //</editor-fold>
 
 
@@ -106,16 +119,16 @@ service PartnerToMicaService {
   //</editor-fold>
 
 
-  //<editor-fold desc="Funds Operations">
+  //<editor-fold desc="Value Operations">
 
-  // An operation to obtain funds from a user in order to pay for goods or services rendered to the user.
-  rpc ObtainFunds(funds.v1.ObtainFundsRequest) returns (funds.v1.ObtainFundsResponse) {}
+  // An operation to obtain value from a user in order to pay for goods or services rendered to the user.
+  rpc ObtainValue(value.v1.ObtainValueRequest) returns (value.v1.ObtainValueResponse) {}
 
-  // An operation to return funds to a user in order to refund them for goods or services.
-  rpc ReturnFunds(funds.v1.ReturnFundsRequest) returns (funds.v1.ReturnFundsResponse) {}
+  // An operation to return value to a user in order to refund them for goods or services.
+  rpc ReturnValue(value.v1.ReturnValueRequest) returns (value.v1.ReturnValueResponse) {}
 
-  // An operation to search for Funds operations either Obtain or Return that the Partner has requested of mica.
-  rpc SearchFunds(funds.v1.SearchFundsRequest) returns (funds.v1.SearchFundsResponse) {}
+  // An operation to search for Value operations either Obtain or Return that the Partner has requested of mica.
+  rpc SearchValue(value.v1.SearchValueRequest) returns (value.v1.SearchValueResponse) {}
   //</editor-fold>
 
 
@@ -131,5 +144,15 @@ service PartnerToMicaService {
   rpc InitializeWidget(widget.v1.InitializeWidgetRequest) returns (widget.v1.InitializeWidgetResponse) {}
 
   rpc ExchangeSessionKey(instrument.v1.ExchangeSessionKeyRequest) returns (instrument.v1.ExchangeSessionKeyResponse) {}
+  //</editor-fold>
+
+
+  //<editor-fold desc="Dashboard Operations">
+
+  rpc SearchTransactionData(transaction.v1.SearchTransactionDataRequest) returns (transaction.v1.SearchTransactionDataResponse) {}
+
+  rpc SearchTransactionGeographyData(transaction.v1.SearchTransactionGeographyDataRequest) returns (transaction.v1.SearchTransactionGeographyDataResponse) {}
+
+  rpc SearchTransactionServiceProviderData(transaction.v1.SearchTransactionServiceProviderDataRequest) returns (transaction.v1.SearchTransactionServiceProviderDataResponse) {}
   //</editor-fold>
 }
