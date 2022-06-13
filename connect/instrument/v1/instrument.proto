@@ -59,7 +59,7 @@ message WidgetRegisterInstrumentInitiateResponse {
 message Instrument {
   common.enums.instrumenttype.v1.InstrumentType instrument_type = 1;
 
-  .common.enums.currency.v1.Currency currency = 3;
+  common.enums.currency.v1.Currency currency = 3;
 
   string instrument_identifier = 2;
 
