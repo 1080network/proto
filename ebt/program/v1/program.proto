@@ -1,0 +1,152 @@
+// Copyright (c) 2022 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package ebt.program.v1;
+
+import "common/enums/ebtregion/v1/ebt_region.proto";
+import "common/enums/ebttype/v1/ebt_type.proto";
+import "common/v1/error.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "mica/proto/ebt/programv1";
+option java_outer_classname = "EBTProgramProto";
+option java_package = "io.mica.ebt.program.v1";
+option objc_class_prefix = "MICA";
+
+message EBTProgramRules {
+  // need to add rules for what to do when an item isn't on the approve or deny lists
+  bool approve_unlisted_items = 1;
+}
+
+enum ProgramManager {
+  PROGRAM_MANAGER_UNSPECIFIED = 0;
+
+  PROGRAM_MANAGER_FIS = 1;
+
+  PROGRAM_MANAGER_CONDUENT = 2;
+
+  PROGRAM_MANAGER_EVERTEC = 3;
+
+  PROGRAM_MANAGER_CHASE = 4;
+
+  PROGRAM_MANAGER_SOLUTRAN = 5;
+
+  PROGRAM_MANAGER_NORTHROP_GRUMMAN = 6;
+}
+
+message EBTProgram {
+  string ebt_program_key = 1;
+
+  google.protobuf.Timestamp created = 2;
+
+  google.protobuf.Timestamp updated = 3;
+
+  int64 version = 4;
+
+  common.enums.ebttype.v1.EbtType ebt_type = 5;
+
+  common.enums.ebtregion.v1.EbtRegion region = 6;
+
+  ProgramManager program_manager = 7;
+
+  EBTProgramRules program_rules = 8;
+}
+
+message CreateEBTProgramRequest {
+  common.enums.ebttype.v1.EbtType ebt_type = 1;
+
+  common.enums.ebtregion.v1.EbtRegion region = 2;
+
+  ProgramManager program_manager = 3;
+
+  EBTProgramRules program_rules = 4;
+}
+
+message CreateEBTProgramResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_DUPLICATE = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  string ebt_program_key = 3;
+
+  int64 version = 4;
+}
+
+message GetEBTProgramRequest {
+  string ebt_program_key = 1;
+}
+
+message GetEBTProgramResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+    STATUS_FORBIDDEN_DATA_ACCESS = 4;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  EBTProgram ebt_program = 3;
+}
+
+message UpdateEBTProgramRequest {
+  string ebt_program_key = 1;
+
+  int64 version = 2;
+
+  ProgramManager program_manager = 3;
+
+  EBTProgramRules program_rules = 4;
+}
+
+message UpdateEBTProgramResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+    STATUS_FORBIDDEN_DATA_ACCESS = 4;
+    STATUS_VERSION_MISMATCH = 5;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3;
+}
+
+message SearchEBTProgramRequest {
+  common.enums.ebttype.v1.EbtType ebt_type = 1;
+
+  common.enums.ebtregion.v1.EbtRegion region = 2;
+
+  ProgramManager program_manager = 3;
+}
+
+message SearchEBTProgramResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  repeated EBTProgram ebt_programs = 3;
+}

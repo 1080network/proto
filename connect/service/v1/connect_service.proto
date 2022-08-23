@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// Copyright (c) 2022 Mica. All rights reserved. All software, including, without limitation, all source
 // code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
 // other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
 // post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
@@ -20,7 +20,7 @@ option java_outer_classname = "ConnectServiceProto";
 option java_package = "io.mica.connect.service.v1";
 option objc_class_prefix = "MICA";
 
-// The Connect Service implements both Legacy Connect and Connect. It is used to enroll user'a financial accounts on the
+// The Connect Service implements both Legacy Connect and Connect. It is used to enroll user's financial accounts on the
 // Mica network.
 service ConnectService {
   // Retrieve systems static data which is used to drive UI behavior. This includes the public keys for the various

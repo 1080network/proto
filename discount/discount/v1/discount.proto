@@ -1,0 +1,158 @@
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package discount.discount.v1;
+
+import "common/enums/currency/v1/currency.proto";
+import "common/enums/unit/v1/unit.proto";
+import "common/v1/error.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "mica/proto/discount/discountv1";
+option java_outer_classname = "DiscountProto";
+option java_package = "io.mica.discount.discount.v1";
+option objc_class_prefix = "MICA";
+
+message Discount {
+  string discount_key = 1;
+
+  int64 version = 2;
+
+  string external_ref = 3;
+
+  string receipt_description = 4;
+
+  DiscountStatus status = 5;
+
+  DiscountType type = 6;
+
+  google.protobuf.Timestamp date_from = 7;
+
+  google.protobuf.Timestamp date_to = 8;
+
+  common.enums.currency.v1.Currency currency = 9;
+
+  string discount_amount = 10;
+
+  string discount_tax_amount = 11;
+
+  string user_key = 12;
+
+  string user_ref = 13;
+
+  // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
+  // discount to apply
+  repeated DiscountCriteria discount_criteria = 14;
+}
+
+enum DiscountStatus {
+  DISCOUNT_STATUS_UNSPECIFIED = 0;
+
+  DISCOUNT_STATUS_AVAILABLE = 1;
+
+  // transitory status set by Mica when a discount would apply during transaction processing.
+  DISCOUNT_STATUS_HOLD = 2;
+
+  // set by the discount provider
+  DISCOUNT_STATUS_SUSPENDED = 3;
+
+  DISCOUNT_STATUS_USED = 4;
+
+  DISCOUNT_STATUS_CLOSED = 5;
+}
+
+enum DiscountType {
+  DISCOUNT_TYPE_UNSPECIFIED = 0;
+
+  DISCOUNT_TYPE_CPG = 1;
+
+  DISCOUNT_TYPE_GOVERNMENT = 2;
+
+  DISCOUNT_TYPE_PARTNER = 3;
+
+  DISCOUNT_TYPE_SERVICE_PROVIDER = 4;
+}
+
+message Quantity {
+  // an integer or decimal number
+  string quantity = 1;
+
+  common.enums.unit.v1.Unit unit = 2;
+}
+
+message DiscountCriteria {
+  Quantity quantity = 1;
+
+  repeated string product_groups = 2;
+
+  // list of product codes of which the basket must include at least one in this list (i.e. it's an or operation)
+  repeated string product_codes = 3;
+}
+
+message CreateDiscountRequest {
+  string external_ref = 1;
+
+  string receipt_description = 2;
+
+  DiscountStatus status = 3;
+
+  DiscountType type = 4;
+
+  google.protobuf.Timestamp date_from = 5;
+
+  google.protobuf.Timestamp date_to = 6;
+
+  common.enums.currency.v1.Currency currency = 7;
+
+  string discount_amount = 8;
+
+  string discount_tax_amount = 9;
+
+  string user_key = 10;
+
+  string user_ref = 11;
+
+  // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
+  // discount to apply
+  repeated DiscountCriteria discount_criteria = 12;
+}
+
+message CreateDiscountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  string discount_key = 3;
+
+  int64 version = 4;
+}
+
+message GetDiscountRequest {
+  string discount_key = 1;
+}
+
+message GetDiscountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  Discount discount = 3;
+}

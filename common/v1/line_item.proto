@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// Copyright (c) 2022 Mica. All rights reserved. All software, including, without limitation, all source
 // code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
 // other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
 // post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
@@ -11,13 +11,14 @@ syntax = "proto3";
 package common.v1;
 
 import "common/enums/lineitemstatus/v1/line_item_status.proto";
+import "common/enums/unit/v1/unit.proto";
 
 option go_package = "mica/proto/common/v1;commonv1";
 option java_outer_classname = "LineItemProto";
 option java_package = "io.mica.common.v1";
 option objc_class_prefix = "MICA";
 
-message LineItemRequest {
+message LineItem {
   // unique number in a list of items that can be used to refer to a specific item
   int32 sequence = 1;
 
@@ -25,22 +26,41 @@ message LineItemRequest {
 
   string description = 3;
 
+  // an integer or decimal number
+  string quantity = 4;
+
+  common.enums.unit.v1.Unit unit = 5;
+
+  string unit_amount = 6;
+
+  string unit_tax_amount = 7;
+
   // The total amount for this line item excluding tax.
   // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
-  string amount = 4;
+  string line_amount = 8;
 
   // The amount of tax for this line item.
   // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
-  string tax_amount = 5;
+  string line_tax_amount = 9;
 }
 
-message LineItemResponse {
+message LineItemSequenceAndStatus {
   // unique number in a list of items that can be used to refer to a specific item
   int32 sequence = 1;
 
   common.enums.lineitemstatus.v1.LineItemStatus status = 2;
 }
 
+message LineItemSequenceAndStatusValue {
+  repeated LineItemSequenceAndStatus line_item_sequence_and_statuses = 1;
+}
+
+message LineItemAndStatus {
+  LineItem line_item = 1;
+
+  common.enums.lineitemstatus.v1.LineItemStatus status = 2;
+}
+
 message LineItemResponseValue {
-  repeated LineItemResponse line_item_responses = 1;
+  repeated LineItemAndStatus line_item_and_statuses = 1;
 }

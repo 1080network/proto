@@ -1,0 +1,121 @@
+// Copyright (c) 2022 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package common.v1;
+
+import "common/v1/error.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "mica/proto/common/v1;commonv1";
+option java_outer_classname = "MTLSCertificates";
+option java_package = "io.mica.common.v1";
+option objc_class_prefix = "MICA";
+
+message MTLSCertificateSignatureRequest {
+  //PEM encoded string
+  string pem_csr = 1;
+}
+
+message MTLSCertificate {
+  //Serial number of the generated certificate
+  string serial_number = 1;
+
+  google.protobuf.Timestamp issued = 2;
+
+  google.protobuf.Timestamp expiry = 3;
+
+  //whether this certificate can be used or has been disallowed for access regardless of expiration
+  bool enabled = 4;
+
+  //The pem encoded certificate generated
+  string pem_certificate = 5;
+
+  //The pem encoded issuing CA
+  string pem_issuing_ca = 6;
+
+  //The pem encoded certificate chain
+  repeated string pem_ca_chain = 7;
+
+  //Aggregate all in one pem bundle
+  string pem_bundle = 8;
+
+  //The roles the certificate has
+  repeated string roles = 9;
+}
+
+message GenerateMTLSCertificateRequest {
+  MTLSCertificateSignatureRequest csr = 1;
+  //TODO we should probably enum this with the few roles that are allowed for mTLS?
+  repeated string roles = 3;
+}
+
+message GenerateMTLSCertificateResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  MTLSCertificate certificate = 3;
+}
+
+message UpdateMTLSCertificateRequest {
+  string serial_number = 1;
+  bool enabled = 2;
+}
+
+message UpdateMTLSCertificateResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+  string serial_number = 3;
+}
+
+message GetMTLSCertificateRequest {
+  string serial_number = 1;
+}
+
+message GetMTLSCertificateResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_NOT_FOUND = 2;
+    STATUS_ERROR = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  MTLSCertificate certificate = 3;
+}
+
+message SearchMTLSCertificateRequest {
+  // Nothing for now; we will add criteria as we add console use-cases.
+}
+
+message SearchMTLSCertificateResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+  repeated MTLSCertificate certificates = 3;
+}

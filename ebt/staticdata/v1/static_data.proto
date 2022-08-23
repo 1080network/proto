@@ -1,0 +1,46 @@
+// Copyright (c) 2022 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package ebt.staticdata.v1;
+
+import "common/v1/error.proto";
+
+option go_package = "mica/proto/ebt/staticdatav1";
+option java_outer_classname = "StaticDataProto";
+option java_package = "io.mica.ebt.staticdata.v1";
+option objc_class_prefix = "MICA";
+
+message GetStaticDataRequest {}
+
+message GetStaticDataResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int32 min_username_length = 3;
+
+  int32 min_password_length = 4;
+
+  repeated string unauth_roles = 5;
+
+  repeated string roles = 6;
+
+  message StringList {
+    repeated string item = 1;
+  }
+  map<string, StringList> role_map = 7;
+
+  map<string, StringList> group_map = 8;
+}

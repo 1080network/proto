@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// Copyright (c) 2022 Mica. All rights reserved. All software, including, without limitation, all source
 // code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
 // other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
 // post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
@@ -33,7 +33,7 @@ message User {
 }
 
 message EnrollUserInstrumentRequest {
-  // The payment token that the Partner can use to obtain or return funds for this user.
+  // The payment token that the Partner can use to obtain or return value for this user.
   string partner_payment_token = 1;
 
   common.v1.UserDemographic user_demographic = 2;
@@ -45,7 +45,7 @@ message EnrollUserInstrumentResponse {
     STATUS_SUCCESS = 1;
     STATUS_ERROR = 2;
     STATUS_PARTIAL_APPROVAL = 3;
-    STATUS_INSUFFICIENT_FUNDS = 4;
+    STATUS_INSUFFICIENT_VALUE = 4;
     STATUS_INELIGIBLE_PRODUCTS = 5;
     STATUS_USER_CLOSED = 6;
   }

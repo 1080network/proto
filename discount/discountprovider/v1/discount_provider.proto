@@ -1,0 +1,109 @@
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package discount.discount.v1;
+
+import "common/v1/address.proto";
+import "common/v1/error.proto";
+
+option go_package = "mica/proto/discount/discountproviderv1";
+option java_outer_classname = "DiscountProviderProto";
+option java_package = "io.mica.discount.discountprovider.v1";
+option objc_class_prefix = "MICA";
+
+message DiscountProvider {
+  string discount_provider_key = 1;
+
+  int64 version = 2;
+
+  string name = 3;
+
+  common.v1.Address address = 5;
+
+  string callback_url = 6;
+
+  string email = 7;
+
+  string phone = 8;
+
+  // The organizations domestic ACH routing number (9 characters)
+  string domestic_ach_routing_number = 11;
+
+  // The organizations international ACH routing number (9 characters)
+  string international_ach_routing_number = 12;
+
+  // The organizations wire routing number (9 characters)
+  string wire_routing_number = 13;
+
+  // The organizations swift routing number (9 characters)
+  string swift_routing_number = 14;
+
+  // The organizations bank account number (14 digits)
+  string bank_account_number = 15;
+}
+
+message GetDiscountProviderRequest {}
+
+message GetDiscountProviderResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  DiscountProvider discount_provider = 3;
+}
+
+message UpdateDiscountProviderRequest {
+  string discount_provider_key = 1;
+
+  string name = 2;
+
+  common.v1.Address address = 3;
+
+  string callback_url = 4;
+
+  string email = 5;
+
+  string phone = 6;
+
+  // The organizations domestic ACH routing number (9 characters)
+  string domestic_ach_routing_number = 7;
+
+  // The organizations international ACH routing number (9 characters)
+  string international_ach_routing_number = 8;
+
+  // The organizations wire routing number (9 characters)
+  string wire_routing_number = 9;
+
+  // The organizations swift routing number (9 characters)
+  string swift_routing_number = 10;
+
+  // The organizations bank account number (14 digits)
+  string bank_account_number = 11;
+}
+
+message UpdateDiscountProviderResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3;
+}
