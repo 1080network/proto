@@ -8,7 +8,7 @@
 
 syntax = "proto3";
 
-package discount.discount.v1;
+package discount.discountprovider.v1;
 
 import "common/v1/address.proto";
 import "common/v1/error.proto";
@@ -27,7 +27,7 @@ message DiscountProvider {
 
   common.v1.Address address = 5;
 
-  string callback_url = 6;
+  string callback_address = 6;
 
   string email = 7;
 
@@ -72,7 +72,7 @@ message UpdateDiscountProviderRequest {
 
   common.v1.Address address = 3;
 
-  string callback_url = 4;
+  string callback_address = 4;
 
   string email = 5;
 
