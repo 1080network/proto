@@ -14,6 +14,8 @@ import "common/enums/currency/v1/currency.proto";
 import "common/enums/unit/v1/unit.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
+import "common/v1/address.proto";
+import "common/v1/line_item.proto";
 
 option go_package = "mica/proto/discount/discountv1";
 option java_outer_classname = "DiscountProto";
@@ -21,35 +23,38 @@ option java_package = "io.mica.discount.discount.v1";
 option objc_class_prefix = "MICA";
 
 message Discount {
-  string discount_key = 1;
+  string discount_definition_key = 1;
 
-  int64 version = 2;
+  string discount_key = 2;
 
-  string external_ref = 3;
+  int64 version = 3;
 
-  string receipt_description = 4;
+  string discount_ref = 4;
 
-  DiscountStatus status = 5;
+  string receipt_description = 5;
 
-  DiscountType type = 6;
+  DiscountStatus status = 6;
 
-  google.protobuf.Timestamp date_from = 7;
+  DiscountType type = 7;
 
-  google.protobuf.Timestamp date_to = 8;
+  google.protobuf.Timestamp date_from = 8;
 
-  common.enums.currency.v1.Currency currency = 9;
+  google.protobuf.Timestamp date_to = 9;
 
-  string discount_amount = 10;
+  // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
+  // discount to apply
+  repeated DiscountCriteria discount_criteria = 10;
 
-  string discount_tax_amount = 11;
+  common.enums.currency.v1.Currency currency = 11;
 
   string user_key = 12;
 
   string user_ref = 13;
 
-  // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
-  // discount to apply
-  repeated DiscountCriteria discount_criteria = 14;
+  oneof discount_amount {
+    MonetaryAmount monetary_amount = 14;
+    PercentageAmount percentage_amount = 15;
+  }
 }
 
 enum DiscountStatus {
@@ -90,38 +95,66 @@ message Quantity {
 message DiscountCriteria {
   Quantity quantity = 1;
 
-  repeated string product_groups = 2;
+  MonetaryAmount monetary_amount = 2;
+
+  // indicates that this criteria is used to determine how much value to apply to these items
+  bool discount_amount_applicable = 3;
+
+  repeated string product_groups = 4;
 
   // list of product codes of which the basket must include at least one in this list (i.e. it's an or operation)
-  repeated string product_codes = 3;
+  repeated string product_codes = 5;
+}
+
+message MonetaryAmount {
+  // must be a monetary amount (e.g. 0.34)
+  string amount = 1;
+
+  string tax_amount = 2;
+}
+
+message PercentageAmount {
+  // must be a percentage (50.3%)
+  string percentage_amount = 1;
+
+  string percentage_tax_amount = 2;
+
+  // must be a monetary amount (e.g. 0.34)
+  MonetaryAmount max_amount = 3;
+
+  // what to apply the percentage to
+  DiscountCriteria criteria = 4;
 }
 
 message CreateDiscountRequest {
-  string external_ref = 1;
+  string discount_description_key = 1;
 
-  string receipt_description = 2;
+  string discount_ref = 2;
 
-  DiscountStatus status = 3;
+  string receipt_description = 3;
 
-  DiscountType type = 4;
+  DiscountStatus status = 4;
 
-  google.protobuf.Timestamp date_from = 5;
+  DiscountType type = 5;
 
-  google.protobuf.Timestamp date_to = 6;
+  google.protobuf.Timestamp date_from = 6;
 
-  common.enums.currency.v1.Currency currency = 7;
-
-  string discount_amount = 8;
-
-  string discount_tax_amount = 9;
-
-  string user_key = 10;
-
-  string user_ref = 11;
+  google.protobuf.Timestamp date_to = 7;
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated DiscountCriteria discount_criteria = 12;
+  repeated DiscountCriteria discount_criteria = 8;
+
+  string user_key = 9;
+
+  string user_ref = 10;
+
+  common.enums.currency.v1.Currency currency = 11;
+
+  oneof discount_amount {
+    MonetaryAmount monetary_amount = 12;
+    PercentageAmount percentage_amount = 13;
+  }
 }
 
 message CreateDiscountResponse {
@@ -155,4 +188,56 @@ message GetDiscountResponse {
   common.v1.Error error = 2;
 
   Discount discount = 3;
+}
+
+message ApplyDiscountNotificationRequest {
+  // discount details
+  string discount_key = 1;
+
+  string discount_ref = 2;
+
+  DiscountStatus status = 3;  // only USED supported initially
+
+  common.enums.currency.v1.Currency currency = 4;
+
+  MonetaryAmount monetary_amount = 5;
+
+  // transaction details
+  string transaction_key = 10;
+
+  google.protobuf.Timestamp transaction_created = 11;  // Timestamp when discount was applied
+
+  string partner_key = 13;
+
+  string partner_name = 14;
+
+  string organization_key = 15;
+
+  string organization_name = 16;
+
+  common.v1.Address organization_address = 17;
+
+  string store_key = 19;
+
+  string store_number = 20;
+
+  common.v1.Address store_address = 21;
+
+  // string federated_user_key = 22;
+
+  repeated common.v1.LineItem line_items = 22;
+}
+
+message ApplyDiscountNotificationResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  // TODO(kuchlein): determine if we want to have an identifier passed back. I'm leaning towards not
+  string external_ref = 3;
 }

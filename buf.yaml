@@ -11,6 +11,7 @@ lint:
     - RPC_RESPONSE_STANDARD_NAME
   ignore:
     - google
+    - validate
 breaking:
   use:
     - WIRE_JSON

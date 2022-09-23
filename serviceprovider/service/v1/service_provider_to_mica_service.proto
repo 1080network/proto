@@ -11,6 +11,7 @@ syntax = "proto3";
 package serviceprovider.service.v1;
 
 import "common/ping/v1/ping.proto";
+import "common/v1/receipt.proto";
 import "serviceprovider/instrument/v1/instrument.proto";
 import "serviceprovider/paymenttoken/v1/payment_token.proto";
 import "serviceprovider/serviceprovider/v1/service_provider.proto";
@@ -121,7 +122,7 @@ service ServiceProviderToMicaService {
   //<editor-fold desc="Transaction Operations">
 
   // Retrieve a transaction based on it's key.
-  rpc GetReceipt(transaction.v1.GetReceiptRequest) returns (transaction.v1.GetReceiptResponse) {}
+  rpc GetReceipt(common.v1.GetReceiptRequest) returns (common.v1.GetReceiptResponse) {}
   //</editor-fold>
 
 

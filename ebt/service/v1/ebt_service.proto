@@ -14,7 +14,6 @@ import "common/ping/v1/ping.proto";
 import "ebt/listitem/v1/list_item.proto";
 import "ebt/program/v1/program.proto";
 import "ebt/staticdata/v1/static_data.proto";
-import "ebt/user/v1/user.proto";
 
 option go_package = "mica/proto/ebt/servicev1";
 option java_outer_classname = "EbtServiceProto";
@@ -64,25 +63,6 @@ service EBTService {
   rpc SearchEBTProgram(program.v1.SearchEBTProgramRequest) returns (program.v1.SearchEBTProgramResponse) {}
   //</editor-fold>
 
-
-  //<editor-fold desc="User Account Operations">
-
-  // Create a user account that it used by a person or system to authenticate against mica.
-  rpc CreateUser(user.v1.CreateUserRequest) returns (user.v1.CreateUserResponse) {}
-
-  // Retrieve a user account based on it's key.
-  rpc GetUser(user.v1.GetUserRequest) returns (user.v1.GetUserResponse) {}
-
-  // Remove a user account based on it's key.
-  rpc RemoveUser(user.v1.RemoveUserRequest) returns (user.v1.RemoveUserResponse) {}
-
-  rpc UpdateUser(user.v1.UpdateUserRequest) returns (user.v1.UpdateUserResponse) {}
-
-  // Update the list of programs this account has access to.
-  rpc SearchUser(user.v1.SearchUserRequest) returns (user.v1.SearchUserResponse) {}
-
-  // FIXME: change password
-  //</editor-fold>
 
   //<editor-fold desc="List Management Operations">
 

@@ -14,7 +14,6 @@ import "common/enums/currency/v1/currency.proto";
 import "common/enums/region/v1/region.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
-import "internalserviceprovider/value/v1/value.proto";
 
 option go_package = "mica/proto/serviceprovider/transactionv1";
 option java_outer_classname = "TransactionProto";
@@ -167,22 +166,3 @@ message SearchTransactionPartnerDataResponse {
 
   repeated SearchTransactionPartnerDataItem items = 4;
 }
-
-message GetReceiptRequest {
-  string transaction_key = 1;
-}
-
-message GetReceiptResponse {
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_SUCCESS = 1;
-    STATUS_ERROR = 2;
-    STATUS_NOT_FOUND = 3;
-  }
-  Status status = 1;
-
-  common.v1.Error error = 2;
-
-  internalserviceprovider.value.v1.Value value = 3;
-}
-

@@ -1,0 +1,153 @@
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package discount.discountdefinition.v1;
+
+import "common/enums/currency/v1/currency.proto";
+import "discount/discount/v1/discount.proto";
+import "common/v1/error.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "mica/proto/discount/discountdefinitionv1";
+option java_outer_classname = "DiscountProto";
+option java_package = "io.mica.discount.discountdefinition.v1";
+option objc_class_prefix = "MICA";
+
+message DiscountDefinition {
+  string discount_definition_key = 1;
+
+  int64 version = 2;
+
+  string discount_definition_ref = 3;
+
+  string receipt_description = 4;
+
+  DiscountDefinitionStatus status = 5;
+
+  discount.v1.DiscountType type = 6;
+
+  google.protobuf.Timestamp date_from = 7;
+
+  google.protobuf.Timestamp date_to = 8;
+
+  // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
+  // discount to apply
+  repeated discount.v1.DiscountCriteria discount_criteria = 9;
+
+  common.enums.currency.v1.Currency currency = 10;
+
+  oneof discount_amount {
+    discount.v1.MonetaryAmount amount = 11;
+    discount.v1.PercentageAmount percentage = 12;
+  }
+}
+
+enum DiscountDefinitionStatus {
+  DISCOUNT_DEFINITION_STATUS_UNSPECIFIED = 0;
+
+  DISCOUNT_DEFINITION_STATUS_AVAILABLE = 1;
+
+  DISCOUNT_DEFINITION_STATUS_SUSPENDED = 2;
+
+  DISCOUNT_DEFINITION_STATUS_CLOSED = 3;
+}
+
+message CreateDiscountDefinitionRequest {
+  string discount_definition_ref = 1;
+
+  string receipt_description = 2;
+
+  discount.v1.DiscountStatus status = 3;
+
+  discount.v1.DiscountType type = 4;
+
+  google.protobuf.Timestamp date_from = 5;
+
+  google.protobuf.Timestamp date_to = 6;
+
+  // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
+  // discount to apply
+  repeated discount.v1.DiscountCriteria discount_criteria = 7;
+
+  common.enums.currency.v1.Currency currency = 8;
+
+  oneof discount_amount {
+    discount.v1.MonetaryAmount amount = 9;
+    discount.v1.PercentageAmount percentage = 10;
+  }
+}
+
+message CreateDiscountDefinitionResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  string discount_definition_key = 3;
+
+  int64 version = 4;
+}
+
+message GetDiscountDefinitionRequest {
+  string discount_definition_ref = 1;
+}
+
+message GetDiscountDefinitionResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  DiscountDefinition discount_definition = 3;
+}
+
+message UpdateDiscountDefinitionRequest {
+  string discount_definition_ref = 1;
+  // what might we want to allow to be updated?
+}
+
+message UpdateDiscountDefinitionResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3;
+}
+
+message RemoveDiscountDefinitionRequest {
+  string discount_definition_ref = 1;
+}
+
+message RemoveDiscountDefinitionResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+}

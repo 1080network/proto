@@ -53,7 +53,7 @@ message Partner {
 
   common.v1.Address address = 7;
 
-  string partner_url = 8;
+  string callback_address = 8;
 
   repeated PartnerAccount partner_accounts = 9;
 }

@@ -88,10 +88,10 @@ service PartnerToMicaService {
   //<editor-fold desc="Payment Token Operations">
 
   // When a user no longer wishes to use their payment tokens this operation can remove them from mica.
-  rpc ClosePaymentToken(paymenttoken.v1.RemovePaymentTokenRequest) returns (paymenttoken.v1.RemovePaymentTokenResponse) {}
+  rpc RemovePaymentToken(paymenttoken.v1.RemovePaymentTokenRequest) returns (paymenttoken.v1.RemovePaymentTokenResponse) {}
 
   // A Partner can proactively replace a payment token with a new one for future use.
-  rpc ReplacePaymentToken(paymenttoken.v1.ExchangePaymentTokenRequest) returns (paymenttoken.v1.ExchangePaymentTokenResponse) {}
+  rpc ExchangePaymentToken(paymenttoken.v1.ExchangePaymentTokenRequest) returns (paymenttoken.v1.ExchangePaymentTokenResponse) {}
 
   // Search for Payment Tokens that the Partner has created.
   rpc SearchPaymentToken(paymenttoken.v1.SearchPaymentTokenRequest) returns (paymenttoken.v1.SearchPaymentTokenResponse) {}

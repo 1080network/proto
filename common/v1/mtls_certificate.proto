@@ -12,6 +12,7 @@ package common.v1;
 
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/common/v1;commonv1";
 option java_outer_classname = "MTLSCertificates";
@@ -20,16 +21,16 @@ option objc_class_prefix = "MICA";
 
 message MTLSCertificateSignatureRequest {
   //PEM encoded string
-  string pem_csr = 1;
+  string pem_csr = 1 [(validate.rules).string.min_len = 1];
 }
 
 message MTLSCertificate {
   //Serial number of the generated certificate
-  string serial_number = 1;
+  string serial_number = 1 [(validate.rules).string.min_len = 1];
 
   google.protobuf.Timestamp issued = 2;
 
-  google.protobuf.Timestamp expiry = 3;
+  google.protobuf.Timestamp expiry = 3 [(validate.rules).timestamp.required = true];
 
   //whether this certificate can be used or has been disallowed for access regardless of expiration
   bool enabled = 4;
@@ -51,9 +52,9 @@ message MTLSCertificate {
 }
 
 message GenerateMTLSCertificateRequest {
-  MTLSCertificateSignatureRequest csr = 1;
+  MTLSCertificateSignatureRequest csr = 1 [(validate.rules).message.required = true];
   //TODO we should probably enum this with the few roles that are allowed for mTLS?
-  repeated string roles = 3;
+  repeated string roles = 3 [(validate.rules).repeated.min_items = 1];
 }
 
 message GenerateMTLSCertificateResponse {
@@ -70,7 +71,7 @@ message GenerateMTLSCertificateResponse {
 }
 
 message UpdateMTLSCertificateRequest {
-  string serial_number = 1;
+  string serial_number = 1 [(validate.rules).string.min_len = 1];
   bool enabled = 2;
 }
 
@@ -87,7 +88,7 @@ message UpdateMTLSCertificateResponse {
 }
 
 message GetMTLSCertificateRequest {
-  string serial_number = 1;
+  string serial_number = 1 [(validate.rules).string.min_len = 1];
 }
 
 message GetMTLSCertificateResponse {

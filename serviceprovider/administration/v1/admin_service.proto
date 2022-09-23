@@ -10,9 +10,9 @@ syntax = "proto3";
 
 package serviceprovider.administration.v1;
 
+import "common/ping/v1/ping.proto";
 import "common/v1/console_user.proto";
 import "common/v1/mtls_certificate.proto";
-import "common/ping/v1/ping.proto";
 
 option go_package = "mica/proto/serviceprovider/administrationv1";
 option java_outer_classname = "AdministrationService";
