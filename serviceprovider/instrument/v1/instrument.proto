@@ -14,6 +14,7 @@ import "common/enums/currency/v1/currency.proto";
 import "common/enums/instrumenttype/v1/instrument_type.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/serviceprovider/instrumentv1";
 option java_outer_classname = "InstrumentProto";
@@ -22,7 +23,10 @@ option objc_class_prefix = "MICA";
 
 message RegisterInstrumentRequest {
   // The key representing this user in Mica.
-  string service_provider_user_key = 1;
+  string service_provider_user_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Primary key on the external system.
   string service_provider_instrument_ref = 2;
@@ -60,7 +64,10 @@ message RegisterInstrumentResponse {
   common.v1.Error error = 2;
 
   // The key representing this instrument in Mica.
-  string service_provider_instrument_key = 3;
+  string service_provider_instrument_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   int64 version = 4;
 }
@@ -68,7 +75,10 @@ message RegisterInstrumentResponse {
 message GetInstrumentRequest {
   oneof criteria {
     // The key representing this instrument in Mica.
-    string service_provider_instrument_key = 1;
+    string service_provider_instrument_key = 1 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
 
     // Primary key on the external system.
     string service_provider_instrument_ref = 2;
@@ -77,7 +87,10 @@ message GetInstrumentRequest {
 
 message Instrument {
   // The primary key that represents this instrument at Mica.
-  string service_provider_instrument_key = 1;
+  string service_provider_instrument_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // version of the user record, used for optimistic locking
   int64 version = 2;
@@ -92,7 +105,10 @@ message Instrument {
   string service_provider_instrument_ref = 5;
 
   // The key that represents this user.
-  string service_provider_user_key = 6;
+  string service_provider_user_key = 6 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Primary key on the external system.
   string service_provider_user_ref = 7;
@@ -123,7 +139,10 @@ message GetInstrumentResponse {
 message RemoveInstrumentRequest {
   oneof criteria {
     // The key representing this instrument in Mica.
-    string service_provider_instrument_key = 1;
+    string service_provider_instrument_key = 1 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
 
     // Primary key on the external system.
     string service_provider_instrument_ref = 2;
@@ -145,7 +164,10 @@ message RemoveInstrumentResponse {
 message SearchInstrumentRequest {
   oneof criteria {
     // The key representing this user in Mica.
-    string service_provider_user_key = 1;
+    string service_provider_user_key = 1 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
   }
 }
 
@@ -167,7 +189,10 @@ message SearchInstrumentResponse {
 message SetPINRequest {
   oneof criteria {
     // The key representing this instrument in Mica.
-    string service_provider_instrument_key = 1;
+    string service_provider_instrument_key = 1 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
 
     // Primary key on the external system.
     string service_provider_instrument_ref = 2;
@@ -191,7 +216,10 @@ message SetPINResponse {
 message ResetPINRequest {
   oneof criteria {
     // The key representing this instrument in Mica.
-    string service_provider_instrument_key = 1;
+    string service_provider_instrument_key = 1 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
 
     // Primary key on the external system.
     string service_provider_instrument_ref = 2;
@@ -217,7 +245,10 @@ message ResetPINResponse {
 message RemovePINRequest {
   oneof criteria {
     // The key representing this instrument in Mica.
-    string service_provider_instrument_key = 1;
+    string service_provider_instrument_key = 1 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
 
     // Primary key on the external system.
     string service_provider_instrument_ref = 2;

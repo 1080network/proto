@@ -12,6 +12,7 @@ lint:
   ignore:
     - google
     - validate
+    - pythongenproto
 breaking:
   use:
     - WIRE_JSON

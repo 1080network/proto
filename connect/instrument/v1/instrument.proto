@@ -14,6 +14,7 @@ import "common/enums/currency/v1/currency.proto";
 import "common/enums/instrumenttype/v1/instrument_type.proto";
 import "common/v1/connect.proto";
 import "common/v1/error.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/connect/instrumentv1";
 option java_outer_classname = "InstrumentProto";
@@ -21,10 +22,16 @@ option java_package = "io.mica.connect.instrument.v1";
 option objc_class_prefix = "MICA";
 
 message WidgetRegisterInstrumentInitiateRequest {
-  string session_key = 1;
+  string session_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The financial institution which holds this account/instrument.
-  string service_provider_key = 2;
+  string service_provider_key = 2 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   oneof instrument_identifier {
     common.v1.BankAccountCredentials bank_account_credentials = 4;
@@ -67,7 +74,10 @@ message Instrument {
 }
 
 message WidgetRegisterInstrumentWithAccountRequest {
-  string session_key = 1;
+  string session_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   Instrument instrument = 3;
 }
@@ -87,7 +97,10 @@ message WidgetRegisterInstrumentWithAccountResponse {
 }
 
 message WidgetRegisterInstrumentCompleteRequest {
-  string session_key = 1;
+  string session_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   oneof details {
     Connect connect = 2;
@@ -119,10 +132,16 @@ message WidgetRegisterInstrumentCompleteResponse {
 }
 
 message WidgetRibbitRegisterInstrumentInitiateRequest {
-  string session_key = 1;
+  string session_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The financial institution which holds this account/instrument.
-  string service_provider_key = 2;
+  string service_provider_key = 2 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }
 
 message WidgetRibbitRegisterInstrumentInitiateResponse {

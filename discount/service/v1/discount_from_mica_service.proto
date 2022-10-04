@@ -19,9 +19,9 @@ option java_package = "io.mica.discount.service.v1";
 option objc_class_prefix = "MICA";
 
 service DiscountFromMicaService {
-
   rpc ApplyDiscountNotification(discount.v1.ApplyDiscountNotificationRequest) returns (discount.v1.ApplyDiscountNotificationResponse) {}
   //<editor-fold desc="Admin Operations">
+
 
   // An operation to ping the server to ensure it's up and running and that the connection is good.
   rpc Ping(common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {}

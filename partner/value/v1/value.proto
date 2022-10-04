@@ -18,6 +18,7 @@ import "common/enums/valueoperationtype/v1/value_operation_type.proto";
 import "common/v1/error.proto";
 import "common/v1/line_item.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/partner/valuev1";
 option java_outer_classname = "ValueProto";
@@ -26,7 +27,10 @@ option objc_class_prefix = "MICA";
 
 message Value {
   // Mica's transaction record primary key.
-  string transaction_key = 1;
+  string transaction_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // version of the user record, used for optimistic locking
   int64 version = 2;
@@ -52,13 +56,19 @@ message Value {
   common.enums.currency.v1.Currency currency = 9;
 
   // The organization this operation is being processed for.
-  string organization_key = 10;
+  string organization_key = 10 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Organization category
   common.enums.organizationcategory.v1.OrganizationCategory category = 11;
 
   // The store where this operation occurred.
-  string store_key = 12;
+  string store_key = 12 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The clerk that processed this operation.
   string clerk_identifier = 13;
@@ -96,13 +106,19 @@ message ValueRequest {
   common.enums.currency.v1.Currency currency = 4;
 
   // The organization this operation is being processed for.
-  string organization_key = 5;
+  string organization_key = 5 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Organization category
   common.enums.organizationcategory.v1.OrganizationCategory category = 6;
 
   // The store where this operation occurred.
-  string store_key = 7;
+  string store_key = 7 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The clerk that processed this operation.
   string clerk_identifier = 8;
@@ -172,7 +188,10 @@ message ObtainValueResponse {
   common.v1.Error error = 2;
 
   // Primary key of created transaction assigned by Mica.
-  string transaction_key = 3;
+  string transaction_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Correlation ID of the request assigned by Mica.
   string cid = 4;
@@ -224,7 +243,10 @@ message ReturnValueResponse {
   common.v1.Error error = 2;
 
   // Primary key of created transaction assigned by Mica.
-  string transaction_key = 3;
+  string transaction_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Correlation ID of the request assigned by Mica.
   string cid = 4;

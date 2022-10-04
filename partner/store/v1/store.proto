@@ -13,6 +13,7 @@ package partner.store.v1;
 import "common/v1/address.proto";
 import "common/v1/error.proto";
 import "common/v1/store.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/partner/storev1";
 option java_outer_classname = "StoreProto";
@@ -21,7 +22,10 @@ option objc_class_prefix = "MICA";
 
 message CreateStoreRequest {
   // The organization that this store is in.
-  string organization_key = 1;
+  string organization_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The primary key for this store at the Partner/Organization.
   string store_ref = 2;
@@ -47,13 +51,19 @@ message CreateStoreResponse {
   common.v1.Error error = 2;
 
   // The primary key of this store within Mica.
-  string store_key = 3;
+  string store_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   int64 version = 4;
 }
 
 message GetStoreRequest {
-  string store_key = 1;
+  string store_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }
 
 message GetStoreResponse {
@@ -73,7 +83,9 @@ message GetStoreResponse {
 
 message SearchStoreRequest {
   // The organization that this store is in.
-  string organization_key = 1;
+  string organization_key = 1 [(validate.rules).string = {
+    max_len: 50
+  }];
 
   // The primary key for this store at the Partner/Organization.
   string store_ref = 2;
@@ -97,7 +109,10 @@ message SearchStoreResponse {
 }
 
 message StoreRef {
-  string organization_key = 1;
+  string organization_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   string store_ref = 2;
 }
@@ -108,7 +123,10 @@ message UpdateStoreRequest {
     StoreRef store_ref = 1;
 
     // The primary key of this store within Mica.
-    string store_key = 2;
+    string store_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
   }
 
   int64 version = 3;
@@ -143,7 +161,10 @@ message RemoveStoreRequest {
     StoreRef store_ref = 1;
 
     // The primary key of this store within Mica.
-    string store_key = 2;
+    string store_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
   }
 }
 

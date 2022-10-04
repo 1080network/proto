@@ -13,6 +13,7 @@ package partner.user.v1;
 import "common/v1/error.proto";
 import "common/v1/user.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/partner/userv1";
 option java_outer_classname = "UserProto";
@@ -20,7 +21,10 @@ option java_package = "io.mica.partner.user.v1";
 option objc_class_prefix = "MICA";
 
 message User {
-  string user_key = 1;
+  string user_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   google.protobuf.Timestamp created = 2;
 

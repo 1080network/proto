@@ -12,6 +12,7 @@ package ebt.listitem.v1;
 
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/ebt/listitemv1";
 option java_outer_classname = "ListItemProto";
@@ -27,7 +28,10 @@ enum ListItemStatus {
 }
 
 message ListItem {
-  string list_item_key = 1;
+  string list_item_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   google.protobuf.Timestamp created = 2;
 
@@ -35,7 +39,10 @@ message ListItem {
 
   int64 version = 4;
 
-  string ebt_program_key = 5;
+  string ebt_program_key = 5 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   string product_code = 6;
 
@@ -45,7 +52,10 @@ message ListItem {
 }
 
 message CreateListItemRequest {
-  string ebt_program_key = 1;
+  string ebt_program_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   string product_code = 2;
 
@@ -66,13 +76,19 @@ message CreateListItemResponse {
 
   common.v1.Error error = 2;
 
-  string list_item_key = 3;
+  string list_item_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   int64 version = 4;
 }
 
 message GetListItemRequest {
-  string list_item_key = 1;
+  string list_item_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }
 
 message GetListItemResponse {
@@ -91,7 +107,10 @@ message GetListItemResponse {
 }
 
 message RemoveListItemRequest {
-  string list_item_key = 1;
+  string list_item_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }
 
 message RemoveListItemResponse {
@@ -108,7 +127,10 @@ message RemoveListItemResponse {
 }
 
 message UpdateListItemRequest {
-  string list_item_key = 1;
+  string list_item_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   int64 version = 2;
 
@@ -134,7 +156,9 @@ message UpdateListItemResponse {
 }
 
 message SearchListItemRequest {
-  string ebt_program_key = 1;
+  string ebt_program_key = 1 [(validate.rules).string = {
+    max_len: 50
+  }];
 
   string product_code = 2;
 

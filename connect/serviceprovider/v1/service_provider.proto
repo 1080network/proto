@@ -13,6 +13,7 @@ package connect.serviceprovider.v1;
 import "common/enums/serviceprovidertype/v1/service_provider_type.proto";
 import "common/v1/error.proto";
 import "common/v1/pagination.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/connect/serviceproviderv1";
 option java_outer_classname = "ServiceProviderProto";
@@ -41,7 +42,10 @@ message SearchServiceProviderResponse {
 }
 
 message ServiceProvider {
-  string service_provider_key = 1;
+  string service_provider_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   int32 rank = 2;
 

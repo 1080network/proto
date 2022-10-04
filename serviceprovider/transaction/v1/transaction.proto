@@ -14,6 +14,7 @@ import "common/enums/currency/v1/currency.proto";
 import "common/enums/region/v1/region.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/serviceprovider/transactionv1";
 option java_outer_classname = "TransactionProto";
@@ -145,7 +146,10 @@ message SearchTransactionPartnerDataRequest {
 }
 
 message SearchTransactionPartnerDataItem {
-  string partner_key = 1;
+  string partner_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   string partner_name = 2;
 

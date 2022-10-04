@@ -11,6 +11,7 @@ syntax = "proto3";
 package partner.instrument.v1;
 
 import "common/v1/error.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/partner/instrumentv1";
 option java_outer_classname = "InstrumentProto";
@@ -19,7 +20,10 @@ option objc_class_prefix = "MICA";
 
 message ExchangeSessionKeyRequest {
   // The session key that was established when the Widget was initialized
-  string session_key = 1;
+  string session_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Primary key on the external system.
   string partner_instrument_ref = 2;

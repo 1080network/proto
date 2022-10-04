@@ -41,4 +41,11 @@ service ServiceProviderAdministrationService {
   rpc GetSingleSignOnConsoleUser(common.v1.GetSingleSignOnConsoleUserRequest) returns (common.v1.GetSingleSignOnConsoleUserResponse) {}
 
   rpc PingExternal(common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {}
+
+  // Client certificates are used when mica needs to call out to a customers environment.
+  rpc GenerateClientMTLSCertificate(common.v1.GenerateClientMTLSCertificateRequest) returns (common.v1.GenerateClientMTLSCertificateResponse) {}
+
+  rpc UpdateClientMTLSCertificate(common.v1.UpdateClientMTLSCertificateRequest) returns (common.v1.UpdateClientMTLSCertificateResponse) {}
+
+  rpc SearchClientMTLSCertificate(common.v1.SearchClientMTLSCertificateRequest) returns (common.v1.SearchClientMTLSCertificateResponse) {}
 }

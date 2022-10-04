@@ -13,6 +13,7 @@ package serviceprovider.user.v1;
 import "common/v1/error.proto";
 import "common/v1/user.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/serviceprovider/userv1";
 option java_outer_classname = "UserProto";
@@ -30,7 +31,10 @@ message User {
   google.protobuf.Timestamp updated = 3;
 
   // The key representing this user in Mica.
-  string service_provider_user_key = 4;
+  string service_provider_user_key = 4 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Primary key on the external system.
   string service_provider_user_ref = 5;
@@ -59,14 +63,20 @@ message RegisterUserResponse {
   common.v1.Error error = 2;
 
   // The key representing this user in Mica.
-  string service_provider_user_key = 3;
+  string service_provider_user_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   int64 version = 4;
 }
 
 message UpdateUserRequest {
   // The key representing this user in Mica.
-  string service_provider_user_key = 1;
+  string service_provider_user_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   int64 version = 2;
 
@@ -90,7 +100,10 @@ message UpdateUserResponse {
 
 message RemoveUserRequest {
   // The key representing this user in Mica.
-  string service_provider_user_key = 1;
+  string service_provider_user_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }
 
 message RemoveUserResponse {
@@ -108,7 +121,10 @@ message RemoveUserResponse {
 message GetUserRequest {
   oneof criteria {
     // The key representing this user in Mica.
-    string service_provider_user_key = 1;
+    string service_provider_user_key = 1 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
 
     // Primary key on the external system.
     string service_provider_user_ref = 2;
@@ -131,7 +147,9 @@ message GetUserResponse {
 
 message SearchUserRequest {
   // The key representing this user in Mica.
-  string service_provider_user_key = 1;
+  string service_provider_user_key = 1 [(validate.rules).string = {
+    max_len: 50
+  }];
 
   string first_name = 2;
 
@@ -157,13 +175,19 @@ message SearchUserResponse {
 
 message EnrollUserInstrumentRequest {
   // The key representing this user in Mica.
-  string service_provider_user_key = 1;
+  string service_provider_user_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Primary key on the external system.
   string service_provider_user_ref = 2;
 
   // The key representing this instrument in Mica.
-  string service_provider_instrument_key = 3;
+  string service_provider_instrument_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Primary key on the external system.
   string service_provider_instrument_ref = 4;

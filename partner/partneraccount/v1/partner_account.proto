@@ -14,6 +14,7 @@ import "common/enums/accounttype/v1/account_type.proto";
 import "common/enums/currency/v1/currency.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/partner/partneraccountv1";
 option java_outer_classname = "PartnerAccountProto";
@@ -21,7 +22,10 @@ option java_package = "io.mica.partner.partneraccount.v1";
 option objc_class_prefix = "MICA";
 
 message PartnerAccount {
-  string partner_account_key = 1;
+  string partner_account_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   google.protobuf.Timestamp created = 2;
 
@@ -29,7 +33,10 @@ message PartnerAccount {
 
   int64 version = 4;
 
-  string partner_key = 5;
+  string partner_key = 5 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   common.enums.accounttype.v1.AccountType account_type = 6;
 
@@ -37,7 +44,10 @@ message PartnerAccount {
 }
 
 message GetPartnerAccountRequest {
-  string partner_account_key = 1;
+  string partner_account_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }
 
 message GetPartnerAccountResponse {

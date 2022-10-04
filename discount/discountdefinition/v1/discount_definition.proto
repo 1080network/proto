@@ -11,9 +11,10 @@ syntax = "proto3";
 package discount.discountdefinition.v1;
 
 import "common/enums/currency/v1/currency.proto";
-import "discount/discount/v1/discount.proto";
 import "common/v1/error.proto";
+import "discount/discount/v1/discount.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/discount/discountdefinitionv1";
 option java_outer_classname = "DiscountProto";
@@ -21,31 +22,37 @@ option java_package = "io.mica.discount.discountdefinition.v1";
 option objc_class_prefix = "MICA";
 
 message DiscountDefinition {
-  string discount_definition_key = 1;
+  string discount_definition_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
-  int64 version = 2;
+  int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  string discount_definition_ref = 3;
+  string discount_definition_ref = 3 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  string receipt_description = 4;
+  string receipt_description = 4 [(validate.rules).string.max_len = 100];
 
   DiscountDefinitionStatus status = 5;
 
   discount.v1.DiscountType type = 6;
 
-  google.protobuf.Timestamp date_from = 7;
+  google.protobuf.Timestamp valid_from = 7 [(validate.rules).timestamp.required = true];
 
-  google.protobuf.Timestamp date_to = 8;
+  google.protobuf.Timestamp valid_to = 8 [(validate.rules).timestamp.gt_now = true];
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated discount.v1.DiscountCriteria discount_criteria = 9;
+  repeated discount.v1.DiscountCriteria discount_criteria = 9 [(validate.rules).repeated.min_items = 1];
 
   common.enums.currency.v1.Currency currency = 10;
 
   oneof discount_amount {
-    discount.v1.MonetaryAmount amount = 11;
-    discount.v1.PercentageAmount percentage = 12;
+    discount.v1.MonetaryAmount monetary_amount = 11;
+    discount.v1.PercentageAmount percentage_amount = 12;
   }
 }
 
@@ -60,27 +67,30 @@ enum DiscountDefinitionStatus {
 }
 
 message CreateDiscountDefinitionRequest {
-  string discount_definition_ref = 1;
+  string discount_definition_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  string receipt_description = 2;
+  string receipt_description = 2 [(validate.rules).string.max_len = 100];
 
-  discount.v1.DiscountStatus status = 3;
+  DiscountDefinitionStatus status = 3;
 
   discount.v1.DiscountType type = 4;
 
-  google.protobuf.Timestamp date_from = 5;
+  google.protobuf.Timestamp valid_from = 5 [(validate.rules).timestamp.required = true];
 
-  google.protobuf.Timestamp date_to = 6;
+  google.protobuf.Timestamp valid_to = 6 [(validate.rules).timestamp.gt_now = true];
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated discount.v1.DiscountCriteria discount_criteria = 7;
+  repeated discount.v1.DiscountCriteria discount_criteria = 7 [(validate.rules).repeated.min_items = 1];
 
   common.enums.currency.v1.Currency currency = 8;
 
   oneof discount_amount {
-    discount.v1.MonetaryAmount amount = 9;
-    discount.v1.PercentageAmount percentage = 10;
+    discount.v1.MonetaryAmount monetary_amount = 9;
+    discount.v1.PercentageAmount percentage_amount = 10;
   }
 }
 
@@ -96,11 +106,14 @@ message CreateDiscountDefinitionResponse {
 
   string discount_definition_key = 3;
 
-  int64 version = 4;
+  int64 version = 4 [(validate.rules).int64.gte = 0];
 }
 
 message GetDiscountDefinitionRequest {
-  string discount_definition_ref = 1;
+  string discount_definition_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 }
 
 message GetDiscountDefinitionResponse {
@@ -118,8 +131,33 @@ message GetDiscountDefinitionResponse {
 }
 
 message UpdateDiscountDefinitionRequest {
-  string discount_definition_ref = 1;
-  // what might we want to allow to be updated?
+  string discount_definition_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+
+  int64 version = 2 [(validate.rules).int64.gte = 0];
+
+  string receipt_description = 3 [(validate.rules).string.max_len = 100];
+
+  DiscountDefinitionStatus status = 4;
+
+  discount.v1.DiscountType type = 5;
+
+  google.protobuf.Timestamp valid_from = 6 [(validate.rules).timestamp.required = true];
+
+  google.protobuf.Timestamp valid_to = 7 [(validate.rules).timestamp.gt_now = true];
+
+  // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
+  // discount to apply
+  repeated discount.v1.DiscountCriteria discount_criteria = 8 [(validate.rules).repeated.min_items = 1];
+
+  common.enums.currency.v1.Currency currency = 9;
+
+  oneof discount_amount {
+    discount.v1.MonetaryAmount monetary_amount = 10;
+    discount.v1.PercentageAmount percentage_amount = 11;
+  }
 }
 
 message UpdateDiscountDefinitionResponse {
@@ -133,11 +171,14 @@ message UpdateDiscountDefinitionResponse {
 
   common.v1.Error error = 2;
 
-  int64 version = 3;
+  int64 version = 3 [(validate.rules).int64.gte = 0];
 }
 
 message RemoveDiscountDefinitionRequest {
-  string discount_definition_ref = 1;
+  string discount_definition_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 }
 
 message RemoveDiscountDefinitionResponse {

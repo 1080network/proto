@@ -14,6 +14,7 @@ import "common/enums/currency/v1/currency.proto";
 import "common/enums/region/v1/region.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/partner/transactionv1";
 option java_outer_classname = "TransactionProto";
@@ -51,10 +52,14 @@ message SearchTransactionDataRequest {
   common.enums.currency.v1.Currency currency = 4;
 
   // optional
-  string organization_key = 5;
+  string organization_key = 5 [(validate.rules).string = {
+    max_len: 50
+  }];
 
   // optional
-  string store_key = 6;
+  string store_key = 6 [(validate.rules).string = {
+    max_len: 50
+  }];
 
   // minimum amount inclusive - optional
   string min_amount = 7;
@@ -109,9 +114,13 @@ message SearchTransactionGeographyDataRequest {
 
   IntervalType interval_type = 3;
 
-  string organization_key = 5;
+  string organization_key = 5 [(validate.rules).string = {
+    max_len: 50
+  }];
 
-  string store_key = 6;
+  string store_key = 6 [(validate.rules).string = {
+    max_len: 50
+  }];
 
   common.enums.region.v1.Region region = 7;
 
@@ -153,13 +162,20 @@ message SearchTransactionServiceProviderDataRequest {
 
   TransactionType transaction_type = 4;
 
-  string organization_key = 5;
+  string organization_key = 5 [(validate.rules).string = {
+    max_len: 50
+  }];
 
-  string store_key = 6;
+  string store_key = 6 [(validate.rules).string = {
+    max_len: 50
+  }];
 }
 
 message SearchTransactionServiceProviderDataItem {
-  string service_provider_key = 1;
+  string service_provider_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   string service_provider_name = 2;
 

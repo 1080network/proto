@@ -12,7 +12,7 @@ package discount.service.v1;
 
 import "common/v1/error.proto";
 import "common/v1/line_item.proto";
-
+import "validate/validate.proto";
 
 option go_package = "mica/proto/discount/servicev1";
 option java_outer_classname = "DiscountTestSupportServiceProto";
@@ -21,16 +21,19 @@ option objc_class_prefix = "MICA";
 
 service DiscountTestSupportService {
   // Determine which discount(s) can be applied to this transaction
-  rpc TestDetermineDiscount (DetermineDiscountRequest) returns (DetermineDiscountResponse) {}
+  rpc TestDetermineDiscount(DetermineDiscountRequest) returns (DetermineDiscountResponse) {}
 
   // Apply the discount(s) that were applicable to this transaction
-  rpc TestApplyDiscount (ApplyDiscountRequest) returns (ApplyDiscountResponse) {}
+  rpc TestApplyDiscount(ApplyDiscountRequest) returns (ApplyDiscountResponse) {}
 }
 
 message DetermineDiscountRequest {
-  string federated_user_key = 12;
+  string federated_user_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
-  repeated common.v1.LineItem line_items = 14;
+  repeated common.v1.LineItem line_items = 2 [(validate.rules).repeated.min_items = 1];
 }
 
 message DetermineDiscountResponse {
@@ -44,9 +47,7 @@ message DetermineDiscountResponse {
   common.v1.Error error = 2;
 }
 
-message ApplyDiscountRequest {
-
-}
+message ApplyDiscountRequest {}
 
 message ApplyDiscountResponse {
   enum Status {

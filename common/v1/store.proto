@@ -12,6 +12,7 @@ package common.v1;
 
 import "common/v1/address.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/common/v1;commonv1";
 option java_outer_classname = "StoreProto";
@@ -20,7 +21,10 @@ option objc_class_prefix = "MICA";
 
 message Store {
   // The primary key of the store in Mica.
-  string store_key = 1;
+  string store_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Date that the Store was created at Mica.
   google.protobuf.Timestamp created = 2;
@@ -31,10 +35,16 @@ message Store {
   int64 version = 4;
 
   // The partner who owns this store.
-  string partner_key = 5;
+  string partner_key = 5 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The organization that this store is in.
-  string organization_key = 6;
+  string organization_key = 6 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The primary key for this store at the Partner/Organization.
   string store_ref = 7;

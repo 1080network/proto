@@ -12,10 +12,11 @@ package discount.discount.v1;
 
 import "common/enums/currency/v1/currency.proto";
 import "common/enums/unit/v1/unit.proto";
-import "common/v1/error.proto";
-import "google/protobuf/timestamp.proto";
 import "common/v1/address.proto";
+import "common/v1/error.proto";
 import "common/v1/line_item.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/discount/discountv1";
 option java_outer_classname = "DiscountProto";
@@ -23,37 +24,57 @@ option java_package = "io.mica.discount.discount.v1";
 option objc_class_prefix = "MICA";
 
 message Discount {
-  string discount_definition_key = 1;
+  string discount_definition_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
-  string discount_key = 2;
+  string discount_definition_ref = 2 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  int64 version = 3;
+  string discount_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
-  string discount_ref = 4;
+  int64 version = 4 [(validate.rules).int64.gte = 0];
 
-  string receipt_description = 5;
+  string discount_ref = 5 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  DiscountStatus status = 6;
+  string receipt_description = 6 [(validate.rules).string.max_len = 100];
 
-  DiscountType type = 7;
+  DiscountStatus status = 7;
 
-  google.protobuf.Timestamp date_from = 8;
+  DiscountType type = 8;
 
-  google.protobuf.Timestamp date_to = 9;
+  google.protobuf.Timestamp valid_from = 9 [(validate.rules).timestamp.required = false];
+
+  google.protobuf.Timestamp valid_to = 10 [(validate.rules).timestamp = {
+    required: false,
+    gt_now: true
+  }];
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated DiscountCriteria discount_criteria = 10;
+  repeated DiscountCriteria discount_criteria = 11;
 
-  common.enums.currency.v1.Currency currency = 11;
+  common.enums.currency.v1.Currency currency = 12;
 
-  string user_key = 12;
+  string user_key = 13;
 
-  string user_ref = 13;
+  string user_ref = 14 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
   oneof discount_amount {
-    MonetaryAmount monetary_amount = 14;
-    PercentageAmount percentage_amount = 15;
+    MonetaryAmount monetary_amount = 15;
+    PercentageAmount percentage_amount = 16;
   }
 }
 
@@ -100,10 +121,10 @@ message DiscountCriteria {
   // indicates that this criteria is used to determine how much value to apply to these items
   bool discount_amount_applicable = 3;
 
-  repeated string product_groups = 4;
+  repeated string product_group_refs = 4 [(validate.rules).repeated.max_items = 100];
 
   // list of product codes of which the basket must include at least one in this list (i.e. it's an or operation)
-  repeated string product_codes = 5;
+  repeated string product_codes = 5 [(validate.rules).repeated.max_items = 100];
 }
 
 message MonetaryAmount {
@@ -121,39 +142,44 @@ message PercentageAmount {
 
   // must be a monetary amount (e.g. 0.34)
   MonetaryAmount max_amount = 3;
-
-  // what to apply the percentage to
-  DiscountCriteria criteria = 4;
 }
 
 message CreateDiscountRequest {
-  string discount_description_key = 1;
+  string discount_definition_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  string discount_ref = 2;
+  string discount_ref = 2 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  string receipt_description = 3;
+  string receipt_description = 3 [(validate.rules).string.max_len = 100];
 
   DiscountStatus status = 4;
 
-  DiscountType type = 5;
+  google.protobuf.Timestamp valid_from = 5 [(validate.rules).timestamp.required = false];
 
-  google.protobuf.Timestamp date_from = 6;
-
-  google.protobuf.Timestamp date_to = 7;
+  google.protobuf.Timestamp valid_to = 6 [(validate.rules).timestamp = {
+    required: false,
+    gt_now: true
+  }];
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated DiscountCriteria discount_criteria = 8;
+  repeated DiscountCriteria discount_criteria = 7;
 
-  string user_key = 9;
+  string user_key = 8;
 
-  string user_ref = 10;
-
-  common.enums.currency.v1.Currency currency = 11;
+  string user_ref = 9 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
   oneof discount_amount {
-    MonetaryAmount monetary_amount = 12;
-    PercentageAmount percentage_amount = 13;
+    MonetaryAmount monetary_amount = 10;
+    PercentageAmount percentage_amount = 11;
   }
 }
 
@@ -169,11 +195,14 @@ message CreateDiscountResponse {
 
   string discount_key = 3;
 
-  int64 version = 4;
+  int64 version = 4 [(validate.rules).int64.gte = 0];
 }
 
 message GetDiscountRequest {
-  string discount_key = 1;
+  string discount_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 }
 
 message GetDiscountResponse {
@@ -190,13 +219,88 @@ message GetDiscountResponse {
   Discount discount = 3;
 }
 
+message UpdateDiscountRequest {
+  string discount_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+
+  int64 version = 2 [(validate.rules).int64.gte = 0];
+
+  string receipt_description = 3 [(validate.rules).string.max_len = 100];
+
+  DiscountStatus status = 4;
+
+  google.protobuf.Timestamp valid_from = 5 [(validate.rules).timestamp.required = false];
+
+  google.protobuf.Timestamp valid_to = 6 [(validate.rules).timestamp = {
+    required: false,
+    gt_now: true
+  }];
+
+  // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
+  // discount to apply
+  repeated DiscountCriteria discount_criteria = 7;
+
+  string user_key = 8;
+
+  string user_ref = 9 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+
+  oneof discount_amount {
+    MonetaryAmount monetary_amount = 10;
+    PercentageAmount percentage_amount = 11;
+  }
+}
+
+message UpdateDiscountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3 [(validate.rules).int64.gte = 0];
+}
+
+message RemoveDiscountRequest {
+  string discount_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+}
+
+message RemoveDiscountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+}
+
 message ApplyDiscountNotificationRequest {
   // discount details
-  string discount_key = 1;
+  string discount_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
-  string discount_ref = 2;
+  string discount_ref = 2 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  DiscountStatus status = 3;  // only USED supported initially
+  DiscountStatus status = 3; // only USED supported initially
 
   common.enums.currency.v1.Currency currency = 4;
 
@@ -205,15 +309,15 @@ message ApplyDiscountNotificationRequest {
   // transaction details
   string transaction_key = 10;
 
-  google.protobuf.Timestamp transaction_created = 11;  // Timestamp when discount was applied
+  google.protobuf.Timestamp transaction_created = 11; // Timestamp when discount was applied
 
   string partner_key = 13;
 
-  string partner_name = 14;
+  string partner_name = 14 [(validate.rules).string.max_len = 100];
 
   string organization_key = 15;
 
-  string organization_name = 16;
+  string organization_name = 16 [(validate.rules).string.max_len = 100];
 
   common.v1.Address organization_address = 17;
 
@@ -239,5 +343,8 @@ message ApplyDiscountNotificationResponse {
   common.v1.Error error = 2;
 
   // TODO(kuchlein): determine if we want to have an identifier passed back. I'm leaning towards not
-  string external_ref = 3;
+  string external_ref = 3 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 }

@@ -12,6 +12,7 @@ package connect.staticdata.v1;
 
 import "common/enums/serviceprovidertype/v1/service_provider_type.proto";
 import "common/v1/error.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/connect/staticdatav1";
 option java_outer_classname = "StaticDataProto";
@@ -36,5 +37,8 @@ message GetStaticDataResponse {
 message ServiceProviderTypeMetadata {
   common.enums.serviceprovidertype.v1.ServiceProviderType service_provider_type = 1;
 
-  string public_key = 2;
+  string public_key = 2 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }

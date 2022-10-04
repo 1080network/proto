@@ -12,6 +12,7 @@ package partner.widget.v1;
 
 import "common/v1/error.proto";
 import "common/v1/user.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/partner/instrumentv1";
 option java_outer_classname = "WidgetProto";
@@ -35,5 +36,8 @@ message InitializeWidgetResponse {
 
   common.v1.Error error = 2;
 
-  string session_key = 3;
+  string session_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }

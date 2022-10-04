@@ -11,6 +11,7 @@ syntax = "proto3";
 package discount.productgroup.v1;
 
 import "common/v1/error.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/discount/productgroupv1";
 option java_outer_classname = "ProductProto";
@@ -18,27 +19,30 @@ option java_package = "io.mica.discount.productgroup.v1";
 option objc_class_prefix = "MICA";
 
 message ProductGroup {
-  string product_group_key = 1;
+  string product_group_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
-  int64 version = 2;
+  int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  string name = 3;
+  string name = 3 [(validate.rules).string.max_len = 100];
 
-  string product_group_ref = 4;
+  string product_group_ref = 4 [(validate.rules).string.max_len = 50];
 
-  repeated string product_match_filters = 5;
+  repeated string product_match_filters = 5 [(validate.rules).repeated.max_items = 100];
 
-  repeated string product_codes = 6;
+  repeated string product_codes = 6 [(validate.rules).repeated.max_items = 100];
 }
 
 message CreateProductGroupRequest {
-  string product_group_ref = 1;
+  string product_group_ref = 1 [(validate.rules).string.max_len = 50];
 
-  string name = 2;
+  string name = 2 [(validate.rules).string.max_len = 100];
 
-  repeated string product_match_filters = 3;
+  repeated string product_match_filters = 3 [(validate.rules).repeated.max_items = 100];
 
-  repeated string product_codes = 4;
+  repeated string product_codes = 4 [(validate.rules).repeated.max_items = 100];
 }
 
 message CreateProductGroupResponse {
@@ -52,13 +56,16 @@ message CreateProductGroupResponse {
 
   common.v1.Error error = 2;
 
-  string product_group_key = 3;
+  string product_group_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
-  int64 version = 4;
+  int64 version = 4 [(validate.rules).int64.gte = 0];
 }
 
 message GetProductGroupRequest {
-  string product_group_key = 1;
+  string product_group_ref = 1 [(validate.rules).string.max_len = 50];
 }
 
 message GetProductGroupResponse {
@@ -76,11 +83,15 @@ message GetProductGroupResponse {
 }
 
 message UpdateProductGroupRequest {
-  string product_group_key = 1;
+  string product_group_ref = 1 [(validate.rules).string.max_len = 50];
 
-  repeated string product_match_filters = 4;
+  int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  repeated string product_codes = 5;
+  string name = 3 [(validate.rules).string.max_len = 100];
+
+  repeated string product_match_filters = 4 [(validate.rules).repeated.max_items = 100];
+
+  repeated string product_codes = 5 [(validate.rules).repeated.max_items = 100];
 }
 
 message UpdateProductGroupResponse {
@@ -94,11 +105,14 @@ message UpdateProductGroupResponse {
 
   common.v1.Error error = 2;
 
-  int64 version = 3;
+  int64 version = 3 [(validate.rules).int64.gte = 0];
 }
 
 message RemoveProductGroupRequest {
-  string product_group_key = 1;
+  string product_group_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 }
 
 message RemoveProductGroupResponse {
@@ -112,4 +126,3 @@ message RemoveProductGroupResponse {
 
   common.v1.Error error = 2;
 }
-

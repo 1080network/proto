@@ -14,6 +14,7 @@ import "common/enums/accounttype/v1/account_type.proto";
 import "common/enums/currency/v1/currency.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/serviceprovider/serviceprovideraccountv1";
 option java_outer_classname = "ServiceProviderAccountProto";
@@ -21,7 +22,10 @@ option java_package = "io.mica.serviceprovider.serviceprovideraccount.v1";
 option objc_class_prefix = "MICA";
 
 message ServiceProviderAccount {
-  string service_provider_account_key = 1;
+  string service_provider_account_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   google.protobuf.Timestamp created = 2;
 
@@ -29,7 +33,10 @@ message ServiceProviderAccount {
 
   int64 version = 4;
 
-  string service_provider_key = 5;
+  string service_provider_key = 5 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   common.enums.accounttype.v1.AccountType account_type = 6;
 
@@ -37,7 +44,10 @@ message ServiceProviderAccount {
 }
 
 message GetServiceProviderAccountRequest {
-  string service_provider_account_key = 1;
+  string service_provider_account_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }
 
 message GetServiceProviderAccountResponse {
@@ -55,7 +65,10 @@ message GetServiceProviderAccountResponse {
 }
 
 message SearchServiceProviderAccountRequest {
-  string service_provider_key = 1;
+  string service_provider_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   common.enums.accounttype.v1.AccountType account_type = 2;
 

@@ -17,6 +17,7 @@ import "common/enums/organizationcategory/v1/organization_category.proto";
 import "common/v1/address.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/serviceprovider/valuev1";
 option java_outer_classname = "ValueProto";
@@ -26,10 +27,15 @@ option objc_class_prefix = "MICA";
 // Type that represents the details of the value request (either to obtain or return).
 message Value {
   // Mica's transaction record primary key.
-  string transaction_key = 1;
+  string transaction_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The Mica generated key for this instrument.
-  string service_provider_instrument_key = 2;
+  string service_provider_instrument_key = 2 [(validate.rules).string = {
+    max_len: 50
+  }];
 
   // Service Provider's primary key for their instrument.
   string service_provider_instrument_ref = 3;
@@ -41,7 +47,10 @@ message Value {
   common.enums.currency.v1.Currency currency = 5;
 
   // The organization this operation is being processed for.
-  string organization_key = 6;
+  string organization_key = 6 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The organization name this operation is being processed for.
   string organization_name = 7;
@@ -53,7 +62,10 @@ message Value {
   common.enums.organizationcategory.v1.OrganizationCategory category = 9;
 
   // The store where this operation occurred.
-  string store_key = 10;
+  string store_key = 10 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The number of this store (an alternative unique value).
   string store_number = 11;
@@ -210,7 +222,10 @@ message From {
 
 message ReceiveValueRequest {
   // The Mica generated key for this instrument.
-  string to_service_provider_instrument_key = 1;
+  string to_service_provider_instrument_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Service Provider's primary key for their instrument.
   string to_service_provider_instrument_ref = 2;
@@ -240,7 +255,10 @@ message ReceiveValueResponse {
 message SearchValueRequest {
   oneof criteria {
     // Mica's transaction record primary key.
-    string transaction_key = 1;
+    string transaction_key = 1 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
 
     // The payment token of the user.
     string service_provider_payment_token = 2;
@@ -272,9 +290,15 @@ message SearchValueResponse {
 //<editor-fold desc="Person to Person Operations">
 
 message SendValueRequest {
-  string from_service_provider_user_key = 1;
+  string from_service_provider_user_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
-  string from_service_provider_instrument_key = 2;
+  string from_service_provider_instrument_key = 2 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   string to_payment_token = 3;
 
@@ -294,7 +318,10 @@ message SendValueResponse {
 
   common.v1.Error error = 2;
 
-  string transaction_key = 3;
+  string transaction_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }
 //</editor-fold>
 

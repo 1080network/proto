@@ -15,6 +15,7 @@ import "common/enums/organizationcategory/v1/organization_category.proto";
 import "common/v1/address.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/common/v1;commonv1";
 option java_outer_classname = "OrganizationProto";
@@ -23,7 +24,10 @@ option objc_class_prefix = "MICA";
 
 message Organization {
   // The primary key of the organization in Mica.
-  string organization_key = 1;
+  string organization_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // Date that the Store was created at Mica.
   google.protobuf.Timestamp created = 2;
@@ -32,7 +36,10 @@ message Organization {
   google.protobuf.Timestamp updated = 3;
 
   // The partner who owns this organization.
-  string partner_key = 4;
+  string partner_key = 4 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // The name of this organization.
   string name = 6;
@@ -44,19 +51,19 @@ message Organization {
   common.v1.Address address = 8;
 
   // The organizations domestic ACH routing number (9 characters)
-  string domestic_ach_routing_number = 9;
+  string domestic_ach_routing_number = 9 [(validate.rules).string.pattern = "^|\\w{9}$"];
 
   // The organizations international ACH routing number (9 characters)
-  string international_ach_routing_number = 10;
+  string international_ach_routing_number = 10 [(validate.rules).string.pattern = "^|\\w{9}$"];
 
   // The organizations wire routing number (9 characters)
-  string wire_routing_number = 11;
+  string wire_routing_number = 11 [(validate.rules).string.pattern = "^|\\w{9}$"];
 
   // The organizations swift routing number (9 characters)
-  string swift_routing_number = 12;
+  string swift_routing_number = 12 [(validate.rules).string.pattern = "^|\\w{9}$"];
 
   // The organizations bank account number (14 digits)
-  string bank_account_number = 13;
+  string bank_account_number = 13 [(validate.rules).string.pattern = "^|\\w{14}$"];
 }
 
 message LegacyConfiguration {
