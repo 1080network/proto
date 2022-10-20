@@ -133,6 +133,8 @@ message ValueRequest {
 
   // List of items bought or returned.
   repeated common.v1.LineItem line_items = 11;
+
+  repeated common.v1.Adjustment adjustments = 12;
 }
 
 message ObtainValueRequest {

@@ -14,7 +14,9 @@ import "common/ping/v1/ping.proto";
 import "discount/discount/v1/discount.proto";
 import "discount/discountdefinition/v1/discount_definition.proto";
 import "discount/discountprovider/v1/discount_provider.proto";
+import "discount/discountprovideraccount/v1/discount_provider_account.proto";
 import "discount/productgroup/v1/product_group.proto";
+import "discount/user/v1/user.proto";
 
 option go_package = "mica/proto/discount/servicev1";
 option java_outer_classname = "DiscountToMicaServiceProto";
@@ -27,6 +29,30 @@ service DiscountToMicaService {
   rpc GetDiscountProvider(.discount.discountprovider.v1.GetDiscountProviderRequest) returns (.discount.discountprovider.v1.GetDiscountProviderResponse) {}
 
   rpc UpdateDiscountProvider(.discount.discountprovider.v1.UpdateDiscountProviderRequest) returns (.discount.discountprovider.v1.UpdateDiscountProviderResponse) {}
+  //</editor-fold>
+
+
+  //<editor-fold desc="Product Group Operations">
+
+  rpc CreateDiscountProviderAccount(.discount.discountprovideraccount.v1.CreateDiscountProviderAccountRequest) returns (.discount.discountprovideraccount.v1.CreateDiscountProviderAccountResponse) {}
+
+  rpc GetDiscountProviderAccount(.discount.discountprovideraccount.v1.GetDiscountProviderAccountRequest) returns (.discount.discountprovideraccount.v1.GetDiscountProviderAccountResponse) {}
+
+  rpc UpdateDiscountProviderAccount(.discount.discountprovideraccount.v1.UpdateDiscountProviderAccountRequest) returns (.discount.discountprovideraccount.v1.UpdateDiscountProviderAccountResponse) {}
+
+  rpc RemoveDiscountProviderAccount(.discount.discountprovideraccount.v1.RemoveDiscountProviderAccountRequest) returns (.discount.discountprovideraccount.v1.RemoveDiscountProviderAccountResponse) {}
+  //</editor-fold>
+
+
+  //<editor-fold desc="Product Group Operations">
+
+  rpc CreateProductGroup(.discount.productgroup.v1.CreateProductGroupRequest) returns (.discount.productgroup.v1.CreateProductGroupResponse) {}
+
+  rpc GetProductGroup(.discount.productgroup.v1.GetProductGroupRequest) returns (.discount.productgroup.v1.GetProductGroupResponse) {}
+
+  rpc UpdateProductGroup(.discount.productgroup.v1.UpdateProductGroupRequest) returns (.discount.productgroup.v1.UpdateProductGroupResponse) {}
+
+  rpc RemoveProductGroup(.discount.productgroup.v1.RemoveProductGroupRequest) returns (.discount.productgroup.v1.RemoveProductGroupResponse) {}
   //</editor-fold>
 
 
@@ -54,17 +80,7 @@ service DiscountToMicaService {
   //</editor-fold>
 
 
-  //<editor-fold desc="Product Group Operations">
-
-  rpc CreateProductGroup(.discount.productgroup.v1.CreateProductGroupRequest) returns (.discount.productgroup.v1.CreateProductGroupResponse) {}
-
-  rpc GetProductGroup(.discount.productgroup.v1.GetProductGroupRequest) returns (.discount.productgroup.v1.GetProductGroupResponse) {}
-
-  rpc UpdateProductGroup(.discount.productgroup.v1.UpdateProductGroupRequest) returns (.discount.productgroup.v1.UpdateProductGroupResponse) {}
-
-  rpc RemoveProductGroup(.discount.productgroup.v1.RemoveProductGroupRequest) returns (.discount.productgroup.v1.RemoveProductGroupResponse) {}
-  //</editor-fold>
-
+  rpc GetUserKey(user.v1.GetUserKeyRequest) returns (user.v1.GetUserKeyResponse) {}
 
   //<editor-fold desc="Admin Operations">
 

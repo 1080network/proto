@@ -11,6 +11,7 @@ syntax = "proto3";
 package discount.discountprovider.v1;
 
 import "common/v1/address.proto";
+import "common/v1/bank_account_detail.proto";
 import "common/v1/error.proto";
 import "validate/validate.proto";
 
@@ -37,20 +38,8 @@ message DiscountProvider {
 
   string phone = 8;
 
-  // The organizations domestic ACH routing number (9 characters)
-  string domestic_ach_routing_number = 9 [(validate.rules).string.pattern = "^|\\w{9}$"];
-
-  // The organizations international ACH routing number (9 characters)
-  string international_ach_routing_number = 10 [(validate.rules).string.pattern = "^|\\w{9}$"];
-
-  // The organizations wire routing number (9 characters)
-  string wire_routing_number = 11 [(validate.rules).string.pattern = "^|\\w{9}$"];
-
-  // The organizations swift routing number (9 characters)
-  string swift_routing_number = 12 [(validate.rules).string.pattern = "^|\\w{9}$"];
-
-  // The organizations bank account number (14 digits)
-  string bank_account_number = 13 [(validate.rules).string.pattern = "^|\\w{14}$"];
+  // Bank account of the Discount Provider to send revenue to
+  common.v1.BankAccountDetail bank_account_detail = 9;
 }
 
 message GetDiscountProviderRequest {}
@@ -82,20 +71,7 @@ message UpdateDiscountProviderRequest {
 
   string phone = 6;
 
-  // The organizations domestic ACH routing number (9 characters)
-  string domestic_ach_routing_number = 7 [(validate.rules).string.pattern = "^|\\w{9}$"];
-
-  // The organizations international ACH routing number (9 characters)
-  string international_ach_routing_number = 8 [(validate.rules).string.pattern = "^|\\w{9}$"];
-
-  // The organizations wire routing number (9 characters)
-  string wire_routing_number = 9 [(validate.rules).string.pattern = "^|\\w{9}$"];
-
-  // The organizations swift routing number (9 characters)
-  string swift_routing_number = 10 [(validate.rules).string.pattern = "^|\\w{9}$"];
-
-  // The organizations bank account number (14 digits)
-  string bank_account_number = 11 [(validate.rules).string.pattern = "^|\\w{14}$"];
+  common.v1.BankAccountDetail bank_account_detail = 7;
 }
 
 message UpdateDiscountProviderResponse {

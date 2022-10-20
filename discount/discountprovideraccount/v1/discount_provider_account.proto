@@ -1,0 +1,132 @@
+// Copyright (c) 2022 Mica, Inc. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package discount.discountprovideraccount.v1;
+
+import "common/v1/bank_account_detail.proto";
+import "common/v1/error.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/proto/discount/discountprovideraccountv1";
+option java_outer_classname = "DiscountProviderAccountProto";
+option java_package = "io.mica.discount.discountprovideraccount.v1";
+option objc_class_prefix = "MICA";
+
+// One of the Discount Provider's accounts that Mica can draw down from
+message DiscountProviderAccount {
+  string discount_provider_account_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  int64 version = 2 [(validate.rules).int64.gte = 0];
+
+  string discount_provider_account_ref = 3 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+
+  string name = 4 [(validate.rules).string.max_len = 100];
+
+  common.v1.BankAccountDetail bank_account_detail = 5;
+}
+
+message CreateDiscountProviderAccountRequest {
+  string discount_provider_account_ref = 3 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+
+  string name = 4 [(validate.rules).string.max_len = 100];
+
+  common.v1.BankAccountDetail bank_account_detail = 5;
+}
+
+message CreateDiscountProviderAccountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  string discount_provider_account_key = 3;
+
+  int64 version = 4 [(validate.rules).int64.gte = 0];
+}
+
+message GetDiscountProviderAccountRequest {
+  string discount_provider_account_ref = 3 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+}
+
+message GetDiscountProviderAccountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  DiscountProviderAccount discount_provider_account = 3;
+}
+
+message UpdateDiscountProviderAccountRequest {
+  string discount_provider_account_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+
+  int64 version = 2 [(validate.rules).int64.gte = 0];
+
+  string name = 3 [(validate.rules).string.max_len = 100];
+
+  common.v1.BankAccountDetail bank_account_detail = 4;
+}
+
+message UpdateDiscountProviderAccountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3 [(validate.rules).int64.gte = 0];
+}
+
+message RemoveDiscountProviderAccountRequest {
+  string discount_provider_account_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+}
+
+message RemoveDiscountProviderAccountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+}

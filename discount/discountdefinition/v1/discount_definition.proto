@@ -34,25 +34,30 @@ message DiscountDefinition {
     max_len: 50
   }];
 
-  string receipt_description = 4 [(validate.rules).string.max_len = 100];
+  string discount_provider_account_ref = 4 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  DiscountDefinitionStatus status = 5;
+  string receipt_description = 5 [(validate.rules).string.max_len = 100];
 
-  discount.v1.DiscountType type = 6;
+  DiscountDefinitionStatus status = 6;
 
-  google.protobuf.Timestamp valid_from = 7 [(validate.rules).timestamp.required = true];
+  discount.v1.DiscountType type = 7;
 
-  google.protobuf.Timestamp valid_to = 8 [(validate.rules).timestamp.gt_now = true];
+  google.protobuf.Timestamp valid_from = 8 [(validate.rules).timestamp.required = true];
+
+  google.protobuf.Timestamp valid_to = 9 [(validate.rules).timestamp.gt_now = true];
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated discount.v1.DiscountCriteria discount_criteria = 9 [(validate.rules).repeated.min_items = 1];
+  repeated discount.v1.DiscountCriteria discount_criteria = 10 [(validate.rules).repeated.min_items = 1];
 
-  common.enums.currency.v1.Currency currency = 10;
+  common.enums.currency.v1.Currency currency = 11;
 
   oneof discount_amount {
-    discount.v1.MonetaryAmount monetary_amount = 11;
-    discount.v1.PercentageAmount percentage_amount = 12;
+    discount.v1.MonetaryAmount monetary_amount = 12;
+    discount.v1.PercentageAmount percentage_amount = 13;
   }
 }
 
@@ -72,25 +77,30 @@ message CreateDiscountDefinitionRequest {
     max_len: 50
   }];
 
-  string receipt_description = 2 [(validate.rules).string.max_len = 100];
+  string discount_provider_account_ref = 2 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  DiscountDefinitionStatus status = 3;
+  string receipt_description = 3 [(validate.rules).string.max_len = 100];
 
-  discount.v1.DiscountType type = 4;
+  DiscountDefinitionStatus status = 4;
 
-  google.protobuf.Timestamp valid_from = 5 [(validate.rules).timestamp.required = true];
+  discount.v1.DiscountType type = 5;
 
-  google.protobuf.Timestamp valid_to = 6 [(validate.rules).timestamp.gt_now = true];
+  google.protobuf.Timestamp valid_from = 6 [(validate.rules).timestamp.required = true];
+
+  google.protobuf.Timestamp valid_to = 7 [(validate.rules).timestamp.gt_now = true];
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated discount.v1.DiscountCriteria discount_criteria = 7 [(validate.rules).repeated.min_items = 1];
+  repeated discount.v1.DiscountCriteria discount_criteria = 8 [(validate.rules).repeated.min_items = 1];
 
-  common.enums.currency.v1.Currency currency = 8;
+  common.enums.currency.v1.Currency currency = 9;
 
   oneof discount_amount {
-    discount.v1.MonetaryAmount monetary_amount = 9;
-    discount.v1.PercentageAmount percentage_amount = 10;
+    discount.v1.MonetaryAmount monetary_amount = 10;
+    discount.v1.PercentageAmount percentage_amount = 11;
   }
 }
 
@@ -138,25 +148,30 @@ message UpdateDiscountDefinitionRequest {
 
   int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  string receipt_description = 3 [(validate.rules).string.max_len = 100];
+  string discount_provider_account_ref = 3 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50
+  }];
 
-  DiscountDefinitionStatus status = 4;
+  string receipt_description = 4 [(validate.rules).string.max_len = 100];
 
-  discount.v1.DiscountType type = 5;
+  DiscountDefinitionStatus status = 5;
 
-  google.protobuf.Timestamp valid_from = 6 [(validate.rules).timestamp.required = true];
+  discount.v1.DiscountType type = 6;
 
-  google.protobuf.Timestamp valid_to = 7 [(validate.rules).timestamp.gt_now = true];
+  google.protobuf.Timestamp valid_from = 7 [(validate.rules).timestamp.required = true];
+
+  google.protobuf.Timestamp valid_to = 8 [(validate.rules).timestamp.gt_now = true];
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated discount.v1.DiscountCriteria discount_criteria = 8 [(validate.rules).repeated.min_items = 1];
+  repeated discount.v1.DiscountCriteria discount_criteria = 9 [(validate.rules).repeated.min_items = 1];
 
-  common.enums.currency.v1.Currency currency = 9;
+  common.enums.currency.v1.Currency currency = 10;
 
   oneof discount_amount {
-    discount.v1.MonetaryAmount monetary_amount = 10;
-    discount.v1.PercentageAmount percentage_amount = 11;
+    discount.v1.MonetaryAmount monetary_amount = 11;
+    discount.v1.PercentageAmount percentage_amount = 12;
   }
 }
 

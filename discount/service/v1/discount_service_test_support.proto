@@ -23,8 +23,9 @@ service DiscountTestSupportService {
   // Determine which discount(s) can be applied to this transaction
   rpc TestDetermineDiscount(DetermineDiscountRequest) returns (DetermineDiscountResponse) {}
 
-  // Apply the discount(s) that were applicable to this transaction
+  // Apply or release a given discount
   rpc TestApplyDiscount(ApplyDiscountRequest) returns (ApplyDiscountResponse) {}
+  rpc TestReleaseDiscount(ReleaseDiscountRequest) returns (ReleaseDiscountResponse) {}
 }
 
 message DetermineDiscountRequest {
@@ -47,13 +48,32 @@ message DetermineDiscountResponse {
   common.v1.Error error = 2;
 }
 
-message ApplyDiscountRequest {}
+message ApplyDiscountRequest {
+  string discount_ref = 1;
+}
 
 message ApplyDiscountResponse {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_SUCCESS = 1;
     STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+}
+
+message ReleaseDiscountRequest {
+  string discount_ref = 1;
+}
+
+message ReleaseDiscountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
   }
   Status status = 1;
 

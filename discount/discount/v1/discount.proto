@@ -76,6 +76,8 @@ message Discount {
     MonetaryAmount monetary_amount = 15;
     PercentageAmount percentage_amount = 16;
   }
+
+  repeated common.v1.LineItem line_items = 17;
 }
 
 enum DiscountStatus {
@@ -123,8 +125,10 @@ message DiscountCriteria {
 
   repeated string product_group_refs = 4 [(validate.rules).repeated.max_items = 100];
 
+  repeated string product_match_filters = 5 [(validate.rules).repeated.max_items = 100];
+
   // list of product codes of which the basket must include at least one in this list (i.e. it's an or operation)
-  repeated string product_codes = 5 [(validate.rules).repeated.max_items = 100];
+  repeated string product_codes = 6 [(validate.rules).repeated.max_items = 100];
 }
 
 message MonetaryAmount {
