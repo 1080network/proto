@@ -40,7 +40,11 @@ service DiscountToMicaService {
 
   rpc UpdateDiscountProviderAccount(.discount.discountprovideraccount.v1.UpdateDiscountProviderAccountRequest) returns (.discount.discountprovideraccount.v1.UpdateDiscountProviderAccountResponse) {}
 
+  rpc UpdateDiscountProviderAccountStatus(.discount.discountprovideraccount.v1.UpdateDiscountProviderAccountStatusRequest) returns (.discount.discountprovideraccount.v1.UpdateDiscountProviderAccountStatusResponse) {}
+
   rpc RemoveDiscountProviderAccount(.discount.discountprovideraccount.v1.RemoveDiscountProviderAccountRequest) returns (.discount.discountprovideraccount.v1.RemoveDiscountProviderAccountResponse) {}
+
+  rpc SearchDiscountProviderAccount(.discount.discountprovideraccount.v1.SearchDiscountProviderAccountRequest) returns (.discount.discountprovideraccount.v1.SearchDiscountProviderAccountResponse) {}
   //</editor-fold>
 
 
@@ -53,6 +57,8 @@ service DiscountToMicaService {
   rpc UpdateProductGroup(.discount.productgroup.v1.UpdateProductGroupRequest) returns (.discount.productgroup.v1.UpdateProductGroupResponse) {}
 
   rpc RemoveProductGroup(.discount.productgroup.v1.RemoveProductGroupRequest) returns (.discount.productgroup.v1.RemoveProductGroupResponse) {}
+
+  rpc SearchProductGroup(.discount.productgroup.v1.SearchProductGroupRequest) returns (.discount.productgroup.v1.SearchProductGroupResponse) {}
   //</editor-fold>
 
 
@@ -64,7 +70,11 @@ service DiscountToMicaService {
 
   rpc UpdateDiscountDefinition(discountdefinition.v1.UpdateDiscountDefinitionRequest) returns (discountdefinition.v1.UpdateDiscountDefinitionResponse) {}
 
+  rpc UpdateDiscountDefinitionStatus(discountdefinition.v1.UpdateDiscountDefinitionStatusRequest) returns (discountdefinition.v1.UpdateDiscountDefinitionStatusResponse) {}
+
   rpc RemoveDiscountDefinition(discountdefinition.v1.RemoveDiscountDefinitionRequest) returns (discountdefinition.v1.RemoveDiscountDefinitionResponse) {}
+
+  rpc SearchDiscountDefinition(discountdefinition.v1.SearchDiscountDefinitionRequest) returns (discountdefinition.v1.SearchDiscountDefinitionResponse) {}
   //</editor-fold>
 
 
@@ -76,7 +86,11 @@ service DiscountToMicaService {
 
   rpc UpdateDiscount(discount.v1.UpdateDiscountRequest) returns (discount.v1.UpdateDiscountResponse) {}
 
+  rpc UpdateDiscountStatus(discount.v1.UpdateDiscountStatusRequest) returns (discount.v1.UpdateDiscountStatusResponse) {}
+
   rpc RemoveDiscount(discount.v1.RemoveDiscountRequest) returns (discount.v1.RemoveDiscountResponse) {}
+
+  rpc SearchDiscount(discount.v1.SearchDiscountRequest) returns (discount.v1.SearchDiscountResponse) {}
   //</editor-fold>
 
 

@@ -12,7 +12,10 @@ package partner.administration.v1;
 
 import "common/ping/v1/ping.proto";
 import "common/v1/console_user.proto";
+import "common/v1/error.proto";
 import "common/v1/mtls_certificate.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/proto/partner/administrationv1";
 option java_outer_classname = "AdministrationService";
@@ -21,6 +24,10 @@ option objc_class_prefix = "MICA";
 
 // This is the administrative interface for a Partner member
 service PartnerAdministrationService {
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse) {}
+
+  rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse) {}
+
   //  Generate a new MTLS certificate.
   rpc GenerateMTLSCertificate(common.v1.GenerateMTLSCertificateRequest) returns (common.v1.GenerateMTLSCertificateResponse) {}
 
@@ -48,4 +55,64 @@ service PartnerAdministrationService {
   rpc UpdateClientMTLSCertificate(common.v1.UpdateClientMTLSCertificateRequest) returns (common.v1.UpdateClientMTLSCertificateResponse) {}
 
   rpc SearchClientMTLSCertificate(common.v1.SearchClientMTLSCertificateRequest) returns (common.v1.SearchClientMTLSCertificateResponse) {}
+}
+
+message Settings {
+  string settings_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  google.protobuf.Timestamp created = 2;
+
+  google.protobuf.Timestamp updated = 3;
+
+  int64 version = 4;
+
+  string callback_address = 5 [(validate.rules).string = {
+    min_len: 3,
+    max_len: 200
+  }];
+}
+
+message GetSettingsRequest {}
+
+message GetSettingsResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  Settings settings = 3;
+}
+
+message UpdateSettingsRequest {
+  string settings_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  int64 version = 2;
+
+  string callback_address = 3 [(validate.rules).string = {
+    min_len: 3,
+    max_len: 200
+  }];
+}
+
+message UpdateSettingsResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3;
 }

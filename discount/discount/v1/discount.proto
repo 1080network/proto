@@ -10,7 +10,9 @@ syntax = "proto3";
 
 package discount.discount.v1;
 
+import "common/enums/approvaltype/v1/approval_type.proto";
 import "common/enums/currency/v1/currency.proto";
+import "common/enums/discounttype/v1/discount_type.proto";
 import "common/enums/unit/v1/unit.proto";
 import "common/v1/address.proto";
 import "common/v1/error.proto";
@@ -22,6 +24,43 @@ option go_package = "mica/proto/discount/discountv1";
 option java_outer_classname = "DiscountProto";
 option java_package = "io.mica.discount.discount.v1";
 option objc_class_prefix = "MICA";
+
+message TransactionDetails {
+  common.enums.approvaltype.v1.ApprovalType approval_type = 1;
+
+  // Mica's transaction record primary key.
+  string transaction_key = 2 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  string partner_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  string partner_name = 4;
+
+  string organization_key = 5 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  string organization_name = 6;
+
+  common.v1.Address organization_address = 7;
+
+  string store_key = 9 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  string store_number = 10;
+
+  common.v1.Address store_address = 11;
+
+  repeated common.v1.LineItem line_items = 12 [(validate.rules).repeated.min_items = 1];
+}
 
 message Discount {
   string discount_definition_key = 1 [(validate.rules).string = {
@@ -39,45 +78,49 @@ message Discount {
     max_len: 50
   }];
 
-  int64 version = 4 [(validate.rules).int64.gte = 0];
+  google.protobuf.Timestamp created = 4;
 
-  string discount_ref = 5 [(validate.rules).string = {
+  google.protobuf.Timestamp updated = 5;
+
+  int64 version = 6 [(validate.rules).int64.gte = 0];
+
+  string discount_ref = 7 [(validate.rules).string = {
     min_len: 1,
     max_len: 50
   }];
 
-  string receipt_description = 6 [(validate.rules).string.max_len = 100];
+  string receipt_description = 8 [(validate.rules).string.max_len = 100];
 
-  DiscountStatus status = 7;
+  DiscountStatus status = 9;
 
-  DiscountType type = 8;
+  common.enums.discounttype.v1.DiscountType type = 10;
 
-  google.protobuf.Timestamp valid_from = 9 [(validate.rules).timestamp.required = false];
+  google.protobuf.Timestamp valid_from = 11 [(validate.rules).timestamp.required = false];
 
-  google.protobuf.Timestamp valid_to = 10 [(validate.rules).timestamp = {
+  google.protobuf.Timestamp valid_to = 12 [(validate.rules).timestamp = {
     required: false,
     gt_now: true
   }];
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated DiscountCriteria discount_criteria = 11;
+  repeated DiscountCriteria discount_criteria = 13;
 
-  common.enums.currency.v1.Currency currency = 12;
+  common.enums.currency.v1.Currency currency = 14;
 
-  string user_key = 13;
+  string user_key = 15;
 
-  string user_ref = 14 [(validate.rules).string = {
+  string user_ref = 16 [(validate.rules).string = {
     min_len: 1,
     max_len: 50
   }];
 
   oneof discount_amount {
-    MonetaryAmount monetary_amount = 15;
-    PercentageAmount percentage_amount = 16;
+    MonetaryAmount monetary_amount = 17;
+    PercentageAmount percentage_amount = 18;
   }
 
-  repeated common.v1.LineItem line_items = 17;
+  TransactionDetails transaction_details = 19;
 }
 
 enum DiscountStatus {
@@ -94,18 +137,6 @@ enum DiscountStatus {
   DISCOUNT_STATUS_USED = 4;
 
   DISCOUNT_STATUS_CLOSED = 5;
-}
-
-enum DiscountType {
-  DISCOUNT_TYPE_UNSPECIFIED = 0;
-
-  DISCOUNT_TYPE_CPG = 1;
-
-  DISCOUNT_TYPE_GOVERNMENT = 2;
-
-  DISCOUNT_TYPE_PARTNER = 3;
-
-  DISCOUNT_TYPE_SERVICE_PROVIDER = 4;
 }
 
 message Quantity {
@@ -203,10 +234,17 @@ message CreateDiscountResponse {
 }
 
 message GetDiscountRequest {
-  string discount_ref = 1 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof discount_identifier {
+    string discount_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 }
 
 message GetDiscountResponse {
@@ -224,10 +262,17 @@ message GetDiscountResponse {
 }
 
 message UpdateDiscountRequest {
-  string discount_ref = 1 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof discount_identifier {
+    string discount_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_key = 12 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 
   int64 version = 2 [(validate.rules).int64.gte = 0];
 
@@ -273,11 +318,49 @@ message UpdateDiscountResponse {
   int64 version = 3 [(validate.rules).int64.gte = 0];
 }
 
+message UpdateDiscountStatusRequest {
+  oneof discount_identifier {
+    string discount_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_key = 3 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
+
+  DiscountStatus discount_status = 2 [(validate.rules).enum.not_in = 0];
+}
+
+message UpdateDiscountStatusResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+    STATUS_INVALID_STATE_TRANSITION = 4;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3 [(validate.rules).int64.gte = 0];
+}
+
 message RemoveDiscountRequest {
-  string discount_ref = 1 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof discount_identifier {
+    string discount_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 }
 
 message RemoveDiscountResponse {
@@ -351,4 +434,36 @@ message ApplyDiscountNotificationResponse {
     min_len: 1,
     max_len: 50
   }];
+}
+
+message SearchDiscountRequest {
+  string discount_definition_ref = 2;
+
+  string receipt_description = 3;
+
+  DiscountStatus status = 4;
+
+  common.enums.discounttype.v1.DiscountType type = 5;
+
+  google.protobuf.Timestamp valid_from = 6;
+
+  google.protobuf.Timestamp valid_to = 7;
+
+  common.enums.currency.v1.Currency currency = 8;
+
+  string user_ref = 9;
+}
+
+message SearchDiscountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  repeated Discount discounts = 3;
 }

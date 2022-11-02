@@ -11,6 +11,7 @@ syntax = "proto3";
 package discount.discountdefinition.v1;
 
 import "common/enums/currency/v1/currency.proto";
+import "common/enums/discounttype/v1/discount_type.proto";
 import "common/v1/error.proto";
 import "discount/discount/v1/discount.proto";
 import "google/protobuf/timestamp.proto";
@@ -27,37 +28,41 @@ message DiscountDefinition {
     max_len: 50
   }];
 
-  int64 version = 2 [(validate.rules).int64.gte = 0];
+  google.protobuf.Timestamp created = 2;
 
-  string discount_definition_ref = 3 [(validate.rules).string = {
+  google.protobuf.Timestamp updated = 3;
+
+  int64 version = 4 [(validate.rules).int64.gte = 0];
+
+  string discount_definition_ref = 5 [(validate.rules).string = {
     min_len: 1,
     max_len: 50
   }];
 
-  string discount_provider_account_ref = 4 [(validate.rules).string = {
+  string discount_provider_account_ref = 6 [(validate.rules).string = {
     min_len: 1,
     max_len: 50
   }];
 
-  string receipt_description = 5 [(validate.rules).string.max_len = 100];
+  string receipt_description = 7 [(validate.rules).string.max_len = 100];
 
-  DiscountDefinitionStatus status = 6;
+  DiscountDefinitionStatus status = 8;
 
-  discount.v1.DiscountType type = 7;
+  common.enums.discounttype.v1.DiscountType type = 9;
 
-  google.protobuf.Timestamp valid_from = 8 [(validate.rules).timestamp.required = true];
+  google.protobuf.Timestamp valid_from = 10 [(validate.rules).timestamp.required = true];
 
-  google.protobuf.Timestamp valid_to = 9 [(validate.rules).timestamp.gt_now = true];
+  google.protobuf.Timestamp valid_to = 11 [(validate.rules).timestamp.gt_now = true];
 
   // the basket must include items that match each of the criteria (i.e. it's an and operation) in order for this
   // discount to apply
-  repeated discount.v1.DiscountCriteria discount_criteria = 10 [(validate.rules).repeated.min_items = 1];
+  repeated discount.v1.DiscountCriteria discount_criteria = 12 [(validate.rules).repeated.min_items = 1];
 
-  common.enums.currency.v1.Currency currency = 11;
+  common.enums.currency.v1.Currency currency = 13;
 
   oneof discount_amount {
-    discount.v1.MonetaryAmount monetary_amount = 12;
-    discount.v1.PercentageAmount percentage_amount = 13;
+    discount.v1.MonetaryAmount monetary_amount = 14;
+    discount.v1.PercentageAmount percentage_amount = 15;
   }
 }
 
@@ -86,7 +91,7 @@ message CreateDiscountDefinitionRequest {
 
   DiscountDefinitionStatus status = 4;
 
-  discount.v1.DiscountType type = 5;
+  common.enums.discounttype.v1.DiscountType type = 5;
 
   google.protobuf.Timestamp valid_from = 6 [(validate.rules).timestamp.required = true];
 
@@ -120,10 +125,17 @@ message CreateDiscountDefinitionResponse {
 }
 
 message GetDiscountDefinitionRequest {
-  string discount_definition_ref = 1 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof discount_definition_identifier {
+    string discount_definition_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_definition_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 }
 
 message GetDiscountDefinitionResponse {
@@ -141,10 +153,17 @@ message GetDiscountDefinitionResponse {
 }
 
 message UpdateDiscountDefinitionRequest {
-  string discount_definition_ref = 1 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof discount_definition_identifier {
+    string discount_definition_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_definition_key = 13 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 
   int64 version = 2 [(validate.rules).int64.gte = 0];
 
@@ -157,7 +176,7 @@ message UpdateDiscountDefinitionRequest {
 
   DiscountDefinitionStatus status = 5;
 
-  discount.v1.DiscountType type = 6;
+  common.enums.discounttype.v1.DiscountType type = 6;
 
   google.protobuf.Timestamp valid_from = 7 [(validate.rules).timestamp.required = true];
 
@@ -189,11 +208,49 @@ message UpdateDiscountDefinitionResponse {
   int64 version = 3 [(validate.rules).int64.gte = 0];
 }
 
+message UpdateDiscountDefinitionStatusRequest {
+  oneof discount_definition_identifier {
+    string discount_definition_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_definition_key = 3 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
+
+  DiscountDefinitionStatus discount_definition_status = 2 [(validate.rules).enum.not_in = 0];
+}
+
+message UpdateDiscountDefinitionStatusResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+    STATUS_INVALID_STATE_TRANSITION = 4;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3 [(validate.rules).int64.gte = 0];
+}
+
 message RemoveDiscountDefinitionRequest {
-  string discount_definition_ref = 1 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof discount_definition_identifier {
+    string discount_definition_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_definition_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 }
 
 message RemoveDiscountDefinitionResponse {
@@ -206,4 +263,32 @@ message RemoveDiscountDefinitionResponse {
   Status status = 1;
 
   common.v1.Error error = 2;
+}
+
+message SearchDiscountDefinitionRequest {
+  string receipt_description = 1;
+
+  DiscountDefinitionStatus status = 2;
+
+  common.enums.discounttype.v1.DiscountType type = 3;
+
+  google.protobuf.Timestamp valid_from = 4;
+
+  google.protobuf.Timestamp valid_to = 5;
+
+  common.enums.currency.v1.Currency currency = 7;
+}
+
+message SearchDiscountDefinitionResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  repeated DiscountDefinition discount_definitions = 3;
 }

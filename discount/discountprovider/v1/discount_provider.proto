@@ -13,6 +13,7 @@ package discount.discountprovider.v1;
 import "common/v1/address.proto";
 import "common/v1/bank_account_detail.proto";
 import "common/v1/error.proto";
+import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 
 option go_package = "mica/proto/discount/discountproviderv1";
@@ -26,20 +27,24 @@ message DiscountProvider {
     max_len: 50
   }];
 
-  int64 version = 2 [(validate.rules).int64.gte = 0];
+  google.protobuf.Timestamp created = 2;
 
-  string name = 3 [(validate.rules).string.max_len = 100];
+  google.protobuf.Timestamp updated = 3;
 
-  common.v1.Address address = 5;
+  int64 version = 4 [(validate.rules).int64.gte = 0];
 
-  string callback_address = 6;
+  string name = 5 [(validate.rules).string.max_len = 100];
 
-  string email = 7;
+  common.v1.Address address = 7;
 
-  string phone = 8;
+  string callback_address = 8;
+
+  string email = 9;
+
+  string phone = 10;
 
   // Bank account of the Discount Provider to send revenue to
-  common.v1.BankAccountDetail bank_account_detail = 9;
+  common.v1.BankAccountDetail bank_account_detail = 11;
 }
 
 message GetDiscountProviderRequest {}

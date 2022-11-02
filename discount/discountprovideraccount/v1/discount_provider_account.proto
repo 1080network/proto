@@ -12,6 +12,7 @@ package discount.discountprovideraccount.v1;
 
 import "common/v1/bank_account_detail.proto";
 import "common/v1/error.proto";
+import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 
 option go_package = "mica/proto/discount/discountprovideraccountv1";
@@ -26,16 +27,32 @@ message DiscountProviderAccount {
     max_len: 50
   }];
 
-  int64 version = 2 [(validate.rules).int64.gte = 0];
+  google.protobuf.Timestamp created = 2;
 
-  string discount_provider_account_ref = 3 [(validate.rules).string = {
+  google.protobuf.Timestamp updated = 3;
+
+  int64 version = 4 [(validate.rules).int64.gte = 0];
+
+  string discount_provider_account_ref = 6 [(validate.rules).string = {
     min_len: 1,
     max_len: 50
   }];
 
-  string name = 4 [(validate.rules).string.max_len = 100];
+  DiscountProviderAccountStatus discount_provider_account_status = 5;
 
-  common.v1.BankAccountDetail bank_account_detail = 5;
+  string name = 7 [(validate.rules).string.max_len = 100];
+
+  common.v1.BankAccountDetail bank_account_detail = 8;
+}
+
+enum DiscountProviderAccountStatus {
+  DISCOUNT_PROVIDER_ACCOUNT_STATUS_UNSPECIFIED = 0;
+
+  DISCOUNT_PROVIDER_ACCOUNT_STATUS_ACTIVE = 1;
+
+  DISCOUNT_PROVIDER_ACCOUNT_STATUS_SUSPENDED = 2;
+
+  DISCOUNT_PROVIDER_ACCOUNT_STATUS_CLOSED = 3;
 }
 
 message CreateDiscountProviderAccountRequest {
@@ -65,10 +82,17 @@ message CreateDiscountProviderAccountResponse {
 }
 
 message GetDiscountProviderAccountRequest {
-  string discount_provider_account_ref = 3 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof discount_provider_account_identifier {
+    string discount_provider_account_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_provider_account_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 }
 
 message GetDiscountProviderAccountResponse {
@@ -86,16 +110,25 @@ message GetDiscountProviderAccountResponse {
 }
 
 message UpdateDiscountProviderAccountRequest {
-  string discount_provider_account_ref = 1 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof discount_provider_account_identifier {
+    string discount_provider_account_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_provider_account_key = 6 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 
   int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  string name = 3 [(validate.rules).string.max_len = 100];
+  DiscountProviderAccountStatus discount_provider_account_status = 3;
 
-  common.v1.BankAccountDetail bank_account_detail = 4;
+  string name = 4 [(validate.rules).string.max_len = 100];
+
+  common.v1.BankAccountDetail bank_account_detail = 5;
 }
 
 message UpdateDiscountProviderAccountResponse {
@@ -112,11 +145,49 @@ message UpdateDiscountProviderAccountResponse {
   int64 version = 3 [(validate.rules).int64.gte = 0];
 }
 
+message UpdateDiscountProviderAccountStatusRequest {
+  oneof discount_provider_account_identifier {
+    string discount_provider_account_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_provider_account_key = 3 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
+
+  DiscountProviderAccountStatus discount_provider_account_status = 2 [(validate.rules).enum.not_in = 0];
+}
+
+message UpdateDiscountProviderAccountStatusResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+    STATUS_INVALID_STATE_TRANSITION = 4;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  int64 version = 3 [(validate.rules).int64.gte = 0];
+}
+
 message RemoveDiscountProviderAccountRequest {
-  string discount_provider_account_ref = 1 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof discount_provider_account_identifier {
+    string discount_provider_account_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string discount_provider_account_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 }
 
 message RemoveDiscountProviderAccountResponse {
@@ -129,4 +200,25 @@ message RemoveDiscountProviderAccountResponse {
   Status status = 1;
 
   common.v1.Error error = 2;
+}
+
+message SearchDiscountProviderAccountRequest {
+  DiscountProviderAccountStatus discount_provider_account_status = 1;
+
+  string name = 2 [(validate.rules).string.max_len = 100];
+
+  common.v1.BankAccountDetail bank_account_detail = 3;
+}
+
+message SearchDiscountProviderAccountResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  repeated DiscountProviderAccount discount_provider_accounts = 3;
 }
