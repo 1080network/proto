@@ -50,17 +50,11 @@ service EBTService {
 
   //<editor-fold desc="EBT Program Management">
 
-  // Create an EBT Program to which access can be granted to a service account in order to create list items.
-  rpc CreateEBTProgram(program.v1.CreateEBTProgramRequest) returns (program.v1.CreateEBTProgramResponse) {}
-
   // Retrieve an EBT Program based on it's key.
   rpc GetEBTProgram(program.v1.GetEBTProgramRequest) returns (program.v1.GetEBTProgramResponse) {}
 
   // Update an EBT program's rules.
   rpc UpdateEBTProgram(program.v1.UpdateEBTProgramRequest) returns (program.v1.UpdateEBTProgramResponse) {}
-
-  // Like GetEBTProgram, can be used to retrieve EBT Programs based on the criteria in the request.
-  rpc SearchEBTProgram(program.v1.SearchEBTProgramRequest) returns (program.v1.SearchEBTProgramResponse) {}
   //</editor-fold>
 
 

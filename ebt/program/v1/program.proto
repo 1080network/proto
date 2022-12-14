@@ -26,70 +26,28 @@ message EBTProgramRules {
   bool approve_unlisted_items = 1;
 }
 
-enum ProgramManager {
-  PROGRAM_MANAGER_UNSPECIFIED = 0;
-
-  PROGRAM_MANAGER_FIS = 1;
-
-  PROGRAM_MANAGER_CONDUENT = 2;
-
-  PROGRAM_MANAGER_EVERTEC = 3;
-
-  PROGRAM_MANAGER_CHASE = 4;
-
-  PROGRAM_MANAGER_SOLUTRAN = 5;
-
-  PROGRAM_MANAGER_NORTHROP_GRUMMAN = 6;
-}
-
 message EBTProgram {
   string ebt_program_key = 1 [(validate.rules).string = {
     min_len: 30,
     max_len: 50
   }];
 
-  google.protobuf.Timestamp created = 2;
+  int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  google.protobuf.Timestamp updated = 3;
+  google.protobuf.Timestamp created = 3;
 
-  int64 version = 4;
+  google.protobuf.Timestamp updated = 4;
 
-  common.enums.ebttype.v1.EbtType ebt_type = 5;
+  common.enums.ebttype.v1.EbtType ebt_type = 5 [(validate.rules).enum.not_in = 0];
 
-  common.enums.ebtregion.v1.EbtRegion region = 6;
+  common.enums.ebtregion.v1.EbtRegion region = 6 [(validate.rules).enum.not_in = 0];
 
-  ProgramManager program_manager = 7;
-
-  EBTProgramRules program_rules = 8;
-}
-
-message CreateEBTProgramRequest {
-  common.enums.ebttype.v1.EbtType ebt_type = 1;
-
-  common.enums.ebtregion.v1.EbtRegion region = 2;
-
-  ProgramManager program_manager = 3;
-
-  EBTProgramRules program_rules = 4;
-}
-
-message CreateEBTProgramResponse {
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_SUCCESS = 1;
-    STATUS_ERROR = 2;
-    STATUS_DUPLICATE = 3;
-  }
-  Status status = 1;
-
-  common.v1.Error error = 2;
-
-  string ebt_program_key = 3 [(validate.rules).string = {
-    min_len: 30,
-    max_len: 50
+  string issuer = 7 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50,
   }];
 
-  int64 version = 4;
+  EBTProgramRules program_rules = 8;
 }
 
 message GetEBTProgramRequest {
@@ -122,9 +80,12 @@ message UpdateEBTProgramRequest {
 
   int64 version = 2;
 
-  ProgramManager program_manager = 3;
+  string issuer = 3 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50,
+  }];
 
-  EBTProgramRules program_rules = 4;
+  EBTProgramRules program_rules = 4 [(validate.rules).message.required = true];
 }
 
 message UpdateEBTProgramResponse {
@@ -141,25 +102,4 @@ message UpdateEBTProgramResponse {
   common.v1.Error error = 2;
 
   int64 version = 3;
-}
-
-message SearchEBTProgramRequest {
-  common.enums.ebttype.v1.EbtType ebt_type = 1;
-
-  common.enums.ebtregion.v1.EbtRegion region = 2;
-
-  ProgramManager program_manager = 3;
-}
-
-message SearchEBTProgramResponse {
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_SUCCESS = 1;
-    STATUS_ERROR = 2;
-  }
-  Status status = 1;
-
-  common.v1.Error error = 2;
-
-  repeated EBTProgram ebt_programs = 3;
 }

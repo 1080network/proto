@@ -150,9 +150,7 @@ message GetUserResponse {
 
 message SearchUserRequest {
   // The key representing this user in Mica.
-  string service_provider_user_key = 1 [(validate.rules).string = {
-    max_len: 50
-  }];
+  string service_provider_user_key = 1;
 
   string first_name = 2;
 

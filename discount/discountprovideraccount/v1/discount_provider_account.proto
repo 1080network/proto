@@ -27,11 +27,11 @@ message DiscountProviderAccount {
     max_len: 50
   }];
 
-  google.protobuf.Timestamp created = 2;
+  int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  google.protobuf.Timestamp updated = 3;
+  google.protobuf.Timestamp created = 3;
 
-  int64 version = 4 [(validate.rules).int64.gte = 0];
+  google.protobuf.Timestamp updated = 4;
 
   string discount_provider_account_ref = 6 [(validate.rules).string = {
     min_len: 1,
@@ -56,14 +56,16 @@ enum DiscountProviderAccountStatus {
 }
 
 message CreateDiscountProviderAccountRequest {
-  string discount_provider_account_ref = 3 [(validate.rules).string = {
+  string discount_provider_account_ref = 1 [(validate.rules).string = {
     min_len: 1,
     max_len: 50
   }];
 
-  string name = 4 [(validate.rules).string.max_len = 100];
+  string name = 2 [(validate.rules).string.max_len = 100];
 
-  common.v1.BankAccountDetail bank_account_detail = 5;
+  DiscountProviderAccountStatus discount_provider_account_status = 3;
+
+  common.v1.BankAccountDetail bank_account_detail = 4;
 }
 
 message CreateDiscountProviderAccountResponse {

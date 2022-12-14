@@ -27,11 +27,11 @@ message ServiceProviderAccount {
     max_len: 50
   }];
 
-  google.protobuf.Timestamp created = 2;
+  int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  google.protobuf.Timestamp updated = 3;
+  google.protobuf.Timestamp created = 3;
 
-  int64 version = 4;
+  google.protobuf.Timestamp updated = 4;
 
   common.enums.accounttype.v1.AccountType account_type = 5;
 
@@ -44,11 +44,11 @@ message ServiceProvider {
     max_len: 50
   }];
 
-  google.protobuf.Timestamp created = 2;
+  int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  google.protobuf.Timestamp updated = 3;
+  google.protobuf.Timestamp created = 3;
 
-  int64 version = 4;
+  google.protobuf.Timestamp updated = 4;
 
   string name = 5;
 

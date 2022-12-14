@@ -10,6 +10,8 @@ syntax = "proto3";
 
 package common.v1;
 
+import "validate/validate.proto";
+
 option go_package = "mica/proto/common/v1;commonv1";
 option java_outer_classname = "ConnectProto";
 option java_package = "io.mica.common.v1";
@@ -17,10 +19,14 @@ option objc_class_prefix = "MICA";
 
 message BankAccountCredentials {
   // The username for this person at the users Service Provider
-  string username = 1;
+  string username = 1 [(validate.rules).string = {
+    min_len: 3
+  }];
 
   // The password for this person at the users Service Provider
-  string password = 2;
+  string password = 2 [(validate.rules).string = {
+    min_len: 3
+  }];
 }
 
 message BankAccountNumber {

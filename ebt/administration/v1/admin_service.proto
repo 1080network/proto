@@ -1,0 +1,33 @@
+// Copyright (c) 2022 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package ebt.administration.v1;
+
+import "common/v1/mtls_certificate.proto";
+
+option go_package = "mica/proto/ebt/administrationv1";
+option java_outer_classname = "EBTAdministrationService";
+option java_package = "io.mica.ebt.administration.v1";
+option objc_class_prefix = "MICA";
+
+service EBTAdministrationService {
+  rpc GenerateMTLSCertificate(common.v1.GenerateMTLSCertificateRequest) returns (common.v1.GenerateMTLSCertificateResponse) {}
+
+  // Update the certificate with a given serial number, only supports enable/disable for now
+  rpc UpdateMTLSCertificate(common.v1.UpdateMTLSCertificateRequest) returns (common.v1.UpdateMTLSCertificateResponse) {}
+
+  //Search for certificates and return the ones that match the criteria provided
+  rpc SearchMTLSCertificate(common.v1.SearchMTLSCertificateRequest) returns (common.v1.SearchMTLSCertificateResponse) {}
+
+  rpc GetMTLSCertificate(common.v1.GetMTLSCertificateRequest) returns (common.v1.GetMTLSCertificateResponse) {}
+
+// This operation is not needed at present since EBT makes no outbound calls to EBT program managers
+// rpc PingExternal(common.ping.v1.PingRequest) returns (common.ping.v1.PingResponse) {}
+}

@@ -36,6 +36,8 @@ enum TransactionType {
   TRANSACTION_TYPE_OBTAIN_DECLINE = 2;
   TRANSACTION_TYPE_RETURN_APPROVAL = 3;
   TRANSACTION_TYPE_RETURN_DECLINE = 4;
+  TRANSACTION_TYPE_OBTAIN_NETWORK_DECLINE = 5;
+  TRANSACTION_TYPE_RETURN_NETWORK_DECLINE = 6;
 }
 
 message SearchTransactionDataRequest {
@@ -48,14 +50,31 @@ message SearchTransactionDataRequest {
   // optional
   IntervalType interval_type = 3;
 
+  // the number of records to return
   // optional
-  common.enums.currency.v1.Currency currency = 4;
+  int64 top_n = 4;
+
+  // optional
+  TransactionType transaction_type = 5;
+
+  // optional
+  common.enums.currency.v1.Currency currency = 6;
+
+  // optional
+  string organization_key = 7 [(validate.rules).string = {
+    max_len: 50
+  }];
+
+  // optional
+  string store_key = 8 [(validate.rules).string = {
+    max_len: 50
+  }];
 
   // minimum amount inclusive - optional
-  string min_amount = 5;
+  string min_amount = 9;
 
   // maximum amount exclusive - optional
-  string max_amount = 6;
+  string max_amount = 10;
 }
 
 message CountAmountItem {
@@ -71,13 +90,21 @@ message CountAmountItem {
 
   string obtain_decline_amount = 6;
 
-  int64 return_approval_count = 7;
+  int64 obtain_network_decline_count = 7;
 
-  string return_approval_amount = 8;
+  string obtain_network_decline_amount = 8;
 
-  int64 return_decline_count = 9;
+  int64 return_approval_count = 9;
 
-  string return_decline_amount = 10;
+  string return_approval_amount = 10;
+
+  int64 return_decline_count = 11;
+
+  string return_decline_amount = 12;
+
+  int64 return_network_decline_count = 13;
+
+  string return_network_decline_amount = 14;
 }
 
 message SearchTransactionDataResponse {
@@ -102,11 +129,40 @@ message SearchTransactionGeographyDataRequest {
   // end of data range exclusive
   google.protobuf.Timestamp date_to = 2;
 
+  // optional
   IntervalType interval_type = 3;
 
-  common.enums.region.v1.Region region = 4;
+  // the number of records to return
+  // optional
+  int64 top_n = 4;
 
-  string postal_code = 5;
+  // optional
+  TransactionType transaction_type = 5;
+
+  // optional
+  common.enums.currency.v1.Currency currency = 6;
+
+  // optional
+  string organization_key = 7 [(validate.rules).string = {
+    max_len: 50
+  }];
+
+  // optional
+  string store_key = 8 [(validate.rules).string = {
+    max_len: 50
+  }];
+
+  // optional
+  common.enums.region.v1.Region region = 9;
+
+  // optional
+  string postal_code = 10;
+
+  // minimum amount inclusive - optional
+  string min_amount = 11;
+
+  // maximum amount exclusive - optional
+  string max_amount = 12;
 }
 
 message SearchTransactionGeographyDataItem {
@@ -139,10 +195,34 @@ message SearchTransactionPartnerDataRequest {
   // end of data range exclusive
   google.protobuf.Timestamp date_to = 2;
 
-  // the number of records to return
-  int64 top_n = 3;
+  // optional
+  IntervalType interval_type = 3;
 
-  TransactionType transaction_type = 4;
+  // the number of records to return
+  // optional
+  int64 top_n = 4;
+
+  // optional
+  TransactionType transaction_type = 5;
+
+  // optional
+  common.enums.currency.v1.Currency currency = 6;
+
+  // optional
+  string organization_key = 7 [(validate.rules).string = {
+    max_len: 50
+  }];
+
+  // optional
+  string store_key = 8 [(validate.rules).string = {
+    max_len: 50
+  }];
+
+  // minimum amount inclusive - optional
+  string min_amount = 9;
+
+  // maximum amount exclusive - optional
+  string max_amount = 10;
 }
 
 message SearchTransactionPartnerDataItem {

@@ -44,7 +44,10 @@ message Value {
   common.enums.valueoperationtype.v1.ValueOperationType operation_type = 5;
 
   // The payment token of the instrument either one specific to the partner or one provisioned by an Service Provider.
-  string payment_token = 6;
+  string payment_token = 6 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   // A unique identifier at the Partner for this transaction.
   string partner_transaction_ref = 7;
@@ -257,6 +260,29 @@ message ReturnValueResponse {
   string approved_amount = 5;
 }
 
+message GetValueRequest {
+  oneof identifier {
+    string transaction_key = 1;
+
+    // the Partner's reference for this transaction
+    string partner_transaction_ref = 2;
+  }
+}
+
+message GetValueResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  Value value = 3;
+}
+
 message SearchValueRequest {
   // the paymentToken to find Value operations for
   string payment_token = 1;
@@ -265,10 +291,10 @@ message SearchValueRequest {
   string partner_transaction_ref = 4;
 
   // filter based on created date from (inclusive)
-  google.protobuf.Timestamp from = 2;
+  google.protobuf.Timestamp date_from = 2;
 
   // filter based on created date to (exclusive)
-  google.protobuf.Timestamp to = 3;
+  google.protobuf.Timestamp date_to = 3;
 }
 
 message SearchValueResponse {
@@ -281,6 +307,6 @@ message SearchValueResponse {
 
   common.v1.Error error = 2;
 
-  // List of instruments that matched the search criteria.
+  // List of transactions that matched the search criteria.
   repeated Value value = 3;
 }

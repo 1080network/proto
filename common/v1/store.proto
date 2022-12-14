@@ -26,13 +26,13 @@ message Store {
     max_len: 50
   }];
 
+  int64 version = 2;
+
   // Date that the Store was created at Mica.
-  google.protobuf.Timestamp created = 2;
+  google.protobuf.Timestamp created = 3;
 
   // Date that the Store was last updated at Mica.
-  google.protobuf.Timestamp updated = 3;
-
-  int64 version = 4;
+  google.protobuf.Timestamp updated = 4;
 
   // The partner who owns this store.
   string partner_key = 5 [(validate.rules).string = {

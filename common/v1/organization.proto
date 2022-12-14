@@ -29,41 +29,43 @@ message Organization {
     max_len: 50
   }];
 
-  // Date that the Store was created at Mica.
-  google.protobuf.Timestamp created = 2;
+  int64 version = 2;
 
-  // Date that the Store was last updated at Mica.
-  google.protobuf.Timestamp updated = 3;
+  // Date that the organization was created at Mica.
+  google.protobuf.Timestamp created = 3;
+
+  // Date that the organization was last updated at Mica.
+  google.protobuf.Timestamp updated = 4;
 
   // The partner who owns this organization.
-  string partner_key = 4 [(validate.rules).string = {
+  string partner_key = 5 [(validate.rules).string = {
     min_len: 30,
     max_len: 50
   }];
 
   // The name of this organization.
-  string name = 6;
+  string name = 7;
 
   // The list of categories of this organization (used by Service Provider's to as part of their processing rules).
-  repeated common.enums.organizationcategory.v1.OrganizationCategory categories = 5;
+  repeated common.enums.organizationcategory.v1.OrganizationCategory categories = 6;
 
   // The street address of the organization.
-  common.v1.Address address = 8;
+  common.v1.Address address = 9;
 
   // The organizations domestic ACH routing number (9 characters)
-  string domestic_ach_routing_number = 9 [(validate.rules).string.pattern = "^|\\w{9}$"];
+  string domestic_ach_routing_number = 10 [(validate.rules).string.pattern = "^|\\w{9}$"];
 
   // The organizations international ACH routing number (9 characters)
-  string international_ach_routing_number = 10 [(validate.rules).string.pattern = "^|\\w{9}$"];
+  string international_ach_routing_number = 11 [(validate.rules).string.pattern = "^|\\w{9}$"];
 
   // The organizations wire routing number (9 characters)
-  string wire_routing_number = 11 [(validate.rules).string.pattern = "^|\\w{9}$"];
+  string wire_routing_number = 12 [(validate.rules).string.pattern = "^|\\w{9}$"];
 
   // The organizations swift routing number (9 characters)
-  string swift_routing_number = 12 [(validate.rules).string.pattern = "^|\\w{9}$"];
+  string swift_routing_number = 13 [(validate.rules).string.pattern = "^|\\w{9}$"];
 
   // The organizations bank account number (14 digits)
-  string bank_account_number = 13 [(validate.rules).string.pattern = "^|\\w{14}$"];
+  string bank_account_number = 14 [(validate.rules).string.pattern = "^|\\w{14}$"];
 }
 
 message LegacyConfiguration {

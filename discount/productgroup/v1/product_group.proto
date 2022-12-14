@@ -25,11 +25,11 @@ message ProductGroup {
     max_len: 50
   }];
 
-  google.protobuf.Timestamp created = 2;
+  int64 version = 2 [(validate.rules).int64.gte = 0];
 
-  google.protobuf.Timestamp updated = 3;
+  google.protobuf.Timestamp created = 3;
 
-  int64 version = 4 [(validate.rules).int64.gte = 0];
+  google.protobuf.Timestamp updated = 4;
 
   string name = 5 [(validate.rules).string.max_len = 100];
 
@@ -70,7 +70,7 @@ message CreateProductGroupResponse {
 }
 
 message GetProductGroupRequest {
-  oneof discount_definition_identifier {
+  oneof product_group_identifier {
     string product_group_ref = 1 [(validate.rules).string = {
       min_len: 1,
       max_len: 50
@@ -98,15 +98,25 @@ message GetProductGroupResponse {
 }
 
 message UpdateProductGroupRequest {
-  string product_group_ref = 1 [(validate.rules).string.max_len = 50];
+  oneof product_group_identifier {
+    string product_group_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
 
-  int64 version = 2 [(validate.rules).int64.gte = 0];
+    string product_group_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 
-  string name = 3 [(validate.rules).string.max_len = 100];
+  int64 version = 3 [(validate.rules).int64.gte = 0];
 
-  repeated string product_match_filters = 4 [(validate.rules).repeated.max_items = 100];
+  string name = 4 [(validate.rules).string.max_len = 100];
 
-  repeated string product_codes = 5 [(validate.rules).repeated.max_items = 100];
+  repeated string product_match_filters = 5 [(validate.rules).repeated.max_items = 100];
+
+  repeated string product_codes = 6 [(validate.rules).repeated.max_items = 100];
 }
 
 message UpdateProductGroupResponse {
@@ -124,10 +134,17 @@ message UpdateProductGroupResponse {
 }
 
 message RemoveProductGroupRequest {
-  string product_group_ref = 1 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 50
-  }];
+  oneof product_group_identifier {
+    string product_group_ref = 1 [(validate.rules).string = {
+      min_len: 1,
+      max_len: 50
+    }];
+
+    string product_group_key = 2 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+  }
 }
 
 message RemoveProductGroupResponse {

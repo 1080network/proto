@@ -14,6 +14,7 @@ import "common/enums/approvaltype/v1/approval_type.proto";
 import "common/enums/channel/v1/channel.proto";
 import "common/enums/currency/v1/currency.proto";
 import "common/enums/organizationcategory/v1/organization_category.proto";
+import "common/enums/valueoperationtype/v1/value_operation_type.proto";
 import "common/v1/address.proto";
 import "common/v1/error.proto";
 import "google/protobuf/timestamp.proto";
@@ -26,6 +27,89 @@ option objc_class_prefix = "MICA";
 
 // Type that represents the details of the value request (either to obtain or return).
 message Value {
+  // Mica's transaction record primary key.
+  string transaction_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // version of the user record, used for optimistic locking
+  int64 version = 2;
+
+  // Date that the Store was created at Mica.
+  google.protobuf.Timestamp created = 3;
+
+  // Date that the Store was last updated at Mica.
+  google.protobuf.Timestamp updated = 4;
+
+  common.enums.valueoperationtype.v1.ValueOperationType operation_type = 5;
+
+  // The Mica generated key for this instrument.
+  string service_provider_instrument_key = 6 [(validate.rules).string = {
+    max_len: 50
+  }];
+
+  // Service Provider's primary key for their instrument.
+  string service_provider_instrument_ref = 7;
+
+  // How this transaction should be processed.
+  common.enums.channel.v1.Channel channel = 8;
+
+  // The 3-letter currency code defined in ISO 4217. Note all amounts are in this currency.
+  common.enums.currency.v1.Currency currency = 9;
+
+  // The organization this operation is being processed for.
+  string organization_key = 10 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // The organization name this operation is being processed for.
+  string organization_name = 11;
+
+  // The organization address this operation is being processed for.
+  common.v1.Address organization_address = 12;
+
+  // The organizations category.
+  common.enums.organizationcategory.v1.OrganizationCategory category = 13;
+
+  // The store where this operation occurred.
+  string store_key = 14 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // The number of this store (an alternative unique value).
+  string store_number = 15;
+
+  // The street address of this store.
+  common.v1.Address store_address = 16;
+
+  // The clerk that processed this operation.
+  string clerk_identifier = 17;
+
+  // Total amount for this transaction.
+  // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+  string total_amount = 18;
+
+  // Total discount amount for this transaction.
+  // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+  string discount_amount = 21;
+
+  // Total discount amount for this transaction.
+  // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+  string ineligible_amount = 22;
+
+  // The amount requested from the Service Provider for this transaction. Note that this calculated as:
+  //    requested_amount = total_amount - discount_amount - ineligible_amount
+  // Amount expressed as: [+-]?([0-9]*[.])?[0-9]+
+  string requested_amount = 19;
+
+  string order_number = 20;
+}
+
+// Type that represents the details of the value request (either to obtain or return).
+message ValueRequest {
   // Mica's transaction record primary key.
   string transaction_key = 1 [(validate.rules).string = {
     min_len: 30,
@@ -105,7 +189,7 @@ enum PINStatus {
 message ObtainValueRequest {
   common.enums.approvaltype.v1.ApprovalType approval_type = 1;
 
-  Value value = 2;
+  ValueRequest value = 2;
 }
 
 message ObtainValueResponse {
@@ -157,7 +241,7 @@ message ObtainValueResponse {
 }
 
 message ReturnValueRequest {
-  Value value = 1;
+  ValueRequest value = 1;
 }
 
 message ReturnValueResponse {
@@ -252,20 +336,41 @@ message ReceiveValueResponse {
   string transaction_ref = 3;
 }
 
-message SearchValueRequest {
-  oneof criteria {
-    // Mica's transaction record primary key.
-    string transaction_key = 1 [(validate.rules).string = {
-      min_len: 30,
-      max_len: 50
-    }];
+message GetValueRequest {
+  oneof identifier {
+    string transaction_key = 1;
 
-    // The payment token of the user.
-    string service_provider_payment_token = 2;
-
-    // Service Provider's primary key for their instrument.
-    string service_provider_instrument_ref = 3;
+    // the Partner's reference for this transaction
+    string partner_transaction_ref = 2;
   }
+}
+
+message GetValueResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  common.v1.Error error = 2;
+
+  Value value = 3;
+}
+
+message SearchValueRequest {
+  // Mica's transaction record primary key.
+  string transaction_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // The payment token of the user.
+  string service_provider_payment_token = 2;
+
+  // Service Provider's primary key for their instrument.
+  string service_provider_instrument_ref = 3;
 
   // Transactions that occurred after this date (inclusive).
   google.protobuf.Timestamp date_from = 4;
@@ -300,7 +405,10 @@ message SendValueRequest {
     max_len: 50
   }];
 
-  string to_payment_token = 3;
+  string to_payment_token = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
   common.enums.currency.v1.Currency currency = 4;
 
@@ -318,10 +426,7 @@ message SendValueResponse {
 
   common.v1.Error error = 2;
 
-  string transaction_key = 3 [(validate.rules).string = {
-    min_len: 30,
-    max_len: 50
-  }];
+  string transaction_key = 3;
 }
 //</editor-fold>
 

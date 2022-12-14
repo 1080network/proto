@@ -108,6 +108,8 @@ service PartnerToMicaService {
 
   // An operation to search for Value operations either Obtain or Return that the Partner has requested of mica.
   rpc SearchValue(value.v1.SearchValueRequest) returns (value.v1.SearchValueResponse) {}
+
+  rpc GetValue(value.v1.GetValueRequest) returns (value.v1.GetValueResponse) {}
   //</editor-fold>
 
 
