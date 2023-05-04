@@ -10,6 +10,7 @@ syntax = "proto3";
 
 package mica.serviceprovider.service.v1;
 
+import "mica/serviceprovider/discount/v1/discount.proto";
 import "mica/serviceprovider/instrument/v1/instrument.proto";
 import "mica/serviceprovider/paymenttoken/v1/payment_token.proto";
 import "mica/serviceprovider/serviceprovider/v1/service_provider.proto";
@@ -116,6 +117,8 @@ service ServiceProviderToMicaService {
 
   rpc SearchTransactionPartnerData(transaction.v1.SearchTransactionPartnerDataRequest) returns (transaction.v1.SearchTransactionPartnerDataResponse) {}
   //</editor-fold>
+
+  rpc SearchUserDiscount(discount.v1.SearchUserDiscountRequest) returns (discount.v1.SearchUserDiscountResponse) {}
 
   //<editor-fold desc="Transaction Operations">
 

@@ -401,6 +401,7 @@ message SendValueRequest {
     max_len: 50
   }];
 
+  // @gotags: mask:"security"
   string to_payment_token = 3 [(validate.rules).string = {
     min_len: 30,
     max_len: 50

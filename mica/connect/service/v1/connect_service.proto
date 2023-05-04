@@ -12,7 +12,6 @@ package mica.connect.service.v1;
 
 import "mica/connect/instrument/v1/instrument.proto";
 import "mica/connect/serviceprovider/v1/service_provider.proto";
-import "mica/connect/staticdata/v1/static_data.proto";
 import "micashared/common/ping/v1/ping.proto";
 
 option go_package = "mica/connect/servicev1";
@@ -23,10 +22,6 @@ option objc_class_prefix = "MICA";
 // The Connect Service implements both Legacy Connect and Connect. It is used to enroll user's financial accounts on the
 // Mica network.
 service ConnectService {
-  // Retrieve systems static data which is used to drive UI behavior. This includes the public keys for the various
-  // service provider types. Called from Widget.
-  rpc GetStaticData(staticdata.v1.GetStaticDataRequest) returns (staticdata.v1.GetStaticDataResponse) {}
-
   //<editor-fold desc="Service Provider Operations">
 
   // Find Service Providers that match a given name. This includes pagination. Called by the mica Widget to populate
@@ -46,12 +41,8 @@ service ConnectService {
   // and they have more than one account at the service provider
   rpc WidgetRegisterInstrumentWithAccount(instrument.v1.WidgetRegisterInstrumentWithAccountRequest) returns (instrument.v1.WidgetRegisterInstrumentWithAccountResponse) {}
 
-  // The final call the Widget makes for either the mica Matching Code or Ribbit's Account Token. Called from Widget.
+  // The final call the Widget makes for either the mica Matching Code. Called from Widget.
   rpc WidgetRegisterInstrumentComplete(instrument.v1.WidgetRegisterInstrumentCompleteRequest) returns (instrument.v1.WidgetRegisterInstrumentCompleteResponse) {}
-
-  // When a user chooses a Ribbit Service Provider, this call is used to initialize the Ribbit Widget. It returns the
-  // JavaScript script along with the Ribbit Institution ID. Called from Widget.
-  rpc WidgetRibbitRegisterInstrumentInitiate(instrument.v1.WidgetRibbitRegisterInstrumentInitiateRequest) returns (instrument.v1.WidgetRibbitRegisterInstrumentInitiateResponse) {}
   //</editor-fold>
 
   //<editor-fold desc="Admin Operations">

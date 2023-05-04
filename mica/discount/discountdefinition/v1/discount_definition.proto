@@ -44,6 +44,12 @@ message DiscountDefinition {
     max_len: 50
   }];
 
+  // human readable description for a given discount that can be shown to the end user
+  string headline = 16 [(validate.rules).string.max_len = 100];
+
+  // human readable description for a given discount that can be shown to the end user
+  string summary = 17 [(validate.rules).string.max_len = 300];
+
   string receipt_description = 7 [(validate.rules).string.max_len = 100];
 
   DiscountDefinitionStatus status = 8;
@@ -64,6 +70,9 @@ message DiscountDefinition {
     discount.v1.MonetaryAmount monetary_amount = 14;
     discount.v1.PercentageAmount percentage_amount = 15;
   }
+
+  // address to the image for this discount definition (note that this image is expected to be square)
+  string thumbnail_url = 18 [(validate.rules).string.max_len = 300];
 }
 
 enum DiscountDefinitionStatus {
@@ -87,6 +96,12 @@ message CreateDiscountDefinitionRequest {
     max_len: 50
   }];
 
+  // human readable description for a given discount that can be shown to the end user
+  string headline = 12 [(validate.rules).string.max_len = 100];
+
+  // human readable description for a given discount that can be shown to the end user
+  string summary = 13 [(validate.rules).string.max_len = 300];
+
   string receipt_description = 3 [(validate.rules).string.max_len = 100];
 
   DiscountDefinitionStatus status = 4;
@@ -107,6 +122,9 @@ message CreateDiscountDefinitionRequest {
     discount.v1.MonetaryAmount monetary_amount = 10;
     discount.v1.PercentageAmount percentage_amount = 11;
   }
+
+  // address to the image for this discount definition (note that this image is expected to be square)
+  string thumbnail_url = 14 [(validate.rules).string.max_len = 300];
 }
 
 message CreateDiscountDefinitionResponse {
@@ -171,6 +189,15 @@ message UpdateDiscountDefinitionRequest {
     min_len: 1,
     max_len: 50
   }];
+
+  // human readable description for a given discount that can be shown to the end user
+  string headline = 14 [(validate.rules).string.max_len = 100];
+
+  // human readable description for a given discount that can be shown to the end user
+  string summary = 15 [(validate.rules).string.max_len = 300];
+
+  // address to the image for this discount definition (note that this image is expected to be square)
+  string thumbnail_url = 16 [(validate.rules).string.max_len = 300];
 
   string receipt_description = 4 [(validate.rules).string.max_len = 100];
 

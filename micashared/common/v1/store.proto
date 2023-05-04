@@ -54,4 +54,8 @@ message Store {
 
   // The street address of this store.
   micashared.common.v1.Address address = 9;
+
+  double latitude = 10;
+
+  double longitude = 11;
 }

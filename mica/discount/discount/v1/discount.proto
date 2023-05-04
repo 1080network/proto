@@ -89,6 +89,15 @@ message Discount {
     max_len: 50
   }];
 
+  // human readable description for a given discount that can be shown to the end user
+  string headline = 20 [(validate.rules).string.max_len = 100];
+
+  // human readable description for a given discount that can be shown to the end user
+  string summary = 21 [(validate.rules).string.max_len = 300];
+
+  // address to the image for this discount definition (note that this image is expected to be square)
+  string thumbnail_url = 22 [(validate.rules).string.max_len = 300];
+
   string receipt_description = 8 [(validate.rules).string.max_len = 100];
 
   DiscountStatus status = 9;

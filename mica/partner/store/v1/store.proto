@@ -11,6 +11,7 @@ syntax = "proto3";
 package mica.partner.store.v1;
 
 import "micashared/common/v1/address.proto";
+import "micashared/common/v1/area.proto";
 import "micashared/common/v1/error.proto";
 import "micashared/common/v1/store.proto";
 import "validate/validate.proto";
@@ -90,6 +91,8 @@ message SearchStoreRequest {
 
   // The number of this store (an alternative unique value)
   string store_number = 3;
+
+  micashared.common.v1.Circle circle = 10;
 }
 
 message SearchStoreResponse {

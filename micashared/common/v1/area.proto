@@ -8,17 +8,29 @@
 
 syntax = "proto3";
 
-package micashared.common.enums.serviceprovidertype.v1;
+package micashared.common.v1;
 
-option go_package = "micashared/common/enums/serviceprovidertypev1";
-option java_outer_classname = "ServiceProviderTypeEnumProto";
-option java_package = "io.micashared.common.enums.v1";
+import "validate/validate.proto";
+
+option go_package = "micashared/common/v1;commonv1";
+option java_outer_classname = "AreaProto";
+option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
-enum ServiceProviderType {
-  SERVICE_PROVIDER_TYPE_UNSPECIFIED = 0;
+// A roughly circle centered at a point (lat/long) with a given radius in metres
+message Circle {
+  double latitude = 1 [(validate.rules).double = {
+    gte: -90,
+    lte: 90
+  }];
 
-  SERVICE_PROVIDER_TYPE_MICA = 1;
+  double longitude = 2 [(validate.rules).double = {
+    gte: -180,
+    lte: 180
+  }];
 
-  SERVICE_PROVIDER_TYPE_RIBBIT = 2;
+  int32 radius = 3 [(validate.rules).int32 = {
+    gte: 0,
+    lte: 10000000 // roughly one quarter the circumference of the earth
+  }];
 }

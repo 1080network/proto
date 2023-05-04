@@ -50,12 +50,7 @@ message EBTProgram {
   EBTProgramRules program_rules = 8;
 }
 
-message GetEBTProgramRequest {
-  string ebt_program_key = 1 [(validate.rules).string = {
-    min_len: 30,
-    max_len: 50
-  }];
-}
+message GetEBTProgramRequest {}
 
 message GetEBTProgramResponse {
   enum Status {

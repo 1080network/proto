@@ -82,7 +82,7 @@ message RemoveServiceProviderPaymentTokenRequest {
     string service_provider_instrument_ref = 2;
 
     // A payment token that can be used at all partners.
-    string service_provider_payment_token = 3;
+    string service_provider_payment_token = 3; // @gotags: mask:"security"
   }
 }
 
@@ -97,7 +97,7 @@ message RemoveServiceProviderPaymentTokenResponse {
 
   micashared.common.v1.Error error = 2;
 
-  repeated string service_provider_payment_tokens = 3;
+  repeated string service_provider_payment_tokens = 3; // @gotags: mask:"security"
 }
 
 message SearchServiceProviderPaymentTokenRequest {
@@ -116,5 +116,5 @@ message SearchServiceProviderPaymentTokenResponse {
 
   micashared.common.v1.Error error = 2;
 
-  repeated ServiceProviderPaymentToken service_provider_payment_tokens = 3;
+  repeated ServiceProviderPaymentToken service_provider_payment_tokens = 3; // @gotags: mask:"security"
 }

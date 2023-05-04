@@ -198,7 +198,7 @@ message SetPINRequest {
     string service_provider_instrument_ref = 2;
   }
 
-  string pin = 3;
+  string pin = 3; // @gotags: mask:"security"
 }
 
 message SetPINResponse {
@@ -225,9 +225,9 @@ message ResetPINRequest {
     string service_provider_instrument_ref = 2;
   }
 
-  string old_pin = 3;
+  string old_pin = 3; // @gotags: mask:"security"
 
-  string new_pin = 4;
+  string new_pin = 4; // @gotags: mask:"security"
 }
 
 message ResetPINResponse {

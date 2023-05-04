@@ -156,9 +156,9 @@ message SearchTransactionGeographyDataRequest {
 }
 
 message SearchTransactionGeographyDataItem {
-  float latitude = 1;
+  double latitude = 1;
 
-  float longitude = 2;
+  double longitude = 2;
 
   repeated CountAmountItem count_amount_items = 3;
 }

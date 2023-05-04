@@ -96,7 +96,7 @@ message Value {
 
 // Type that represents the details of the value request (either to obtain or return).
 message ValueRequest {
-  // The payment token of the instrument either one specific to the partner or one provisioned by an Service Provider.
+  // The payment token of the instrument is either one specific to the partner or one provisioned by a Service Provider.
   string payment_token = 1;
 
   // A unique identifier at the Partner for this transaction.

@@ -1,7 +1,4 @@
-version: v1beta1
-build:
-  roots:
-    - .
+version: v1
 lint:
   use:
     - DEFAULT
@@ -12,7 +9,6 @@ lint:
   ignore:
     - google
     - validate
-    - pythongenproto
 breaking:
   use:
     - WIRE_JSON

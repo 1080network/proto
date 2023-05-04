@@ -12,7 +12,6 @@ package mica.connect.instrument.v1;
 
 import "micashared/common/enums/currency/v1/currency.proto";
 import "micashared/common/enums/instrumenttype/v1/instrument_type.proto";
-import "micashared/common/v1/connect.proto";
 import "micashared/common/v1/error.proto";
 import "validate/validate.proto";
 
@@ -34,10 +33,6 @@ message WidgetRegisterInstrumentInitiateRequest {
   }];
 
   oneof instrument_identifier {
-    micashared.common.v1.BankAccountCredentials bank_account_credentials = 4;
-
-    micashared.common.v1.BankAccountNumber bank_account_number = 5;
-
     ConnectDetails connect_details = 3;
   }
 }
@@ -69,8 +64,6 @@ message Instrument {
   micashared.common.enums.currency.v1.Currency currency = 3;
 
   string instrument_identifier = 2;
-
-  // other fields from Ribbit
 }
 
 message WidgetRegisterInstrumentWithAccountRequest {
@@ -104,18 +97,12 @@ message WidgetRegisterInstrumentCompleteRequest {
 
   oneof details {
     Connect connect = 2;
-
-    Ribbit ribbit = 3;
   }
 }
 
 message Connect {
   // The matching code sent from the users Service Provider and given by the user.
   string matching_code = 1;
-}
-
-message Ribbit {
-  string account_token = 1;
 }
 
 message WidgetRegisterInstrumentCompleteResponse {
@@ -129,37 +116,4 @@ message WidgetRegisterInstrumentCompleteResponse {
   Status status = 1;
 
   micashared.common.v1.Error error = 2;
-}
-
-message WidgetRibbitRegisterInstrumentInitiateRequest {
-  string session_key = 1 [(validate.rules).string = {
-    min_len: 30,
-    max_len: 50
-  }];
-
-  // The financial institution which holds this account/instrument.
-  string service_provider_key = 2 [(validate.rules).string = {
-    min_len: 30,
-    max_len: 50
-  }];
-}
-
-message WidgetRibbitRegisterInstrumentInitiateResponse {
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-
-    STATUS_SUCCESS = 1;
-
-    // generic error that's not one of the following
-    STATUS_ERROR = 2;
-
-    STATUS_UNSUPPORTED_SERVICE_PROVIDER = 3;
-  }
-  Status status = 1;
-
-  micashared.common.v1.Error error = 2;
-
-  string script = 3;
-
-  int64 ribbit_institution_id = 4;
 }

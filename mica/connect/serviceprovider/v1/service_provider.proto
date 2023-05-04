@@ -10,7 +10,6 @@ syntax = "proto3";
 
 package mica.connect.serviceprovider.v1;
 
-import "micashared/common/enums/serviceprovidertype/v1/service_provider_type.proto";
 import "micashared/common/v1/error.proto";
 import "micashared/common/v1/pagination.proto";
 import "validate/validate.proto";
@@ -49,20 +48,9 @@ message ServiceProvider {
 
   int32 rank = 2;
 
-  micashared.common.enums.serviceprovidertype.v1.ServiceProviderType service_provider_type = 3;
-
   string name = 4;
 
   string logo_file_name = 5;
-
-  string primary_color = 6;
-
-  string secondary_color = 7;
-
-  string tertiary_color = 8;
-
-  // list of fields (e.g. username, password, routing/account number)
-  repeated ServiceProviderField fields = 9;
 }
 
 enum ServiceProviderFieldType {
@@ -71,12 +59,4 @@ enum ServiceProviderFieldType {
   SERVICE_PROVIDER_FIELD_TYPE_USERNAME = 1;
 
   SERVICE_PROVIDER_FIELD_TYPE_PASSWORD = 2;
-}
-
-message ServiceProviderField {
-  string sequence = 1;
-
-  string name = 2;
-
-  ServiceProviderFieldType type = 3;
 }

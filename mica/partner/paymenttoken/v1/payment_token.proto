@@ -19,7 +19,15 @@ option java_package = "io.mica.partner.paymenttoken.v1";
 option objc_class_prefix = "MICA";
 
 message PaymentToken {
+  // reference to the user at the Partner
+  string partner_user_ref = 3;
+
+  // reference to the user's instrument at the Partner
   string partner_instrument_ref = 1;
+
+  // depending on how the Partner handles instruments and payment tokens, this will either be their reference to this
+  // Payment Token or a random UUID value if they don't have this concept
+  string partner_payment_token_ref = 4;
 
   micashared.common.v1.CommonPaymentToken payment_token = 2;
 }
@@ -65,7 +73,15 @@ message ExchangePaymentTokenResponse {
 }
 
 message SearchPaymentTokenRequest {
+  // reference to the user at the Partner
+  string partner_user_ref = 3;
+
+  // reference to the user's instrument at the Partner
   string partner_instrument_ref = 1;
+
+  // depending on how the Partner handles instruments and payment tokens, this will either be their reference to this
+  // Payment Token or a random UUID value if they don't have this concept
+  string partner_payment_token_ref = 4;
 }
 
 message SearchPaymentTokenResponse {
