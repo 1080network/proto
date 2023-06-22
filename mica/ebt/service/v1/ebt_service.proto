@@ -33,7 +33,7 @@ option objc_class_prefix = "MICA";
 // is associated with a program and has a product code (required), an optional description and a
 // status indicating how the item should be processed. The status can be one of:</p>
 // <ul><li>ELIGIBLE</li><li>INELIGIBLE</li><li>AGE_RESTRICTED</li></ul>
-// <p>When processing an EBT payment token, mica will send the list of basket items to the EBT
+// <p>When processing an EBT UUEK, mica will send the list of basket items to the EBT
 // service in order to confirm that all the items in the basket are eligible. Any that aren't will
 // be marked as such and the total requested amount from the Partner will be reduced. If the
 // approval type is FULL then mica will decline the value obtain request. If PARTIAL, mica will

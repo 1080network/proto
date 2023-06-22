@@ -8,41 +8,42 @@
 
 syntax = "proto3";
 
-package mica.serviceprovider.paymenttoken.v1;
+package mica.serviceprovider.uuek.v1;
 
+import "google/protobuf/timestamp.proto";
 import "micashared/common/v1/error.proto";
-import "micashared/common/v1/payment_token.proto";
+import "micashared/common/v1/uuek.proto";
 import "validate/validate.proto";
 
-option go_package = "mica/serviceprovider/paymenttokenv1";
-option java_outer_classname = "ProvisionServiceProviderPaymentTokenProto";
-option java_package = "io.mica.serviceprovider.paymenttoken.v1";
+option go_package = "mica/serviceprovider/uuekv1";
+option java_outer_classname = "ProvisionServiceProviderUUEKProto";
+option java_package = "io.mica.serviceprovider.uuek.v1";
 option objc_class_prefix = "MICA";
 
-message ServiceProviderPaymentToken {
-  // Mica generated key for the user that owns this token
+message ServiceProviderUUEK {
+  // Mica generated key for the user that owns this UUEK.
   string service_provider_user_key = 1 [(validate.rules).string = {
     min_len: 30,
     max_len: 50
   }];
 
-  // the primary key of this user at the Service Provider
+  // the primary key of this user at the Service Provider.
   string service_provider_user_ref = 2;
 
-  // Mica generated key for the instrument that this token represents
+  // Mica generated key for the instrument that this UUEK represents.
   string service_provider_instrument_key = 3 [(validate.rules).string = {
     min_len: 30,
     max_len: 50
   }];
 
-  // the primary key of this instrument at the Service Provider
+  // the primary key of this instrument at the Service Provider.
   string service_provider_instrument_ref = 4;
 
-  micashared.common.v1.CommonPaymentToken payment_token = 5;
+  micashared.common.v1.CommonUUEK uuek = 5;
 }
 
 // to Mica
-message ProvisionServiceProviderPaymentTokenRequest {
+message ProvisionServiceProviderUUEKRequest {
   oneof criteria {
     // The key representing this instrument in Mica.
     string service_provider_instrument_key = 1 [(validate.rules).string = {
@@ -53,9 +54,15 @@ message ProvisionServiceProviderPaymentTokenRequest {
     // Primary key on the external system.
     string service_provider_instrument_ref = 2;
   }
+
+  // if set the provisioned UUEK will not be valid until the specified time if not set the UUEK is valid immediately
+  google.protobuf.Timestamp valid_from = 3;
+
+  // if set the provisioned UUEK will expired at the specified time, if not set it will be used untile removed
+  google.protobuf.Timestamp valid_to = 4;
 }
 
-message ProvisionServiceProviderPaymentTokenResponse {
+message ProvisionServiceProviderUUEKResponse {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_SUCCESS = 1;
@@ -66,11 +73,14 @@ message ProvisionServiceProviderPaymentTokenResponse {
 
   micashared.common.v1.Error error = 2;
 
-  // A payment token that can be used at all partners.
-  string service_provider_payment_token = 3;
+  // A UUEK that can be used at all partners.
+  string service_provider_uuek = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 }
 
-message RemoveServiceProviderPaymentTokenRequest {
+message RemoveServiceProviderUUEKRequest {
   oneof criteria {
     // The key representing this instrument in Mica.
     string service_provider_instrument_key = 1 [(validate.rules).string = {
@@ -81,12 +91,12 @@ message RemoveServiceProviderPaymentTokenRequest {
     // Primary key on the external system.
     string service_provider_instrument_ref = 2;
 
-    // A payment token that can be used at all partners.
-    string service_provider_payment_token = 3; // @gotags: mask:"security"
+    // A UUEK that can be used at all partners.
+    string service_provider_uuek = 3; // @gotags: mask:"security"
   }
 }
 
-message RemoveServiceProviderPaymentTokenResponse {
+message RemoveServiceProviderUUEKResponse {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_SUCCESS = 1;
@@ -97,16 +107,16 @@ message RemoveServiceProviderPaymentTokenResponse {
 
   micashared.common.v1.Error error = 2;
 
-  repeated string service_provider_payment_tokens = 3; // @gotags: mask:"security"
+  repeated string service_provider_uueks = 3; // @gotags: mask:"security"
 }
 
-message SearchServiceProviderPaymentTokenRequest {
+message SearchServiceProviderUUEKRequest {
   string service_provider_user_key = 1 [(validate.rules).string = {max_len: 50}];
 
   string service_provider_instrument_key = 2 [(validate.rules).string = {max_len: 50}];
 }
 
-message SearchServiceProviderPaymentTokenResponse {
+message SearchServiceProviderUUEKResponse {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_SUCCESS = 1;
@@ -116,5 +126,5 @@ message SearchServiceProviderPaymentTokenResponse {
 
   micashared.common.v1.Error error = 2;
 
-  repeated ServiceProviderPaymentToken service_provider_payment_tokens = 3; // @gotags: mask:"security"
+  repeated ServiceProviderUUEK service_provider_uueks = 3; // @gotags: mask:"security"
 }
