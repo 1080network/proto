@@ -8,18 +8,19 @@
 
 syntax = "proto3";
 
-package micashared.common.enums.country.v1;
+package micashared.common.enums.barcodelocation.v1;
 
-option go_package = "micashared/common/enums/countryv1";
-option java_outer_classname = "CountryEnumProto";
+option go_package = "micashared/common/enums/barcodelocationv1";
+option java_outer_classname = "BarcodeLocationEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
-// ISO 3166-2:US
-enum Country {
-  COUNTRY_UNSPECIFIED = 0;
+enum BarcodeLocation {
+  BARCODE_LOCATION_UNSPECIFIED = 0;
 
-  COUNTRY_US = 1; // United States
+  BARCODE_LOCATION_NONE = 1;
 
-  COUNTRY_JM = 2; // Jamacia
+  BARCODE_LOCATION_TOP = 2;
+
+  BARCODE_LOCATION_BOTTOM = 3;
 }

@@ -8,23 +8,19 @@
 
 syntax = "proto3";
 
-package micashared.common.enums.channel.v1;
+package micashared.common.enums.transactiontype.v1;
 
-option go_package = "micashared/common/enums/channelv1";
-option java_outer_classname = "ChannelEnumProto";
+option go_package = "micashared/common/enums/transactiontypev1";
+option java_outer_classname = "TransactionTypeEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
-enum Channel {
-  CHANNEL_UNSPECIFIED = 0;
+enum TransactionType {
+  TRANSACTION_TYPE_UNSPECIFIED = 0;
 
-  CHANNEL_DOMESTIC_ACH = 1;
+  TRANSACTION_TYPE_OBTAIN = 1;
 
-  CHANNEL_INTERNATIONAL_ACH = 2;
+  TRANSACTION_TYPE_RETURN = 2;
 
-  CHANNEL_WIRE_TRANSFER = 3;
-
-  CHANNEL_SWIFT_TRANSFER = 4;
-
-  CHANNEL_REAL_TIME_PAYMENTS = 5;
+  TRANSACTION_TYPE_P2P = 3;
 }
