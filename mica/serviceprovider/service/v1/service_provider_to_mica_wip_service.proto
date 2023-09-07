@@ -18,7 +18,7 @@ import "micashared/common/v1/user.proto";
 import "validate/validate.proto";
 
 option go_package = "mica/serviceprovider/servicev1";
-option java_outer_classname = "ServiceProviderToMicaServiceProto";
+option java_outer_classname = "ServiceProviderToMicaWIPServiceProto";
 option java_package = "io.mica.serviceprovider.service.v1";
 option objc_class_prefix = "MICA";
 
