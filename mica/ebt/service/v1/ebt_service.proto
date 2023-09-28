@@ -12,7 +12,6 @@ package mica.ebt.service.v1;
 
 import "mica/ebt/listitem/v1/list_item.proto";
 import "mica/ebt/program/v1/program.proto";
-import "mica/ebt/staticdata/v1/static_data.proto";
 import "micashared/common/ping/v1/ping.proto";
 
 option go_package = "mica/ebt/servicev1";
@@ -45,9 +44,6 @@ option objc_class_prefix = "MICA";
 // reject only those that are AGE_RESTRICTED/INELIGIBLE or accept/reject those that aren't either
 // of those.</p>
 service EBTService {
-  // Retrieve systems static data which is used to drive UI behavior.
-  rpc GetStaticData(staticdata.v1.GetStaticDataRequest) returns (staticdata.v1.GetStaticDataResponse) {}
-
   //<editor-fold desc="EBT Program Management">
 
   // Retrieve an EBT Program based on it's key.

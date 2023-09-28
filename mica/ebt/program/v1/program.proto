@@ -28,7 +28,7 @@ message EBTProgramRules {
 
 message EBTProgram {
   string ebt_program_key = 1 [(validate.rules).string = {
-    min_len: 30,
+    min_len: 27,
     max_len: 50
   }];
 
@@ -69,7 +69,7 @@ message GetEBTProgramResponse {
 
 message UpdateEBTProgramRequest {
   string ebt_program_key = 1 [(validate.rules).string = {
-    min_len: 30,
+    min_len: 27,
     max_len: 50
   }];
 

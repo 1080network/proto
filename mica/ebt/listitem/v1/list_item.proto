@@ -29,7 +29,7 @@ enum ListItemStatus {
 
 message ListItem {
   string list_item_key = 1 [(validate.rules).string = {
-    min_len: 30,
+    min_len: 27,
     max_len: 50
   }];
 
@@ -40,7 +40,7 @@ message ListItem {
   google.protobuf.Timestamp updated = 4;
 
   string ebt_program_key = 5 [(validate.rules).string = {
-    min_len: 30,
+    min_len: 27,
     max_len: 50
   }];
 
@@ -53,7 +53,7 @@ message ListItem {
 
 message CreateListItemRequest {
   string ebt_program_key = 1 [(validate.rules).string = {
-    min_len: 30,
+    min_len: 27,
     max_len: 50
   }];
 
@@ -77,7 +77,7 @@ message CreateListItemResponse {
   micashared.common.v1.Error error = 2;
 
   string list_item_key = 3 [(validate.rules).string = {
-    min_len: 30,
+    min_len: 27,
     max_len: 50
   }];
 
@@ -86,7 +86,7 @@ message CreateListItemResponse {
 
 message GetListItemRequest {
   string list_item_key = 1 [(validate.rules).string = {
-    min_len: 30,
+    min_len: 27,
     max_len: 50
   }];
 }
@@ -108,7 +108,7 @@ message GetListItemResponse {
 
 message RemoveListItemRequest {
   string list_item_key = 1 [(validate.rules).string = {
-    min_len: 30,
+    min_len: 27,
     max_len: 50
   }];
 }
@@ -128,7 +128,7 @@ message RemoveListItemResponse {
 
 message UpdateListItemRequest {
   string list_item_key = 1 [(validate.rules).string = {
-    min_len: 30,
+    min_len: 27,
     max_len: 50
   }];
 

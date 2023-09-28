@@ -154,6 +154,9 @@ message ProvisionEnrollmentValidationCodeRequest {
     string service_provider_instrument_ref = 3;
     string service_provider_instrument_key = 4;
   }
+
+  //if this is set the values will be shared with the other side that is performing the enrollment
+  micashared.common.v1.UserDemographic shared_user_information = 5;
 }
 
 message ProvisionEnrollmentValidationCodeResponse {
