@@ -35,6 +35,8 @@ service PartnerToMicaService {
   //<editor-fold desc="Organization Operations">
 
   // Retrieve an organization based on it's key.
+  rpc CreateOrganization(organization.v1.CreateOrganizationRequest) returns (organization.v1.CreateOrganizationResponse) {}
+
   rpc GetOrganization(organization.v1.GetOrganizationRequest) returns (organization.v1.GetOrganizationResponse) {}
 
   // Update a given organization.
