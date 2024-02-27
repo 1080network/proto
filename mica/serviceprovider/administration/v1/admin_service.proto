@@ -55,6 +55,8 @@ service ServiceProviderAdministrationService {
 
   rpc SearchExternalClientMTLSCertificate(micashared.common.v1.SearchExternalClientMTLSCertificateRequest) returns (micashared.common.v1.SearchExternalClientMTLSCertificateResponse) {}
 
+  rpc GenerateQuickstartPackageZip(micashared.common.v1.GenerateQuickstartPackageZipRequest) returns (micashared.common.v1.GenerateQuickstartPackageZipResponse) {}
+
   rpc SearchDataExtractionStatistics(micashared.common.v1.SearchDataExtractionRequest) returns (micashared.common.v1.SearchDataExtractionResponse) {}
 
   rpc GetDataExtractionStatistics(micashared.common.v1.GetDataExtractionRequest) returns (micashared.common.v1.GetDataExtractionResponse) {}

@@ -19,8 +19,8 @@ import "micashared/common/v1/discount.proto";
 import "micashared/common/v1/error.proto";
 import "micashared/common/v1/line_item.proto";
 import "micashared/common/v1/receipt.proto";
-import "micashared/common/v1/uuek.proto";
 import "micashared/common/v1/risk_signals.proto";
+import "micashared/common/v1/uuek.proto";
 import "validate/validate.proto";
 
 option go_package = "mica/partner/valuev1";
@@ -272,8 +272,8 @@ message ReturnValueRequest {
   // Service Provider can then use this field to match up Returns with the original Obtain.
   string initial_partner_transaction_ref = 3 [(validate.rules).string.max_len = 100];
 
-   //use the risk signals to pass enhanced data that can be used by the service provider to understand the origination characteristics of the transaction origin
-   micashared.common.v1.RiskSignal risk_signal = 4;
+  //use the risk signals to pass enhanced data that can be used by the service provider to understand the origination characteristics of the transaction origin
+  micashared.common.v1.RiskSignal risk_signal = 4;
 }
 
 message ReturnValueResponse {
@@ -504,6 +504,8 @@ message HoldValueResponse {
     STATUS_LIMIT_EXCEEDED = 19;
     // This request has already been processed and this is a duplicate request
     STATUS_DUPLICATE = 20;
+    // A request for a hold on an instrument that can't support holds
+    STATUS_INSTRUMENT_TYPE_NOT_SUPPORTED = 21;
   }
   Status status = 1;
 
@@ -673,6 +675,8 @@ message ObtainHoldValueResponse {
     STATUS_DUPLICATE = 20;
     // The hold was already expired or released or not found (as it's already been released or expired and purged)
     STATUS_INVALID_HOLD = 21;
+    // A request for a hold on an instrument that can't support holds
+    STATUS_INSTRUMENT_TYPE_NOT_SUPPORTED = 22;
   }
   Status status = 1;
 

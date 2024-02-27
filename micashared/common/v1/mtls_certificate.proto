@@ -217,3 +217,18 @@ message SearchExternalClientMTLSCertificateResponse {
   micashared.common.v1.Error error = 2;
   repeated ClientMTLSCertificate certificates = 3;
 }
+
+message GenerateQuickstartPackageZipRequest {}
+
+message GenerateQuickstartPackageZipResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  micashared.common.v1.Error error = 2;
+
+  bytes quickstart_package_zip = 3;
+}

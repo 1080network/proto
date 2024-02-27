@@ -308,7 +308,6 @@ message ReturnValueRequest {
 
   //use the risk signals to pass enhanced data that can be used by the service provider to understand the origination characteristics of the transaction origin
   micashared.common.v1.RiskSignal risk_signal = 3;
-
 }
 
 message ReturnValueResponse {

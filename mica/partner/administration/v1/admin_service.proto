@@ -50,6 +50,8 @@ service PartnerAdministrationService {
   // Client certificates are used when mica needs to call out to a customers environment.
   rpc GenerateExternalClientMTLSCertificate(micashared.common.v1.GenerateExternalClientMTLSCertificateRequest) returns (micashared.common.v1.GenerateExternalClientMTLSCertificateResponse) {}
 
+  rpc GenerateQuickstartPackageZip(micashared.common.v1.GenerateQuickstartPackageZipRequest) returns (micashared.common.v1.GenerateQuickstartPackageZipResponse) {}
+
   rpc UpdateExternalClientMTLSCertificate(micashared.common.v1.UpdateExternalClientMTLSCertificateRequest) returns (micashared.common.v1.UpdateExternalClientMTLSCertificateResponse) {}
 
   rpc SearchExternalClientMTLSCertificate(micashared.common.v1.SearchExternalClientMTLSCertificateRequest) returns (micashared.common.v1.SearchExternalClientMTLSCertificateResponse) {}

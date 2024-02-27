@@ -41,6 +41,8 @@ message Partner {
   string callback_address = 8;
 
   string network_group = 9;
+
+  repeated string features = 10;
 }
 
 message GetPartnerRequest {}

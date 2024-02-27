@@ -21,7 +21,7 @@ option java_package = "io.mica.serviceprovider.serviceprovider.v1";
 option objc_class_prefix = "MICA";
 
 message ServiceProvider {
-  reserved 10; 
+  reserved 10;
 
   string service_provider_key = 1 [(validate.rules).string = {
     min_len: 30,
@@ -43,6 +43,8 @@ message ServiceProvider {
   micashared.common.v1.BankAccountDetail revenue_account = 9;
 
   string network_group = 11;
+
+  repeated string features = 12;
 }
 
 message GetServiceProviderRequest {}
