@@ -8,17 +8,19 @@
 
 syntax = "proto3";
 
-package micashared.common.enums.custodialbank.v1;
+package micashared.common.enums.organizationstatus.v1;
 
-option go_package = "micashared/common/enums/custodialbankv1";
-option java_outer_classname = "CustodialBankEnumProto";
+option go_package = "micashared/common/enums/organizationstatusv1";
+option java_outer_classname = "OrganizationStatusEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
-enum CustodialBank {
-  CUSTODIAL_BANK_UNSPECIFIED = 0;
-
-  CUSTODIAL_BANK_TEST_BANK = 1;
-
-  CUSTODIAL_BANK_MAINSTREET_BANK = 2;
+// State transition diagram:
+//   INACTIVE (initial state) -> ACTIVE
+//   ACTIVE -> INACTIVE
+enum OrganizationStatus {
+  reserved 1, 2, 4;
+  ORGANIZATION_STATUS_UNSPECIFIED = 0;
+  ORGANIZATION_STATUS_ACTIVE = 3;
+  ORGANIZATION_STATUS_INACTIVE = 5;
 }

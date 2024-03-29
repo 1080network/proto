@@ -10,27 +10,21 @@ syntax = "proto3";
 
 package micashared.common.v1;
 
-import "micashared/common/enums/country/v1/country.proto";
-import "micashared/common/enums/region/v1/region.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "micashared/common/v1;commonv1";
-option java_outer_classname = "AddressProto";
+option java_outer_classname = "TransactionProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
-message Address {
-  repeated string street_lines = 1;
+message TransactionIdentifier {
+  // Global transaction ID passed that reflects the ID of this transaction across the entire path through the network.
+  // This can be used report issues and debug transactions
+  string global_transaction_id = 1;
 
-  // typically city
-  string locality = 2;
-
-  // this would be state in the US (ISO 3166-2:US), prefecture in Japan (ISO 3166-2:JP) or
-  // territory in Australia (ISO 3166-2:AU)
-  micashared.common.enums.region.v1.Region region = 3;
-
-  // postal code, in the US this would be zip code
-  string postal_code = 4;
-
-  // https://en.wikipedia.org/wiki/ISO_3166-2
-  micashared.common.enums.country.v1.Country country = 5;
+  // Global timestamp passed that reflects the time when the request arrived at the network and is the same for all
+  // services that are involved with processing a transaction. This field can be used when trying to reconcile data
+  // between you and the network (assuming you store this timestamp).
+  google.protobuf.Timestamp global_transaction_time = 2;
 }
+
