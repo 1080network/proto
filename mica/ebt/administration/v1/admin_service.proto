@@ -13,7 +13,7 @@ package mica.ebt.administration.v1;
 import "micashared/common/v1/mtls_certificate.proto";
 
 option go_package = "mica/ebt/administrationv1";
-option java_outer_classname = "EBTAdministrationService";
+option java_outer_classname = "EBTAdministrationServiceProto";
 option java_package = "io.mica.ebt.administration.v1";
 option objc_class_prefix = "MICA";
 
