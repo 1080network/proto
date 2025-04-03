@@ -2,13 +2,30 @@ version: v1
 lint:
   use:
     - STANDARD
-  except:
-    - RPC_REQUEST_RESPONSE_UNIQUE
-    - RPC_REQUEST_STANDARD_NAME
-    - RPC_RESPONSE_STANDARD_NAME
   ignore:
     - google
     - validate
+  ignore_only:
+    # These ignores are temporary while we refactor proto services to be conventional.
+    # Goal is to have the ignore_only block removed by the end of things.
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      - mica/partner
+      - mica/serviceprovider
+      - micainternal/partner
+      - micainternal/serviceprovider
+      - micainternal/serviceproviderproxy
+    RPC_REQUEST_STANDARD_NAME:
+      - mica/partner
+      - mica/serviceprovider
+      - micainternal/partner
+      - micainternal/serviceprovider
+      - micainternal/serviceproviderproxy
+    RPC_RESPONSE_STANDARD_NAME:
+      - mica/partner
+      - mica/serviceprovider
+      - micainternal/partner
+      - micainternal/serviceprovider
+      - micainternal/serviceproviderproxy
 breaking:
   use:
     - WIRE_JSON
