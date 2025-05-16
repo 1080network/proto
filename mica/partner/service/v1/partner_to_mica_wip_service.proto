@@ -25,7 +25,7 @@ import "micashared/common/v1/uuek.proto";
 import "validate/validate.proto";
 
 option go_package = "mica/partner/servicev1";
-option java_outer_classname = "PartnerToMicaServiceProto";
+option java_outer_classname = "PartnerToMicaWIPServiceProto";
 option java_package = "io.mica.partner.service.v1";
 option objc_class_prefix = "MICA";
 
