@@ -11,8 +11,8 @@ syntax = "proto3";
 package mica.partner.service.v1;
 
 import "google/protobuf/timestamp.proto";
+import "mica/common/v1/currency.proto";
 import "micashared/common/enums/currency/v1/currency.proto";
-import "micashared/common/v1/user.proto";
 import "micashared/common/v1/error.proto";
 import "validate/validate.proto";
 
@@ -30,12 +30,6 @@ service PartnerToMicaWIPService {
 
   //  The user should call this method before calling ExecuteRecurringPaymentObtainValue below
   rpc ProvisionRecurringPaymentUUEK(ProvisionRecurringPaymentUUEKRequest) returns (ProvisionRecurringPaymentUUEKResponse) {}
-  
-  // Initialize the widget (deprecated)
-  rpc InitializeWidget(InitializeWidgetRequest) returns (InitializeWidgetResponse) {option deprecated = true;}
-
-  // Exchange the session key for a UUEK (deprecated)
-  rpc ExchangeSessionKey(ExchangeSessionKeyRequest) returns (ExchangeSessionKeyResponse) {option deprecated = true;}
 }
 
 
@@ -44,7 +38,7 @@ message RecurringPayment {
 
   string nickname = 2;
 
-  micashared.common.enums.currency.v1.Currency currency = 3;
+  mica.common.v1.Currency currency = 3;
 
   google.protobuf.Timestamp created = 4;
 }
@@ -69,7 +63,9 @@ message CreateRecurringPaymentRequest {
 
   string nickname = 3;
 
-  micashared.common.enums.currency.v1.Currency currency = 5;
+  micashared.common.enums.currency.v1.Currency obsolete_currency = 5 [deprecated = true];
+
+  mica.common.v1.Currency currency = 7;
 
   RecurringPaymentTerms terms = 6 [(validate.rules).message.required = true];
 }
@@ -122,63 +118,4 @@ message ProvisionRecurringPaymentUUEKResponse {
   micashared.common.v1.Error error = 2;
 
   string uuek = 3;
-}
-
-message InitializeWidgetRequest {
-  // Details of the user.
-  micashared.common.v1.UserDemographic user_demographic = 3;
-}
-
-message InitializeWidgetResponse {
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-
-    STATUS_SUCCESS = 1;
-    // generic error that's not one of the following
-    STATUS_ERROR = 2;
-  }
-  Status status = 1;
-
-  micashared.common.v1.Error error = 2;
-
-  string session_key = 3 [(validate.rules).string = {
-    min_len: 27,
-    max_len: 50
-  }];
-}
-
-message ExchangeSessionKeyRequest {
-  reserved 2, 3, 4;
-  // The session key that was established when the Widget was initialized
-  string session_key = 1 [(validate.rules).string = {
-    min_len: 27,
-    max_len: 50
-  }];
-
-  // The organization this operation is being processed for.
-  oneof organization_identifier {
-    string organization_key = 5 [(validate.rules).string = {max_len: 50}];
-
-    // The primary key for this organization at the Partner.
-    string organization_ref = 6 [(validate.rules).string = {max_len: 100}];
-  }
-}
-
-message ExchangeSessionKeyResponse {
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_SUCCESS = 1;
-    STATUS_ERROR = 2;
-    STATUS_MATCHING_CODE_MISMATCH = 3;
-    STATUS_NOT_FOUND = 4;
-  }
-  Status status = 1;
-
-  micashared.common.v1.Error error = 2;
-
-  // The UUEK that the Partner can use to obtain or return value for this user.
-  string partner_uuek = 3 [(validate.rules).string = {
-    min_len: 30,
-    max_len: 50
-  }];
 }

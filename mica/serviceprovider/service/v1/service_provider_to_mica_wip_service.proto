@@ -11,6 +11,7 @@ syntax = "proto3";
 package mica.serviceprovider.service.v1;
 
 import "google/protobuf/timestamp.proto";
+import "mica/common/v1/currency.proto";
 import "mica/discount/discount/v1/discount.proto";
 import "mica/serviceprovider/instrument/v1/instrument.proto";
 import "micashared/common/enums/currency/v1/currency.proto";
@@ -233,8 +234,7 @@ message GetLinkedAccountBalanceResponse {
 
   micashared.common.v1.Error error = 2;
 
-  // URN that represents the FIAT urn:value:fiat:usd
-  string currency = 3;
+  string currency = 3 [deprecated = true];
 
   // the amount of money available in a given currency for purchases
   string available_balance = 4;
@@ -275,7 +275,7 @@ message RecurringPayment {
 
   mica.serviceprovider.instrument.v1.InstrumentExternalReference instrument_external_ref = 4;
 
-  micashared.common.enums.currency.v1.Currency currency = 5;
+  mica.common.v1.Currency currency = 5;
 
   google.protobuf.Timestamp created_at = 6;
 
@@ -348,7 +348,7 @@ message SendValueRequest {
   // @gotags: mask:"security"
   string to_uuek = 3;
 
-  micashared.common.enums.currency.v1.Currency currency = 4;
+  mica.common.v1.Currency currency = 4;
 
   // Amount expressed as: ([0-9]*[.])?[0-9]+
   string amount = 5;
@@ -396,7 +396,7 @@ message ServiceProviderUserDiscount {
     gt_now: true
   }];
 
-  micashared.common.enums.currency.v1.Currency currency = 7;
+  micashared.common.enums.currency.v1.Currency obsolete_currency = 7 [deprecated = true];
 
   oneof discount_amount {
     option (validate.required) = true;
@@ -407,6 +407,8 @@ message ServiceProviderUserDiscount {
 
   // address to the image for this discount definition (note that this image is expected to be square)
   string thumbnail_url = 10;
+
+  mica.common.v1.Currency currency = 13;
 }
 
 // This operation will only filter discounts that are valid and ignores any that aren't
