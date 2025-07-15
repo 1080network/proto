@@ -10,8 +10,9 @@ syntax = "proto3";
 
 package mica.serviceprovider.service.v1;
 
+import "mica/common/v1/currency.proto";
 import "mica/serviceprovider/instrument/v1/instrument.proto";
-import "micashared/common/enums/currency/v1/currency.proto";
+import "mica/serviceprovider/value/v1/value.proto";
 import "micashared/common/v1/error.proto";
 import "micashared/common/v1/transaction.proto";
 import "validate/validate.proto";
@@ -27,6 +28,8 @@ service ServiceProviderFromMicaWIPService {
   // the users instrument. If the dispute resulted in a replacement or an in-store credit, then the Service Provider
   // is not called.
   rpc ApproveChargeback(ApproveChargebackRequest) returns (ApproveChargebackResponse) {}
+
+  rpc ReceiveValue(value.v1.ReceiveValueRequest) returns (value.v1.ReceiveValueResponse) {}
 }
 
 message ApproveChargebackRequest {
@@ -37,8 +40,8 @@ message ApproveChargebackRequest {
   // Service Provider's primary key for their instrument.
   mica.serviceprovider.instrument.v1.InstrumentExternalReference instrument_external_reference = 22 [(validate.rules).message.required = true];
 
-  // The 3-letter currency code defined in ISO 4217. Note all amounts are in this currency.
-  micashared.common.enums.currency.v1.Currency currency = 5;
+  // The currency
+  mica.common.v1.Currency currency = 5;
 
   // Amount expressed as: ([0-9]*[.])?[0-9]+
   string requested_amount = 15;
