@@ -1,4 +1,4 @@
-name: "Proto- proto changes - NIX PR build"
+name: "Lint protos"
 on:
   pull_request:
     branches: 'main'
@@ -9,19 +9,10 @@ jobs:
     name: lint-proto
     runs-on: ubuntu-latest
     
-    env:
-      PROJECT_ID: 'mica-io-ops'
-
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
     steps:
       - uses: actions/checkout@v5
       - uses: cachix/install-nix-action@v31
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
-          
-      - uses: actions/checkout@v4
+          nix_path: nixpkgs=channel:nixos-unstable          
 
-      - run: nix-shell --run 'make lint'
+      - run: nix-shell --packages protobuf buf --run 'make lint'
