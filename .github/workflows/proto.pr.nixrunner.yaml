@@ -7,7 +7,8 @@ on:
 jobs:
   lint-protos:
     name: lint-proto
-
+    runs-on: ubuntu-22.04
+    
     env:
       PROJECT_ID: 'mica-io-ops'
 
