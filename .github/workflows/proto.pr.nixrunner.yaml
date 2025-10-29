@@ -22,15 +22,7 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v2'
+      - uses: workflow/nix-shell-action@v3
         with:
-          workload_identity_provider: 'projects/62674393727/locations/global/workloadIdentityPools/github-actions/providers/github-actions'
-          service_account: 'github-actions@mica-io-ops.iam.gserviceaccount.com'
-      
-      - id: 'setupcloud'
-        name: 'Setup cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
-       
-      - run: nix-shell --packages protobuf buf --run 'make lint'
+          script: |
+            nix-shell --packages protobuf buf --run 'make lint'
