@@ -7,7 +7,6 @@ on:
 jobs:
   lint-protos:
     name: lint-proto
-    runs-on: nix-enabled
 
     env:
       PROJECT_ID: 'mica-io-ops'
@@ -33,4 +32,4 @@ jobs:
         name: 'Setup cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
        
-      - run: nix-shell --run 'make lint'
+      - run: nix-shell --packages protobuf buf --run 'make lint'
