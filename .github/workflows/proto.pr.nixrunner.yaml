@@ -1,9 +1,7 @@
 name: "Proto- proto changes - NIX PR build"
 on:
   pull_request:
-    branches: 'master'
-    paths:
-      - 'proto/**'
+    branches: 'main'
   workflow_dispatch:
 
 jobs:
