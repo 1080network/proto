@@ -11,10 +11,15 @@ Pick the role you play, and use the SDK for your language:
 | --- | --- |
 | Go | [1080network/golang](https://github.com/1080network/golang) |
 | Kotlin / Java | [1080network/kotlin](https://github.com/1080network/kotlin) |
-| Python | [1080network/python](https://github.com/1080network/python) |
 | C# / .NET | [1080network/dotnet](https://github.com/1080network/dotnet) |
+| Node.js / TypeScript | [1080network/node](https://github.com/1080network/node) |
+| Python | [1080network/python](https://github.com/1080network/python) |
+| Ruby | [1080network/ruby](https://github.com/1080network/ruby) |
+| Rust | [1080network/rust](https://github.com/1080network/rust) |
+| PHP | [1080network/php](https://github.com/1080network/php) |
+| C++ | [1080network/cpp](https://github.com/1080network/cpp) |
 
-The SDKs are generated from the protos in this repository. If your language isn't listed, or you want to
+Each SDK is split by role, so you install only the code for the roles you play. The SDKs are generated from the protos in this repository (the C++ SDK builds them with CMake against your own protobuf and gRPC). If your language isn't listed, or you want to
 generate the code yourself, see [Building your own SDK](docs/build-your-own-sdk.md).
 
 ## Layout
