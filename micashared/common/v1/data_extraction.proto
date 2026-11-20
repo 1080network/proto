@@ -18,13 +18,17 @@ option java_outer_classname = "DataExtractionProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// Progress of one of the batch extractors that copy a member's records out of Mica for settlement and reporting.
 message DataExtraction {
-  //Serial number of the generated certificate
+  // Name of the extractor.
   string extractor_name = 1 [(validate.rules).string.min_len = 1];
 
+  // High-water mark: the point in time up to which the extractor has extracted records.
   google.protobuf.Timestamp watermark_time = 2 [(validate.rules).timestamp.required = true];
 
+  // When the extractor last ran.
   google.protobuf.Timestamp last_execution_time = 3;
 
+  // Total number of records the extractor has processed, accumulated across runs.
   uint32 records_processed = 4;
 }

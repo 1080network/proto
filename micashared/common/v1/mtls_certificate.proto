@@ -17,21 +17,32 @@ option objc_class_prefix = "MICA";
 
 // From Mica Client mTLS certificate operations.
 
+// A client certificate that Mica presents when it calls a member's endpoint over mutual TLS. Mica generates the
+// private key and a certificate signing request (CSR); the member signs the CSR with a CA its endpoint trusts and
+// uploads the signed certificate, then enables it. The private key never leaves Mica.
 message FromMicaClientCertificate {
+  // Mica-assigned identifier of this certificate, used to refer to it in later calls. It is not the key or the
+  // certificate itself.
   string certificate_id = 1; // Used for lookups NOT the actual private key.
 
+  // Friendly name chosen by the member.
   string display_name = 2;
 
-  //Base64 standard encoded cert PEM string
+  // The signed certificate, as a PEM string encoded with standard base64. Empty until the member uploads it.
   string base64_certificate_pem = 7;
 
-  //Base64 standard encoded CSR PEM string
+  // The certificate signing request for the member to sign, as a PEM string encoded with standard base64.
   string base64_csr_pem = 8;
 
-  //Base64 standard encoded PEM string
+  // CA certificate bundle Mica uses to verify the member endpoint's server certificate, as a PEM string encoded with
+  // standard base64.
   string base64_rootca_pem = 9;
 
+  // Whether Mica uses this certificate. Only one client certificate is enabled at a time: enabling one disables the
+  // others. A certificate can only be enabled once its signed certificate has been uploaded.
   bool enabled = 6;
 
+  // When true, Mica verifies the member endpoint's server certificate against the public CAs trusted by Mica's host
+  // instead of `base64_rootca_pem`.
   bool use_host_trusted_certs = 10;
 }

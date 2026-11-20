@@ -1,0 +1,522 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.issuer.service.v2;
+
+import "google/protobuf/timestamp.proto";
+import "mica/common/v1/currency.proto";
+import "mica/issuer/instrument/v2/instrument.proto";
+import "micashared/common/v1/address.proto";
+import "micashared/common/v1/risk_signals.proto";
+import "micashared/common/v1/transaction.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/issuer/servicev2";
+option java_outer_classname = "IssuerFromMicaServiceProto";
+option java_package = "io.mica.issuer.service.v2";
+option objc_class_prefix = "MICA";
+
+// Operations Mica calls on the Issuer. The Issuer hosts this service at the callback address configured with
+// IssuerAdministrationService.UpdateFromMicaClientCallbackAddress, and Mica authenticates with the client certificate
+// enabled through that administration service.
+//
+// Each value operation asks the Issuer to move value on one of its instruments for a network transaction. The
+// operations correspond to those on AcceptorToMicaValueService.
+//
+// Every value operation runs in two steps, identified by `transaction_identifier` and the instrument, so that Mica can
+// apply a transaction completely or not at all. The request's `phase` says which step it is:
+//   "PREFLIGHT" - check that the operation can be applied and reserve what it needs, without applying it
+//   "COMMIT"    - apply the operation, for the amount approved at preflight
+//   "ROLLBACK"  - release what the preflight reserved; nothing is applied
+// Reject a request whose `phase` is anything else. A request whose preflight result Mica did not receive is always
+// rolled back. Mica may repeat a COMMIT or ROLLBACK it did not get an answer to, so apply each only once.
+//
+// The Issuer reports its decision in the response. A failure to process the request at all, rather than a decline, is
+// reported as a gRPC status code, and an operation the Issuer does not support returns UNIMPLEMENTED.
+service IssuerFromMicaService {
+  // Asks the Issuer to take value from the instrument for a payment. The Issuer may approve less than `amount` at
+  // preflight.
+  rpc ObtainValue(ObtainValueRequest) returns (ObtainValueResponse) {}
+
+  // Asks the Issuer to reverse an earlier ObtainValue in full, returning everything it took to the instrument.
+  rpc ReverseObtainValue(ReverseObtainValueRequest) returns (ReverseObtainValueResponse) {}
+
+  // Asks the Issuer to credit the instrument with part or all of an earlier payment, for example for a returned
+  // item.
+  rpc RefundValue(RefundValueRequest) returns (RefundValueResponse) {}
+
+  // Asks the Issuer to credit the instrument for a payout: value sent to the user that does not refer to an earlier
+  // payment.
+  rpc PayoutValue(PayoutValueRequest) returns (PayoutValueResponse) {}
+
+  // Asks the Issuer to reserve value on the instrument until `expiration`. The hold is later captured with
+  // ObtainHoldValue, released with ReleaseHoldValue, or left to expire.
+  rpc HoldValue(HoldValueRequest) returns (HoldValueResponse) {}
+
+  // Asks the Issuer to release an earlier hold in full without capturing it, returning all of the reserved value to
+  // the instrument.
+  rpc ReleaseHoldValue(ReleaseHoldValueRequest) returns (ReleaseHoldValueResponse) {}
+
+  // Asks the Issuer to take value against an earlier hold, once the final amount is known. This settles the hold.
+  rpc ObtainHoldValue(ObtainHoldValueRequest) returns (ObtainHoldValueResponse) {}
+
+  // Informs the Issuer about steps of value operations that Mica could not complete with the Issuer, for example a
+  // COMMIT the Issuer did not answer in time. The Issuer should acknowledge promptly and reconcile afterwards, undoing
+  // any value movement it applied for a transaction the network declined. Not sent by the current network release.
+  rpc ValueAdvice(ValueAdviceRequest) returns (ValueAdviceResponse) {}
+
+  // Lets Mica check that the Issuer's service is reachable and that the mTLS connection works. Mica calls this when
+  // the Issuer tests connectivity with IssuerAdministrationService.PingExternal or enables a new client certificate.
+  rpc Ping(IssuerFromMicaServicePingRequest) returns (IssuerFromMicaServicePingResponse) {}
+}
+
+// Every value request numbers the fields it shares with the others the same way:
+//   1 plan_name, 2 phase, 3 amount, 4 currency, 5 transaction_identifier, 6 issuer_instrument_key,
+//   7 instrument_external_reference, 8 risk_signal, 9 location_details, 10 original_transaction_identifier,
+//   11 expiration.
+// Every value response is a transaction_ref (1) and a result (approved 2, declined 3).
+
+// A request to take value from the instrument for one step of a payment.
+message ObtainValueRequest {
+  // The name of the plan Mica is using to process the transaction, for reference.
+  string plan_name = 1;
+
+  // Which step this is: "PREFLIGHT", "COMMIT" or "ROLLBACK".
+  string phase = 2 [(validate.rules).string = {in: ["PREFLIGHT", "COMMIT", "ROLLBACK"]}];
+
+  // The amount to take, as a decimal string. On COMMIT and ROLLBACK it is the amount the Issuer approved at
+  // preflight.
+  string amount = 3;
+
+  // The currency of `amount`.
+  mica.common.v1.Currency currency = 4 [(validate.rules).message.required = true];
+
+  // Mica's network-wide identifier and time for the payment. The same for every step, so use it to match the
+  // COMMIT or ROLLBACK to the PREFLIGHT.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 5;
+
+  // Mica's key for the instrument to debit.
+  string issuer_instrument_key = 6;
+
+  // The Issuer's own user and instrument references for the instrument.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 7;
+
+  // Information about where and how the payment originated, supplied by the Acceptor for the Issuer's risk and
+  // fraud checks. May be empty.
+  micashared.common.v1.RiskSignal risk_signal = 8;
+
+  // Where the payment took place.
+  LocationDetails location_details = 9;
+}
+
+message ObtainValueResponse {
+  // The Issuer's own reference for this step of the payment (up to 100 characters). Mica sends the reference from
+  // the COMMIT back as `original_transaction_identifier.transaction_ref` in later operations that refer to it.
+  string transaction_ref = 1 [(validate.rules).string.max_len = 100];
+
+  // The Issuer's decision. Exactly one is set.
+  oneof result {
+    // The payment is approved for `approved.approved_amount`, which may be less than the amount requested.
+    ApprovedResult approved = 2;
+
+    // The payment is declined.
+    DeclinedResult declined = 3;
+  }
+}
+
+// A request to reverse an earlier payment in full, for one step.
+message ReverseObtainValueRequest {
+  // The name of the plan Mica is using to process the transaction, for reference.
+  string plan_name = 1;
+
+  // Which step this is: "PREFLIGHT", "COMMIT" or "ROLLBACK".
+  string phase = 2 [(validate.rules).string = {in: ["PREFLIGHT", "COMMIT", "ROLLBACK"]}];
+
+  // Mica's network-wide identifier and time for the reversal. The same for every step, so use it to match the
+  // COMMIT or ROLLBACK to the PREFLIGHT.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 5;
+
+  // Mica's key for the instrument to credit.
+  string issuer_instrument_key = 6;
+
+  // The Issuer's own user and instrument references for the instrument.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 7;
+
+  // Information about where and how the reversal originated, supplied by the Acceptor for the Issuer's risk and
+  // fraud checks. May be empty.
+  micashared.common.v1.RiskSignal risk_signal = 8;
+
+  // Where the reversal took place.
+  LocationDetails location_details = 9;
+
+  // The payment being reversed.
+  OriginalTransactionIdentifier original_transaction_identifier = 10 [(validate.rules).message.required = true];
+}
+
+message ReverseObtainValueResponse {
+  // The Issuer's own reference for this step of the reversal (up to 100 characters). Mica sends the reference from
+  // the COMMIT back as `original_transaction_identifier.transaction_ref` in later operations that refer to it.
+  string transaction_ref = 1 [(validate.rules).string.max_len = 100];
+
+  // The Issuer's decision. Exactly one is set.
+  oneof result {
+    // The reversal is approved; `approved.approved_amount` is the amount returned to the instrument.
+    ApprovedResult approved = 2;
+
+    // The reversal is declined.
+    DeclinedResult declined = 3;
+  }
+}
+
+// A request to credit the instrument with part or all of an earlier payment, for one step.
+message RefundValueRequest {
+  // The name of the plan Mica is using to process the transaction, for reference.
+  string plan_name = 1;
+
+  // Which step this is: "PREFLIGHT", "COMMIT" or "ROLLBACK".
+  string phase = 2 [(validate.rules).string = {in: ["PREFLIGHT", "COMMIT", "ROLLBACK"]}];
+
+  // The amount to credit, as a decimal string. At most the amount the original payment took from this instrument,
+  // less any earlier refunds of it.
+  string amount = 3;
+
+  // The currency of `amount`.
+  mica.common.v1.Currency currency = 4 [(validate.rules).message.required = true];
+
+  // Mica's network-wide identifier and time for the refund. The same for every step, so use it to match the
+  // COMMIT or ROLLBACK to the PREFLIGHT.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 5;
+
+  // Mica's key for the instrument to credit.
+  string issuer_instrument_key = 6;
+
+  // The Issuer's own user and instrument references for the instrument.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 7;
+
+  // Information about where and how the refund originated, supplied by the Acceptor for the Issuer's risk and
+  // fraud checks. May be empty.
+  micashared.common.v1.RiskSignal risk_signal = 8;
+
+  // Where the refund took place.
+  LocationDetails location_details = 9;
+
+  // The payment being refunded.
+  OriginalTransactionIdentifier original_transaction_identifier = 10 [(validate.rules).message.required = true];
+}
+
+message RefundValueResponse {
+  // The Issuer's own reference for this step of the refund (up to 100 characters). Mica sends the reference from
+  // the COMMIT back as `original_transaction_identifier.transaction_ref` in later operations that refer to it.
+  string transaction_ref = 1 [(validate.rules).string.max_len = 100];
+
+  // The Issuer's decision. Exactly one is set.
+  oneof result {
+    // The refund is approved for `approved.approved_amount`.
+    ApprovedResult approved = 2;
+
+    // The refund is declined.
+    DeclinedResult declined = 3;
+  }
+}
+
+// A request to credit the instrument for one step of a payout.
+message PayoutValueRequest {
+  // The name of the plan Mica is using to process the transaction, for reference.
+  string plan_name = 1;
+
+  // Which step this is: "PREFLIGHT", "COMMIT" or "ROLLBACK".
+  string phase = 2 [(validate.rules).string = {in: ["PREFLIGHT", "COMMIT", "ROLLBACK"]}];
+
+  // The amount to credit, as a decimal string.
+  string amount = 3;
+
+  // The currency of `amount`.
+  mica.common.v1.Currency currency = 4 [(validate.rules).message.required = true];
+
+  // Mica's network-wide identifier and time for the payout. The same for every step, so use it to match the
+  // COMMIT or ROLLBACK to the PREFLIGHT.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 5;
+
+  // Mica's key for the instrument to credit.
+  string issuer_instrument_key = 6;
+
+  // The Issuer's own user and instrument references for the instrument.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 7;
+
+  // Information about where and how the payout originated, supplied by the Acceptor for the Issuer's risk and
+  // fraud checks. May be empty.
+  micashared.common.v1.RiskSignal risk_signal = 8;
+
+  // Where the payout took place.
+  LocationDetails location_details = 9;
+}
+
+message PayoutValueResponse {
+  // The Issuer's own reference for this step of the payout (up to 100 characters). Mica sends the reference from
+  // the COMMIT back as `original_transaction_identifier.transaction_ref` in later operations that refer to it.
+  string transaction_ref = 1 [(validate.rules).string.max_len = 100];
+
+  // The Issuer's decision. Exactly one is set.
+  oneof result {
+    // The payout is approved for `approved.approved_amount`.
+    ApprovedResult approved = 2;
+
+    // The payout is declined.
+    DeclinedResult declined = 3;
+  }
+}
+
+// A request to reserve value on the instrument for one step of a hold.
+message HoldValueRequest {
+  // The name of the plan Mica is using to process the transaction, for reference.
+  string plan_name = 1;
+
+  // Which step this is: "PREFLIGHT", "COMMIT" or "ROLLBACK".
+  string phase = 2 [(validate.rules).string = {in: ["PREFLIGHT", "COMMIT", "ROLLBACK"]}];
+
+  // The amount to reserve, as a decimal string.
+  string amount = 3;
+
+  // The currency of `amount`.
+  mica.common.v1.Currency currency = 4 [(validate.rules).message.required = true];
+
+  // Mica's network-wide identifier and time for the hold. The same for every step, so use it to match the
+  // COMMIT or ROLLBACK to the PREFLIGHT.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 5;
+
+  // Mica's key for the instrument to reserve value on.
+  string issuer_instrument_key = 6;
+
+  // The Issuer's own user and instrument references for the instrument.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 7;
+
+  // Information about where and how the hold originated, supplied by the Acceptor for the Issuer's risk and
+  // fraud checks. May be empty.
+  micashared.common.v1.RiskSignal risk_signal = 8;
+
+  // Where the hold took place.
+  LocationDetails location_details = 9;
+
+  // When the hold expires. After this time the reserved value returns to the instrument unless the hold has been
+  // captured.
+  google.protobuf.Timestamp expiration = 11 [(validate.rules).timestamp.required = true];
+}
+
+message HoldValueResponse {
+  // The Issuer's own reference for this step of the hold (up to 100 characters). Mica sends the reference from
+  // the COMMIT back as `original_transaction_identifier.transaction_ref` in later operations that refer to it.
+  string transaction_ref = 1 [(validate.rules).string.max_len = 100];
+
+  // The Issuer's decision. Exactly one is set.
+  oneof result {
+    // The hold is approved for `approved.approved_amount`, which may be less than the amount requested.
+    ApprovedResult approved = 2;
+
+    // The hold is declined.
+    DeclinedResult declined = 3;
+  }
+}
+
+// A request to release an earlier hold in full, for one step.
+message ReleaseHoldValueRequest {
+  // The name of the plan Mica is using to process the transaction, for reference.
+  string plan_name = 1;
+
+  // Which step this is: "PREFLIGHT", "COMMIT" or "ROLLBACK".
+  string phase = 2 [(validate.rules).string = {in: ["PREFLIGHT", "COMMIT", "ROLLBACK"]}];
+
+  // Mica's network-wide identifier and time for the release. The same for every step, so use it to match the
+  // COMMIT or ROLLBACK to the PREFLIGHT.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 5;
+
+  // Mica's key for the instrument to release value on.
+  string issuer_instrument_key = 6;
+
+  // The Issuer's own user and instrument references for the instrument.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 7;
+
+  // Information about where and how the release originated, supplied by the Acceptor for the Issuer's risk and
+  // fraud checks. May be empty.
+  micashared.common.v1.RiskSignal risk_signal = 8;
+
+  // Where the release took place.
+  LocationDetails location_details = 9;
+
+  // The hold being released.
+  OriginalTransactionIdentifier original_transaction_identifier = 10 [(validate.rules).message.required = true];
+}
+
+message ReleaseHoldValueResponse {
+  // The Issuer's own reference for this step of the release (up to 100 characters). Mica sends the reference from
+  // the COMMIT back as `original_transaction_identifier.transaction_ref` in later operations that refer to it.
+  string transaction_ref = 1 [(validate.rules).string.max_len = 100];
+
+  // The Issuer's decision. Exactly one is set.
+  oneof result {
+    // The release is approved; `approved.approved_amount` is the amount returned to the instrument.
+    ApprovedResult approved = 2;
+
+    // The release is declined.
+    DeclinedResult declined = 3;
+  }
+}
+
+// A request to take value against an earlier hold, for one step.
+message ObtainHoldValueRequest {
+  // The name of the plan Mica is using to process the transaction, for reference.
+  string plan_name = 1;
+
+  // Which step this is: "PREFLIGHT", "COMMIT" or "ROLLBACK".
+  string phase = 2 [(validate.rules).string = {in: ["PREFLIGHT", "COMMIT", "ROLLBACK"]}];
+
+  // The final amount to take, as a decimal string. At most the amount held.
+  string amount = 3;
+
+  // The currency of `amount`.
+  mica.common.v1.Currency currency = 4 [(validate.rules).message.required = true];
+
+  // Mica's network-wide identifier and time for the capture. The same for every step, so use it to match the
+  // COMMIT or ROLLBACK to the PREFLIGHT.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 5;
+
+  // Mica's key for the instrument to debit.
+  string issuer_instrument_key = 6;
+
+  // The Issuer's own user and instrument references for the instrument.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 7;
+
+  // Information about where and how the capture originated, supplied by the Acceptor for the Issuer's risk and
+  // fraud checks. May be empty.
+  micashared.common.v1.RiskSignal risk_signal = 8;
+
+  // Where the capture took place.
+  LocationDetails location_details = 9;
+
+  // The hold being captured.
+  OriginalTransactionIdentifier original_transaction_identifier = 10 [(validate.rules).message.required = true];
+}
+
+message ObtainHoldValueResponse {
+  // The Issuer's own reference for this step of the capture (up to 100 characters). Mica sends the reference from
+  // the COMMIT back as `original_transaction_identifier.transaction_ref` in later operations that refer to it.
+  string transaction_ref = 1 [(validate.rules).string.max_len = 100];
+
+  // The Issuer's decision. Exactly one is set.
+  oneof result {
+    // The capture is approved for `approved.approved_amount`.
+    ApprovedResult approved = 2;
+
+    // The capture is declined.
+    DeclinedResult declined = 3;
+  }
+}
+
+// Request for the Issuer's Ping operation. It has no fields.
+message IssuerFromMicaServicePingRequest {}
+
+// Response for the Issuer's Ping operation. It has no fields; returning it without an error is enough.
+message IssuerFromMicaServicePingResponse {}
+
+// Where a transaction took place.
+message LocationDetails {
+  // Mica's key for the Acceptor organization where the transaction took place.
+  string organization_key = 1 [(validate.rules).string = {max_len: 50}];
+
+  // Name of the organization where the transaction took place.
+  string organization_name = 2;
+
+  // Address of the organization where the transaction took place.
+  micashared.common.v1.Address organization_address = 3;
+
+  // The organization category this transaction is for, in the form AAA-BBB (for example COM-GRO). See
+  // https://developer.mica.io/apis/organization-categories/
+  string category = 4;
+
+  // Identifier of the clerk who processed the transaction, if the Acceptor supplied one.
+  string clerk_identifier = 7;
+}
+
+// The earlier transaction a follow-up operation applies to: the payment being reversed or refunded, or the hold being
+// released or captured. It is on the same instrument as the request.
+message OriginalTransactionIdentifier {
+  // Mica's network-wide identifier and time for the earlier transaction.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 1;
+
+  // The Issuer's own reference for the earlier transaction, as the Issuer returned it on that transaction's COMMIT.
+  string transaction_ref = 2 [(validate.rules).string.max_len = 100];
+}
+
+// The Issuer approved the request.
+message ApprovedResult {
+  // The amount approved, as a decimal string in the request's currency. On PREFLIGHT it is the amount Mica later
+  // commits or rolls back. It may be less than the amount requested only for an operation that allows partial
+  // approval.
+  string approved_amount = 1;
+}
+
+// The Issuer declined the request.
+message DeclinedResult {
+  // Why the Issuer declined, as a code Mica can act on and pass on to the Acceptor. The codes are not defined yet.
+  string code = 1;
+
+  // A human-readable description of the decline, for logs and support. Not shown to the user.
+  string message = 2;
+}
+
+// Tells the Issuer about steps of value operations that Mica could not complete with the Issuer. It does not need
+// real-time handling: acknowledge it promptly and reconcile afterwards.
+message ValueAdviceRequest {
+  // The advices being delivered.
+  repeated ValueAdvice value_advices = 1;
+}
+
+// Returned to acknowledge the advices. It has no fields; returning it without an error means they were received.
+message ValueAdviceResponse {}
+
+// One step of a value operation that Mica could not complete with the Issuer.
+message ValueAdvice {
+  // Processing priority for this advice: the lower the number, the higher the priority. Advices about Issuer timeouts
+  // and unavailability have the highest priority, because the Issuer may have applied those steps.
+  int32 advice_priority = 1;
+
+  // Why Mica could not complete the step:
+  //   "ISSUER_TIMEOUT"     - the Issuer did not answer in time; it may have applied the step
+  //   "ISSUER_UNAVAILABLE" - the Issuer was considered unavailable, so Mica did not wait for an answer
+  //   "ERROR"              - Mica could not complete the step for another reason
+  string advice_reason = 2;
+
+  // The operation, named after its operation on this service: "ObtainValue", "ReverseObtainValue", "RefundValue",
+  // "PayoutValue", "HoldValue", "ReleaseHoldValue" or "ObtainHoldValue".
+  string operation = 3;
+
+  // The step Mica could not complete: "PREFLIGHT", "COMMIT" or "ROLLBACK".
+  string phase = 4;
+
+  // The amount of the step, as a decimal string. Empty for an operation that has no amount.
+  string amount = 5;
+
+  // The currency of `amount`.
+  mica.common.v1.Currency currency = 6;
+
+  // Mica's network-wide identifier and time for the operation, as sent in the step's request.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 7;
+
+  // Mica's key for the instrument.
+  string issuer_instrument_key = 8;
+
+  // The Issuer's own user and instrument references for the instrument.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 9;
+
+  // The earlier transaction the operation applies to, for a reversal, refund, release or capture.
+  OriginalTransactionIdentifier original_transaction_identifier = 10;
+
+  // The Issuer's own reference for the operation, if the Issuer returned one on an earlier step.
+  string transaction_ref = 11 [(validate.rules).string.max_len = 100];
+}

@@ -15,12 +15,17 @@ option java_outer_classname = "TransactionTypeEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// The kind of transaction.
 enum TransactionType {
+  // Not set.
   TRANSACTION_TYPE_UNSPECIFIED = 0;
 
+  // A payment: value taken from the user's instrument.
   TRANSACTION_TYPE_OBTAIN = 1;
 
+  // A refund: value credited back to the user's instrument.
   TRANSACTION_TYPE_RETURN = 2;
 
+  // A person-to-person transfer.
   TRANSACTION_TYPE_P2P = 3;
 }

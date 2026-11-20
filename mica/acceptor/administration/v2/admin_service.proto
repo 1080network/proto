@@ -1,0 +1,98 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.acceptor.administration.v2;
+
+import "google/protobuf/timestamp.proto";
+import "micashared/common/v1/error.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/acceptor/administrationv2";
+option java_outer_classname = "AdministrationServiceProto";
+option java_package = "io.mica.acceptor.administration.v2";
+option objc_class_prefix = "MICA";
+
+// Administrative operations for an Acceptor's own Mica instance.
+service AcceptorAdministrationService {
+  // Lists the statistics of every data extractor running for your instance.
+  rpc SearchDataExtractionStatistics(SearchDataExtractionStatisticsRequest) returns (SearchDataExtractionStatisticsResponse) {}
+
+  // Returns the statistics of one data extractor by name. An unknown name is reported as the gRPC status NOT_FOUND.
+  rpc GetDataExtractionStatistics(GetDataExtractionStatisticsRequest) returns (GetDataExtractionStatisticsResponse) {}
+}
+
+// Progress of one data extractor: the batch job that copies records from your instance for offline processing, such
+// as settlement.
+message DataExtraction {
+  // The extractor's name.
+  string extractor_name = 1 [(validate.rules).string.min_len = 1];
+
+  // The extractor's watermark: the point in time up to which it has extracted records.
+  google.protobuf.Timestamp watermark_time = 2 [(validate.rules).timestamp.required = true];
+
+  // When the extractor last ran.
+  google.protobuf.Timestamp last_execution_time = 3;
+
+  // The total number of records the extractor has processed across all its runs.
+  uint32 records_processed = 4;
+}
+
+message GetDataExtractionStatisticsRequest {
+  // The name of the extractor. Required.
+  string extractor_name = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetDataExtractionStatisticsResponse {
+  // The outcome of GetDataExtractionStatistics. In practice a call that does not succeed fails with a gRPC status
+  // code (NOT_FOUND or INTERNAL) instead of returning STATUS_NOT_FOUND or STATUS_ERROR.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The statistics are in extraction.
+    STATUS_SUCCESS = 1;
+    // No extractor has this name.
+    STATUS_NOT_FOUND = 2;
+    // The statistics could not be retrieved.
+    STATUS_ERROR = 3;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The extractor's statistics. Present when status is STATUS_SUCCESS.
+  DataExtraction extraction = 3;
+}
+
+// Takes no search criteria yet: every extractor is returned.
+message SearchDataExtractionStatisticsRequest {
+  // Nothing for now; we will add criteria as we add console use-cases.
+}
+
+message SearchDataExtractionStatisticsResponse {
+  // The outcome of SearchDataExtractionStatistics. In practice a call that does not succeed fails with the gRPC
+  // status INTERNAL instead of returning STATUS_ERROR.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The statistics are in extractions.
+    STATUS_SUCCESS = 1;
+    // The statistics could not be retrieved.
+    STATUS_ERROR = 2;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+  // The statistics of every extractor.
+  repeated DataExtraction extractions = 3;
+}

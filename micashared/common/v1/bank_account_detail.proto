@@ -15,33 +15,40 @@ option java_outer_classname = "BankAccountDetailProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// A US bank account identified by its ABA routing number.
 message ABAAccountNumber {
   // The name of the bank.
   string name = 1;
 
-  // The 9 digit ABA routing number.
+  // The 9-digit ABA routing transit number.
   string routing_number = 2;
 
-  // The account number.
+  // The account number at that bank.
   string account_number = 3;
 }
 
+// A bank account used for settlement.
 message BankAccountDetail {
   reserved 6;
 
-  // The bank at which this account is held at
+  // The bank at which this account is held.
   string bank = 8;
 
-  // The account reference for this account
+  // Identifier of the account at `bank`. Mica stores it encrypted.
   string account_ref = 7;
 }
 
+// A stored ABA account record.
 message ABAAccountEntry {
+  // Mica-assigned key of this record.
   string key = 1;
 
+  // Version of this record, incremented on every change.
   int64 version = 2;
 
+  // Whether this account may currently be used.
   bool enabled = 3;
 
+  // The account itself.
   ABAAccountNumber account_detail = 4;
 }

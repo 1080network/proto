@@ -15,10 +15,14 @@ option java_outer_classname = "MemberTypeEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// The role a member plays on the network.
 enum MemberType {
+  // Not set.
   MEMBER_TYPE_UNSPECIFIED = 0;
 
+  // An Acceptor: accepts payments, for example a merchant.
   MEMBER_TYPE_PARTNER = 1;
 
+  // An Issuer: holds the user's instrument and approves payments from it, for example a bank.
   MEMBER_TYPE_SERVICE_PROVIDER = 2;
 }

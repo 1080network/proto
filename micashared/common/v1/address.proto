@@ -10,8 +10,6 @@ syntax = "proto3";
 
 package micashared.common.v1;
 
-import "micashared/common/enums/country/v1/country.proto";
-import "micashared/common/enums/region/v1/region.proto";
 import "validate/validate.proto";
 
 option go_package = "micashared/common/v1;commonv1";
@@ -19,21 +17,27 @@ option java_outer_classname = "AddressProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// A postal address.
 message Address {
+  reserved 3, 5;
+
+  // Street address lines, most significant first (for example "123 Main St", then "Suite 400"). Mica stores only the
+  // first two lines; any further lines are dropped.
   repeated string street_lines = 1;
 
-  // typically city
+  // City, town or similar locality.
   string locality = 2;
 
-  // this would be state in the US (ISO 3166-2:US), prefecture in Japan (ISO 3166-2:JP) or
-  // territory in Australia (ISO 3166-2:AU)
-  micashared.common.enums.region.v1.Region region = 3 [deprecated = true];
+  // The subdivision part of the ISO 3166-2 code, without the country prefix: 1 to 3 characters. This is the state in
+  // the US (ISO 3166-2:US), the prefecture in Japan (ISO 3166-2:JP) or the state or territory in Australia
+  // (ISO 3166-2:AU). For example, the US state of Virginia is "US-VA", so `region_code` is "VA" and `country_code` is
+  // "US"; the Japanese prefecture of Kanagawa is "JP-14", so `region_code` is "14" and `country_code` is "JP".
   string region_code = 6 [(validate.rules).string = {max_len: 3}];
 
-  // postal code, in the US this would be zip code
+  // Postal code; in the US, the ZIP code.
   string postal_code = 4;
 
-  // https://en.wikipedia.org/wiki/ISO_3166-2
-  micashared.common.enums.country.v1.Country country = 5 [deprecated = true];
+  // ISO 3166-1 alpha-2 country code, 2 characters. For example "US" for the United States, "JP" for Japan, "AU" for
+  // Australia.
   string country_code = 7 [(validate.rules).string.max_len = 2];
 }

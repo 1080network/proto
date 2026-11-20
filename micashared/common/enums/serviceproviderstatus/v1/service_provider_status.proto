@@ -15,10 +15,14 @@ option java_outer_classname = "ServiceProviderStatusEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// Lifecycle state of an Issuer.
 enum ServiceProviderStatus {
+  // Not set.
   SERVICE_PROVIDER_STATUS_UNSPECIFIED = 0;
 
+  // The Issuer is active.
   SERVICE_PROVIDER_STATUS_ACTIVE = 1;
 
+  // The Issuer is not active.
   SERVICE_PROVIDER_STATUS_INACTIVE = 2;
 }

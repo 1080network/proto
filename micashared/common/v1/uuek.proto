@@ -15,9 +15,10 @@ option java_outer_classname = "UUEKProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
-// This message holds immutable details about the instruments that back UUEKs. These attributes can be used to have
-// stable references or knowledge of the underlying instrument that was used to transact.
+// Details about the instrument behind a UUEK that do not change between transactions. A UUEK changes, but these
+// values stay the same, so they can be used to recognise the same underlying instrument across transactions.
 message ImmutableInstrumentDetails {
-  // non operable fix identifier guaranteed to be consistent across transactions
+  // Stable identifier of the instrument: 64 lowercase hexadecimal characters, the same for every transaction made
+  // with that instrument. It cannot be used to make a payment.
   string identifier = 1;
 }

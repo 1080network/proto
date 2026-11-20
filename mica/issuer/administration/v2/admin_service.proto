@@ -1,0 +1,337 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.issuer.administration.v2;
+
+import "google/protobuf/timestamp.proto";
+import "micashared/common/v1/data_extraction.proto";
+import "micashared/common/v1/error.proto";
+import "micashared/common/v1/external_client.proto";
+import "micashared/common/v1/mtls_certificate.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/issuer/administrationv2";
+option java_outer_classname = "AdministrationServiceProto";
+option java_package = "io.mica.issuer.administration.v2";
+option objc_class_prefix = "MICA";
+
+// Administration of an Issuer's Mica instance: the client certificates and callback address Mica uses to call the
+// Issuer's IssuerFromMicaService, connectivity tests, and data extraction statistics.
+//
+// To set up the connection from Mica to the Issuer: call GenerateFromMicaClientCertificate to have Mica create a key
+// pair and certificate signing request (CSR), sign the CSR with a CA the Issuer's server trusts, upload the signed
+// certificate with UpdateFromMicaClientCertificate, set the callback address with
+// UpdateFromMicaClientCallbackAddress, then call EnableFromMicaClientCertificate.
+service IssuerAdministrationService {
+  // Creates a new client key pair and certificate signing request (CSR) that Mica will use to authenticate when it
+  // calls the Issuer. The private key stays with Mica; the response carries the CSR for the Issuer to sign.
+  rpc GenerateFromMicaClientCertificate(GenerateFromMicaClientCertificateRequest) returns (GenerateFromMicaClientCertificateResponse) {}
+  // Uploads the certificate the Issuer signed from the CSR, together with the root CA bundle Mica should trust for the
+  // Issuer's server. Can also update the display name.
+  rpc UpdateFromMicaClientCertificate(UpdateFromMicaClientCertificateRequest) returns (UpdateFromMicaClientCertificateResponse) {}
+  // Makes a certificate the one Mica uses to call the Issuer. Mica first pings the Issuer with it and fails the call if
+  // the ping fails. Only one certificate is enabled at a time, so enabling one disables the previous one.
+  rpc EnableFromMicaClientCertificate(EnableFromMicaClientCertificateRequest) returns (EnableFromMicaClientCertificateResponse) {}
+  // Returns all client certificates Mica holds for calling the Issuer.
+  rpc SearchFromMicaClientCertificate(SearchFromMicaClientCertificateRequest) returns (SearchFromMicaClientCertificateResponse) {}
+  // Returns the settings Mica uses to call the Issuer: the callback address and how Mica authenticates.
+  rpc GetFromMicaClientSettings(GetFromMicaClientSettingsRequest) returns (GetFromMicaClientSettingsResponse) {}
+
+  // Sets the address at which Mica calls the Issuer's IssuerFromMicaService.
+  rpc UpdateFromMicaClientCallbackAddress(UpdateFromMicaClientCallbackAddressRequest) returns (UpdateFromMicaClientCallbackAddressResponse) {}
+
+  // Returns statistics for every data extraction job on the Issuer's instance.
+  rpc SearchDataExtractionStatistics(SearchDataExtractionStatisticsRequest) returns (SearchDataExtractionStatisticsResponse) {}
+
+  // Returns statistics for one data extraction job, by name.
+  rpc GetDataExtractionStatistics(GetDataExtractionStatisticsRequest) returns (GetDataExtractionStatisticsResponse) {}
+  // Tests that Mica can reach the Issuer: Mica calls the Issuer's Ping operation with the currently enabled
+  // certificate. The call fails with a gRPC error if the ping fails.
+  rpc PingExternal(PingExternalRequest) returns (PingExternalResponse) {}
+
+  // Tests that Mica can reach the Issuer using a specific certificate, whether or not it is enabled. Use it to check a
+  // new certificate before enabling it. The call fails with a gRPC error if the ping fails.
+  rpc PingExternalWithCertificate(PingExternalWithCertificateRequest) returns (PingExternalWithCertificateResponse) {}
+}
+
+// Request for PingExternal. It has no fields.
+message PingExternalRequest {}
+
+// Response for PingExternal. It has no fields; a response without an error means the ping succeeded.
+message PingExternalResponse {}
+
+message PingExternalWithCertificateRequest {
+  // The certificate to test, as FromMicaClientCertificate.certificate_id.
+  string certificate_id = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+}
+
+message PingExternalWithCertificateResponse {
+  // The certificate that was tested.
+  string certificate_id = 1;
+}
+
+message UpdateFromMicaClientCallbackAddressRequest {
+  // The current version of the settings, as returned in ExternalClientSettings.version. The update fails if the
+  // settings have changed since.
+  int64 version = 1 [(validate.rules).int64.gte = 0];
+  // The address at which Mica calls the Issuer, in the form `<hostname>:<port>` with a 3-6 digit port, for example
+  // `mycallbackservice.somecompany.io:443`.
+  string callback_address = 2 [(validate.rules).string.pattern = "^[^/]+:\\d{3,6}$"];
+}
+
+message UpdateFromMicaClientCallbackAddressResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The callback address was updated.
+    STATUS_SUCCESS = 1;
+    // The update failed, for example because `version` was stale; see `error`.
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The new version of the settings.
+  int64 version = 3 [(validate.rules).int64.gte = 0];
+}
+
+
+// Request for GetFromMicaClientSettings. It has no fields.
+message GetFromMicaClientSettingsRequest {}
+
+message GetFromMicaClientSettingsResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The settings are returned in `settings`.
+    STATUS_SUCCESS = 1;
+    // The request failed; see `error`.
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The callback address and authentication settings Mica uses to call the Issuer.
+  micashared.common.v1.ExternalClientSettings settings = 3;
+}
+
+
+// Request to change how Mica authenticates when it calls the Issuer. Not currently used by any operation in this
+// service.
+message UpdateFromMicaClientAuthenticationTypeRequest {
+  // The current version of the settings.
+  int64 version = 1 [(validate.rules).int64.gte = 0];
+  // The authentication type to use. Must not be CLIENT_AUTHENTICATION_TYPE_UNSPECIFIED.
+  ClientAuthenticationType authentication_type = 3 [(validate.rules).enum = {
+    not_in: [0]
+  }];
+}
+
+// Response to UpdateFromMicaClientAuthenticationTypeRequest. Not currently used by any operation in this service.
+message UpdateFromMicaClientAuthenticationTypeResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The authentication type was updated.
+    STATUS_SUCCESS = 1;
+    // The update failed; see `error`.
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The new version of the settings.
+  int64 version = 3 [(validate.rules).int64.gte = 0];
+}
+
+// How Mica authenticates when it calls the Issuer.
+enum ClientAuthenticationType {
+  CLIENT_AUTHENTICATION_TYPE_UNSPECIFIED = 0;
+  // Mutual TLS with a client certificate managed through this service.
+  CLIENT_AUTHENTICATION_TYPE_CLIENT_CERTIFICATE = 1;
+  // An API token.
+  CLIENT_AUTHENTICATION_TYPE_API_TOKEN = 2;
+}
+
+// The settings Mica uses to call the Issuer. GetFromMicaClientSettings returns the shared
+// micashared.common.v1.ExternalClientSettings instead; this message is not currently used by any operation in this
+// service.
+message ExternalClientSettings {
+  // Record version, used for optimistic locking.
+  int64 version = 1 [(validate.rules).int64.gte = 0];
+
+  // When the settings were created.
+  google.protobuf.Timestamp created = 2;
+
+  // When the settings were last updated.
+  google.protobuf.Timestamp updated = 3;
+
+  // The address at which Mica calls the Issuer, as `<hostname>:<port>`.
+  string callback_address = 4 [(validate.rules).string = {
+    min_len: 3,
+    max_len: 200
+  }];
+
+  // How Mica authenticates when it calls the Issuer.
+  ClientAuthenticationSettings client_authentication_settings = 5;
+}
+
+// Which authentication types are supported and which one is in use.
+message ClientAuthenticationSettings {
+  // The authentication types the Issuer's instance supports.
+  repeated ClientAuthenticationType suported_client_authentication_types = 1;
+  // The authentication type currently in use.
+  ClientAuthenticationType current_authentication_type = 2;
+}
+
+// Request to create a new client key pair and CSR for Mica to use when calling the Issuer.
+message GenerateFromMicaClientCertificateRequest {
+  // A name to identify the certificate by.
+  string display_name = 1;
+}
+
+message GenerateFromMicaClientCertificateResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The key pair and CSR were created.
+    STATUS_SUCCESS = 1;
+    // The request failed; see `error`.
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The new certificate record. Its `certificate_id` identifies it in later calls, and `base64_csr_pem` holds the CSR
+  // to sign.
+  micashared.common.v1.FromMicaClientCertificate certificate_to_sign = 3;
+}
+
+message UpdateFromMicaClientCertificateRequest {
+  // The certificate to update, as returned by GenerateFromMicaClientCertificate.
+  string certificate_id = 1;
+  // A new display name for the certificate.
+  string display_name = 2;
+  // The certificate signed from the CSR, as a PEM string encoded with standard base64.
+  string base64_signed_cert_pem_from_csr = 3;
+  // The root CA bundle Mica should trust for the Issuer's server, as a PEM string encoded with standard base64.
+  string base64_rootca_pem = 4;
+
+}
+
+message UpdateFromMicaClientCertificateResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The certificate was updated.
+    STATUS_SUCCESS = 1;
+    // The request failed; see `error`.
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+  // The updated certificate record.
+  micashared.common.v1.FromMicaClientCertificate certificate = 3;
+}
+
+message EnableFromMicaClientCertificateRequest {
+  // The certificate to enable. It must already have a signed certificate uploaded.
+  string certificate_id = 1 ;
+}
+
+message EnableFromMicaClientCertificateResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The certificate is now enabled.
+    STATUS_SUCCESS = 1;
+    // The request failed; see `error`.
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+  // The enabled certificate record.
+  micashared.common.v1.FromMicaClientCertificate certificate = 3;
+}
+
+
+// Request for SearchFromMicaClientCertificate. It has no fields.
+message SearchFromMicaClientCertificateRequest {}
+
+message SearchFromMicaClientCertificateResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The certificates are returned in `certificates`.
+    STATUS_SUCCESS = 1;
+    // The request failed; see `error`.
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+  // All client certificates Mica holds for calling the Issuer.
+  repeated micashared.common.v1.FromMicaClientCertificate certificates = 3;
+}
+
+message GetDataExtractionStatisticsRequest {
+  // The name of the extraction job, as returned in DataExtraction.extractor_name (for example
+  // "TransactionExtractor").
+  string extractor_name = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetDataExtractionStatisticsResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The statistics are returned in `extraction`.
+    STATUS_SUCCESS = 1;
+    // No extraction job has that name.
+    STATUS_NOT_FOUND = 2;
+    // The request failed; see `error`.
+    STATUS_ERROR = 3;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // Statistics for the extraction job.
+  micashared.common.v1.DataExtraction extraction = 3;
+}
+
+// Request for SearchDataExtractionStatistics. It has no fields yet; it returns every extraction job.
+message SearchDataExtractionStatisticsRequest {
+  // No search criteria yet.
+}
+
+message SearchDataExtractionStatisticsResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The statistics are returned in `extractions`.
+    STATUS_SUCCESS = 1;
+    // The request failed; see `error`.
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+  // Statistics for every extraction job.
+  repeated micashared.common.v1.DataExtraction extractions = 3;
+}

@@ -20,108 +20,139 @@ option java_outer_classname = "LineItemProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// One item in a basket: a product that was bought or returned. Amounts are decimal strings in the currency of the
+// transaction, for example "12.34", with no currency symbol or thousands separator.
 message LineItem {
-  // unique number in a list of items that can be used to refer to a specific item
+  // Number that identifies this item within the list, unique within that list. Other messages refer to the item by
+  // this number (see `LineItemSequenceAndStatus`).
   int32 sequence = 1;
 
-  // a header label that is shown on a receipt to group line items
+  // Heading shown on a receipt to group related line items.
   string line_item_group = 2;
 
+  // Product identifier, such as a UPC, EAN, PLU or SKU.
   string product_code = 3;
 
+  // Product description, as shown on a receipt.
   string description = 4;
 
-  // an integer or decimal number
+  // Number of units, as an integer or decimal string, for example "2" or "1.25". What a unit is is given by `unit`.
   string quantity = 5;
 
+  // Unit that `quantity` is measured in.
   micashared.common.enums.unit.v1.Unit unit = 6;
 
+  // Price of one unit, excluding tax, as a decimal string.
   string unit_amount = 7;
 
+  // Tax on one unit, as a decimal string.
   string unit_tax_amount = 8;
 
-  // The total amount for this line item excluding tax.
-  // Amount expressed as: ([0-9]*[.])?[0-9]+
+  // Total amount for this line item, excluding tax, as a decimal string matching ([0-9]*[.])?[0-9]+.
   string line_amount = 9;
 
-  // The amount of tax for this line item.
-  // Amount expressed as: ([0-9]*[.])?[0-9]+
+  // Total tax for this line item, as a decimal string matching ([0-9]*[.])?[0-9]+.
   string line_tax_amount = 10;
 }
 
+// Kind of adjustment applied to a basket.
 enum AdjustmentType {
   ADJUSTMENT_TYPE_UNSPECIFIED = 0;
 
+  // A discount funded by the product's manufacturer, such as a manufacturer coupon.
   ADJUSTMENT_TYPE_MANUFACTURER_DISCOUNT = 1;
 
+  // A discount funded by the store.
   ADJUSTMENT_TYPE_STORE_DISCOUNT = 2;
 
+  // A returned item.
   ADJUSTMENT_TYPE_RETURN = 3;
 
+  // Part of the basket paid in cash.
   ADJUSTMENT_TYPE_PAYMENT_CASH = 4;
 
+  // Part of the basket paid with a gift card.
   ADJUSTMENT_TYPE_PAYMENT_GIFT_CARD = 5;
 
+  // Part of the basket paid by another method.
   ADJUSTMENT_TYPE_PAYMENT_OTHER = 6;
 }
 
+// A list of line items.
 message LineItemWrapper {
   repeated LineItem line_items = 1;
 }
 
+// Something that changes what is owed for a basket without being a product, such as a discount, a return or a
+// payment made by another tender. Amounts are decimal strings in the currency of the transaction.
 message Adjustment {
-  // unique number in a list of items that can be used to refer to a specific item
+  // Number that identifies this adjustment within the list, unique within that list.
   int32 sequence = 1;
 
+  // Kind of adjustment.
   AdjustmentType adjustment_type = 2;
 
+  // Product the adjustment relates to, if any, such as the product a coupon applies to.
   string product_code = 3;
 
+  // Description of the adjustment, as shown on a receipt.
   string description = 4;
 
-  // an integer or decimal number
+  // Number of units, as an integer or decimal string.
   string quantity = 5;
 
+  // Unit that `quantity` is measured in.
   micashared.common.enums.unit.v1.Unit unit = 6;
 
+  // Amount per unit, excluding tax, as a decimal string.
   string unit_amount = 7;
 
+  // Tax per unit, as a decimal string.
   string unit_tax_amount = 8;
 
-  // The total amount for this line item excluding tax.
-  // Amount expressed as: ([0-9]*[.])?[0-9]+
+  // Total amount of this adjustment, excluding tax, as a decimal string matching ([0-9]*[.])?[0-9]+.
   string line_amount = 9;
 
-  // The amount of tax for this line item.
-  // Amount expressed as: ([0-9]*[.])?[0-9]+
+  // Total tax of this adjustment, as a decimal string matching ([0-9]*[.])?[0-9]+.
   string line_tax_amount = 10;
 }
 
+// The status of one line item, identified by its sequence number.
 message LineItemSequenceAndStatus {
-  // unique number in a list of items that can be used to refer to a specific item
+  // `sequence` of the line item this status is for.
   int32 sequence = 1;
 
+  // Status of that line item.
   micashared.common.enums.lineitemstatus.v1.LineItemStatus status = 2;
 }
 
+// A list of line item statuses.
 message LineItemSequenceAndStatusValue {
   repeated LineItemSequenceAndStatus line_item_sequence_and_statuses = 1;
 }
 
+// A line item together with its status.
 message LineItemAndStatus {
+  // The line item.
   LineItem line_item = 1;
 
+  // Status of the line item.
   micashared.common.enums.lineitemstatus.v1.LineItemStatus status = 2;
 }
 
+// A list of line items with their statuses.
 message LineItemResponseValue {
   repeated LineItemAndStatus line_item_and_statuses = 1;
 }
 
 
+// A charge added on top of the basket, such as an ATM fee or a tip.
 message Surcharge{
+  // Description of the charge, as shown on a receipt.
   string description = 1;
 
+  // Amount of the charge as a decimal string of 1 to 50 characters matching ^([0-9]*[.])?[0-9]+$, for example
+  // "2.50".
   string amount = 2 [(validate.rules).string = {
     min_len: 1,
     max_len: 50,

@@ -15,9 +15,12 @@ option java_outer_classname = "UnitEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// Unit of measure for a quantity.
 enum Unit {
+  // Not set.
   UNIT_UNSPECIFIED = 0;
 
+  // A countable item: the quantity is a number of items.
   UNIT_ITEM = 1;
 
   // weight

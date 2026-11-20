@@ -1,0 +1,132 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.acceptor.service.v2;
+
+import "mica/acceptor/instrument/v2/instrument.proto";
+import "micashared/common/v1/instrument.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/acceptor/servicev2";
+option java_outer_classname = "AcceptorToMicaLinkServiceProto";
+option java_package = "io.mica.acceptor.service.v2";
+option objc_class_prefix = "MICA";
+
+// The service an Acceptor calls to manage links to a user's payment profile: complete a link from a linking code,
+// provision UUEKs from it, look it up and remove it. Payments made with those UUEKs are in AcceptorToMicaValueService.
+//
+// A request that breaks a validation rule on its fields is rejected with INVALID_ARGUMENT before it is processed, and
+// a caller not permitted to use an operation gets PERMISSION_DENIED. CompleteLinkingWithCode and
+// ProvisionUUEKFromLink report every other failure as a gRPC status code; GetLink and RemoveInstrumentLink report
+// their outcome in the response.
+service AcceptorToMicaLinkService {
+  // Completes a link to a user's payment profile using the linking code the user gave you, and returns a link_key you
+  // can keep and use with ProvisionUUEKFromLink to pay with that profile later. Set create_uuek to also receive a UUEK
+  // for an immediate payment.
+  //
+  // Failures are reported as gRPC status codes:
+  //   NOT_FOUND           - the linking code is unknown or has already been used
+  //   FAILED_PRECONDITION - the organization or acceptor was not found, or the organization is not active
+  //   INVALID_ARGUMENT    - the organization key is malformed
+  //   PERMISSION_DENIED   - the caller may not complete links
+  rpc CompleteLinkingWithCode(CompleteLinkingWithCodeRequest) returns (CompleteLinkingWithCodeResponse);
+
+  // Provisions a new UUEK from a link_key returned by CompleteLinkingWithCode. Pass the UUEK to ObtainValue on
+  // AcceptorToMicaValueService to pay with the linked payment profile.
+  //
+  // Failures are reported as gRPC status codes:
+  //   NOT_FOUND         - no link exists for this link_key (for example it was removed with RemoveInstrumentLink)
+  //   INVALID_ARGUMENT  - the link_key is malformed
+  //   PERMISSION_DENIED - the caller may not provision UUEKs
+  //   INTERNAL          - the UUEK could not be provisioned
+  rpc ProvisionUUEKFromLink(ProvisionUUEKFromLinkRequest) returns (ProvisionUUEKFromLinkResponse) {}
+
+  // Retrieves a link by the link_key returned when it was completed.
+  rpc GetLink(instrument.v2.GetLinkRequest) returns (instrument.v2.GetLinkResponse) {}
+
+  // Removes a link so it can no longer be used to provision UUEKs. Mica deletes the link and, where it can, notifies
+  // the other side of the link.
+  rpc RemoveInstrumentLink(instrument.v2.RemoveInstrumentLinkRequest) returns (instrument.v2.RemoveInstrumentLinkResponse) {}
+}
+
+message CompleteLinkingWithCodeRequest {
+  // The linking code the user gave you.
+  string linking_code = 1;
+
+  // The organization the link is created for. The organization must exist and be active.
+  oneof organization_identifier {
+    // Mica's key for the organization, as returned by CreateOrganization. At most 50 characters.
+    string organization_key = 2 [(validate.rules).string = {max_len: 50}];
+    // Your own reference for the organization (its organization_ref). At most 100 characters.
+    string organization_ref = 3 [(validate.rules).string = {max_len: 100}];
+  }
+
+  // Set to true to also receive a UUEK in the response, so you can take a payment straight away without calling
+  // ProvisionUUEKFromLink.
+  bool create_uuek = 4;
+}
+
+message CompleteLinkingWithCodeResponse {
+  // Whether the link can be used only once. Links completed with this service are always reusable, so this is
+  // currently always false.
+  bool is_one_time_use = 1;
+
+  // Mica's key for the new link. Keep it to provision UUEKs with ProvisionUUEKFromLink, or to look up or remove the
+  // link with GetLink and RemoveInstrumentLink.
+  string link_key = 2;
+
+  // A UUEK for an immediate payment with ObtainValue. Present only when create_uuek was set in the request.
+  string uuek = 3;
+
+  // The name of the user's payment profile that was linked, suitable for display to the user.
+  string link_name = 4;
+
+  // Information about the user that the Issuer shares with you through this link, such as their name and contact
+  // details. Absent when the Issuer shares nothing.
+  micashared.common.v1.InstrumentLinkClaims claims = 5;
+}
+
+message ProvisionUUEKFromLinkRequest {
+  // The link_key returned by CompleteLinkingWithCode. 27 to 50 characters.
+  string link_key = 1 [(validate.rules).string = {
+    min_len: 27,
+    max_len: 50
+  }];
+
+  // The action the Acceptor intends to take with this UUEK. Set create_recurring_payment for a UUEK to pass to
+  // CreateRecurringPayment on AcceptorToMicaWIPService; with any other intent, or none, the UUEK is for ObtainValue.
+  oneof intent {
+    // Provision a UUEK to obtain value from this link.
+    ObtainValueIntent obtain_value = 2;
+
+    // Provision a UUEK to return value to this link.
+    ReturnValueIntent return_value = 3;
+
+    // Provision a UUEK to hold value against this link.
+    HoldValueIntent hold_value = 4;
+
+    // Provision a UUEK to authorize the creation of a recurring payment.
+    CreateRecurringPaymentIntent create_recurring_payment = 5;
+  }
+
+  // Selects the obtain-value intent. Has no fields.
+  message ObtainValueIntent {}
+  // Selects the return-value intent. Has no fields.
+  message ReturnValueIntent {}
+  // Selects the hold-value intent. Has no fields.
+  message HoldValueIntent {}
+  // Selects the create-recurring-payment intent. Has no fields.
+  message CreateRecurringPaymentIntent {}
+}
+
+message ProvisionUUEKFromLinkResponse {
+  // A new UUEK for the linked payment profile. Pass it to ObtainValue on AcceptorToMicaValueService.
+  string uuek = 1;
+}

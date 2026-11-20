@@ -1,0 +1,96 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.issuer.service.v2;
+
+import "mica/issuer/instrument/v2/instrument.proto";
+import "mica/issuer/issuer/v2/issuer.proto";
+import "mica/issuer/user/v2/user.proto";
+import "mica/issuer/uuek/v2/uuek.proto";
+import "mica/issuer/value/v2/value.proto";
+
+option go_package = "mica/issuer/servicev2";
+option java_outer_classname = "IssuerToMicaServiceProto";
+option java_package = "io.mica.issuer.service.v2";
+option objc_class_prefix = "MICA";
+
+// Operations the Issuer calls on Mica, authenticated with the Issuer's mTLS client certificate.
+//
+// Before Mica can route payments to the Issuer, the Issuer registers each user with RegisterUser and each of that
+// user's instruments (accounts) with RegisterInstrument. Mica returns its own key for every record it creates
+// (`issuer_user_key`, `issuer_instrument_key`); most operations accept either that key or the Issuer's own reference
+// (`issuer_user_ref`, `issuer_instrument_ref`). The Issuer then provisions UUEKs for an instrument with
+// ProvisionIssuerUUEK and hands them to its users to pay at Acceptors.
+//
+// The instrument link operations let a user connect one of their instruments to another member (for example, to save
+// a payment method at a merchant).
+service IssuerToMicaService {
+  // Returns the Issuer's own member record at Mica.
+  rpc GetIssuer(issuer.v2.GetIssuerRequest) returns (issuer.v2.GetIssuerResponse) {}
+
+  // Registers one of the Issuer's users with Mica and returns Mica's key for the user. This registers the user only;
+  // register each of the user's instruments separately with RegisterInstrument. Returns STATUS_DUPLICATE if
+  // `issuer_user_ref` is already registered.
+  rpc RegisterUser(user.v2.RegisterUserRequest) returns (user.v2.RegisterUserResponse) {}
+
+  // Returns a registered user, looked up by Mica's user key or the Issuer's user reference.
+  rpc GetUser(user.v2.GetUserRequest) returns (user.v2.GetUserResponse) {}
+
+  // Updates the demographic data Mica holds for a user. Pass the `version` last returned for the user; a stale version
+  // returns STATUS_VERSION_MISMATCH.
+  rpc UpdateUser(user.v2.UpdateUserRequest) returns (user.v2.UpdateUserResponse) {}
+
+  // Removes a user from Mica, typically when the user ends their relationship with the Issuer (for example, closes
+  // their account). Once removed, the user's `issuer_user_ref` can be registered again.
+  rpc RemoveUser(user.v2.RemoveUserRequest) returns (user.v2.RemoveUserResponse) {}
+
+  // Registers one of a user's instruments (accounts) with Mica and returns Mica's key for the instrument. The user must
+  // already be registered. Returns STATUS_DUPLICATE if the user already has an instrument with this
+  // `issuer_instrument_ref`.
+  rpc RegisterInstrument(instrument.v2.RegisterInstrumentRequest) returns (instrument.v2.RegisterInstrumentResponse) {}
+
+  // Returns a registered instrument, looked up by Mica's instrument key or by the Issuer's user and instrument
+  // references.
+  rpc GetInstrument(instrument.v2.GetInstrumentRequest) returns (instrument.v2.GetInstrumentResponse) {}
+
+  // Removes an instrument from Mica. Once removed, its `issuer_instrument_ref` can be registered again.
+  rpc RemoveInstrument(instrument.v2.RemoveInstrumentRequest) returns (instrument.v2.RemoveInstrumentResponse) {}
+
+  // Returns all instruments registered for a user.
+  rpc SearchInstrument(instrument.v2.SearchInstrumentRequest) returns (instrument.v2.SearchInstrumentResponse) {}
+
+  // Creates a UUEK for one of the Issuer's instruments. The Issuer gives the UUEK to its user, who presents it to an
+  // Acceptor to pay from that instrument. The request controls how long, how often and for how much the UUEK can be
+  // used.
+  rpc ProvisionIssuerUUEK(uuek.v2.ProvisionIssuerUUEKRequest) returns (uuek.v2.ProvisionIssuerUUEKResponse) {}
+
+  // Starts linking one of a user's instruments to another member by returning a linking code. The user enters the code
+  // at the other member (for example, a merchant) to save the instrument as a persistent payment method there.
+  rpc ProvisionInstrumentLinkingCode(instrument.v2.ProvisionInstrumentLinkingCodeRequest) returns (instrument.v2.ProvisionInstrumentLinkingCodeResponse) {}
+
+  // Completes a link that another member started: the user brings a linking code from the other member, and the
+  // Issuer submits it here together with the user and instrument the link should attach to.
+  rpc CompleteLinkingWithCode(instrument.v2.CompleteLinkingWithCodeRequest) returns (instrument.v2.CompleteLinkingWithCodeResponse) {}
+
+  // Returns one instrument link by its `link_key`.
+  rpc GetInstrumentLink(instrument.v2.GetInstrumentLinkRequest) returns (instrument.v2.GetInstrumentLinkResponse) {}
+
+  // Returns the established instrument links for a user, an instrument, or both.
+  rpc SearchInstrumentLinks(instrument.v2.SearchInstrumentLinksRequest) returns (instrument.v2.SearchInstrumentLinksResponse) {}
+
+  // Removes an instrument link. Mica also notifies the member on the other side of the link so it is removed there.
+  rpc RemoveInstrumentLink(instrument.v2.RemoveInstrumentLinkRequest)returns (instrument.v2.RemoveInstrumentLinkResponse) {}
+
+  // Returns the records of a past transaction by Mica's global transaction id or the Issuer's transaction reference.
+  // Intended for pre-production testing: Mica purges transactions from its operational store shortly after they
+  // complete, and this call only reads that store. `oldest_transaction_time` in the response says how far back data is
+  // still available.
+  rpc GetValue(value.v2.GetValueRequest) returns (value.v2.GetValueResponse) {}
+}

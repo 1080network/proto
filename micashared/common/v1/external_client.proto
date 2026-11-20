@@ -18,28 +18,44 @@ option java_outer_classname = "ExternalClientProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// How Mica authenticates itself when it calls a member's endpoint ("from Mica" calls).
 enum ClientAuthenticationType {
+  // No outbound authentication has been configured yet.
   CLIENT_AUTHENTICATION_TYPE_UNSPECIFIED = 0;
+  // Mica presents a client certificate (mutual TLS). See `FromMicaClientCertificate`.
   CLIENT_AUTHENTICATION_TYPE_CLIENT_CERTIFICATE = 1;
+  // Mica sends an API token in a request header over TLS. See `ApiTokenConfiguration`.
   CLIENT_AUTHENTICATION_TYPE_API_TOKEN = 2;
 }
 
+// How Mica connects to a member's endpoint when it calls the member.
 message ExternalClientSettings {
+  // Version of these settings, incremented on every change. Send it back when updating the callback address; the
+  // update is rejected if the settings changed in the meantime.
   int64 version = 1 [(validate.rules).int64.gte = 0];
 
+  // When these settings were created.
   google.protobuf.Timestamp created = 2;
 
+  // When these settings were last changed.
   google.protobuf.Timestamp updated = 3;
 
+  // gRPC target Mica dials to reach the member, normally <hostname>:<port>, for example "callbacks.example.com:443".
+  // 3 to 200 characters. Empty until configured; Mica cannot call the member while it is empty.
   string callback_address = 4 [(validate.rules).string = {
     min_len: 3,
     max_len: 200
   }];
 
+  // Which authentication methods are available and which one Mica currently uses.
   ClientAuthenticationSettings client_authentication_settings = 5;
 }
 
+// Authentication methods for Mica's calls to a member.
 message ClientAuthenticationSettings {
+  // Methods the member can choose between.
   repeated ClientAuthenticationType suported_client_authentication_types = 1;
+  // Method Mica uses now. It changes to CLIENT_AUTHENTICATION_TYPE_CLIENT_CERTIFICATE when a client certificate is
+  // generated and to CLIENT_AUTHENTICATION_TYPE_API_TOKEN when an API token configuration is created.
   ClientAuthenticationType current_authentication_type = 2;
 }

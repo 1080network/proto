@@ -10,126 +10,216 @@ syntax = "proto3";
 
 package mica.partner.service.v1;
 
-import "google/protobuf/timestamp.proto";
-import "mica/partner/account/v1/account.proto";
-import "mica/partner/instrument/v1/instrument.proto";
-import "mica/partner/organization/v1/organization.proto";
-import "mica/partner/partner/v1/partner.proto";
-import "mica/partner/store/v1/store.proto";
-import "mica/partner/value/v1/value.proto";
+import "mica/common/v1/currency.proto";
+import "micashared/common/enums/approvaltype/v1/approval_type.proto";
+import "micashared/common/v1/discount.proto";
+import "micashared/common/v1/error.proto";
+import "micashared/common/v1/line_item.proto";
+import "micashared/common/v1/risk_signals.proto";
+import "micashared/common/v1/transaction.proto";
+import "micashared/common/v1/uuek.proto";
+import "validate/validate.proto";
 
 option go_package = "mica/partner/servicev1";
 option java_outer_classname = "PartnerToMicaServiceProto";
 option java_package = "io.mica.partner.service.v1";
 option objc_class_prefix = "MICA";
 
+// What is left of the v1 service an Acceptor called to manage its own details, its organizations and its links, and to
+// take payments: ObtainValue, kept for an Acceptor that still calls it. Everything else is gone. The v2 replacements
+// are AcceptorToMicaService, AcceptorToMicaLinkService for linking and AcceptorToMicaValueService for payments, all in
+// mica.acceptor.service.v2.
+//
+// A request that breaks a validation rule, carries a malformed key or omits a required identifier is rejected with the
+// gRPC status INVALID_ARGUMENT; a caller not permitted to use the operation gets PERMISSION_DENIED, and an unexpected
+// server failure INTERNAL.
 service PartnerToMicaService {
-  // Retrieves the details of the Partner at Mica.
-  rpc GetPartner(partner.v1.GetPartnerRequest) returns (partner.v1.GetPartnerResponse) {}
+  // Deprecated: use ObtainValue on AcceptorToMicaValueService in mica.acceptor.service.v2.
+  //
+  // Obtains value from the user behind a UUEK to pay for goods or services. Only UUEKs issued by Mica's wallet
+  // service are accepted, such as those AcceptorToMicaLinkService returns; any other UUEK is no longer supported and
+  // the call fails. The payment is processed exactly as the v2 ObtainValue processes it, and failures that v2 reports
+  // as gRPC status codes are reported the same way here.
+  rpc ObtainValue(ObtainValueRequest) returns (ObtainValueResponse) {option deprecated = true;}
 
-  // Create an ABA account for a partner for use in settling transactions.
-  rpc CreateABAAccount(mica.partner.account.v1.CreateABAAccountRequest) returns (mica.partner.account.v1.CreateABAAccountResponse) {}
-
-  // Search for ABA accounts based on the criteria in the request.
-  rpc SearchABAAccount(mica.partner.account.v1.SearchABAAccountRequest) returns (mica.partner.account.v1.SearchABAAccountResponse) {}
-
-  // A method to create an organization.
-  rpc CreateOrganization(organization.v1.CreateOrganizationRequest) returns (organization.v1.CreateOrganizationResponse) {}
-
-  // Retrieve an organization based on it's key or ref.
-  rpc GetOrganization(organization.v1.GetOrganizationRequest) returns (organization.v1.GetOrganizationResponse) {}
-
-  // Update a given organization.
-  rpc UpdateOrganization(organization.v1.UpdateOrganizationRequest) returns (organization.v1.UpdateOrganizationResponse) {}
-
-  // Update an organization financial data for use by settlement.
-  rpc UpdateOrganizationSettlementData(organization.v1.UpdateOrganizationSettlementDataRequest) returns (organization.v1.UpdateOrganizationSettlementDataResponse) {}
-
-  // Activate an organization that is currently inactive assuming the preconditions are met.
-  rpc ActivateOrganization(organization.v1.ActivateOrganizationRequest) returns (organization.v1.ActivateOrganizationResponse) {}
-
-  // Deactivate an organization that is currently active.
-  rpc DeactivateOrganization(organization.v1.DeactivateOrganizationRequest) returns (organization.v1.DeactivateOrganizationResponse) {}
-
-  // Like GetOrganization, can be used to retrieve Organizations based on the criteria in the request.
-  rpc SearchOrganization(organization.v1.SearchOrganizationRequest) returns (organization.v1.SearchOrganizationResponse) {}
-
-  // Create a store that sits under an Organization.
-  rpc CreateStore(store.v1.CreateStoreRequest) returns (store.v1.CreateStoreResponse) {}
-
-  // Retrieve a store based on it's key.
-  rpc GetStore(store.v1.GetStoreRequest) returns (store.v1.GetStoreResponse) {}
-
-  // Update the store number and address of a Store.
-  rpc UpdateStore(store.v1.UpdateStoreRequest) returns (store.v1.UpdateStoreResponse) {}
-
-  // Remove an existing Store.
-  rpc RemoveStore(store.v1.RemoveStoreRequest) returns (store.v1.RemoveStoreResponse) {}
-
-  // Like GetStore, can be used to retrieve Stores based on the criteria in the request.
-  rpc SearchStore(store.v1.SearchStoreRequest) returns (store.v1.SearchStoreResponse) {}
-
-  // A method to obtain value from a user in order to pay for goods or services rendered to the user.
-  rpc ObtainValue(value.v1.ObtainValueRequest) returns (value.v1.ObtainValueResponse) {}
-
-  // A method to reverse obtain value, including transaction fees and discounts for a given transaction
-  rpc ReverseObtainValue(value.v1.ReverseObtainValueRequest) returns (value.v1.ReverseObtainValueResponse) {}
-
-  // A method to return value to a user in order to refund them for goods or services.
-  rpc ReturnValue(value.v1.ReturnValueRequest) returns (value.v1.ReturnValueResponse) {}
-
-  // A method to reverse return value for a given transaction
-  rpc ReverseReturnValue(value.v1.ReverseReturnValueRequest) returns (value.v1.ReverseReturnValueResponse) {}
-
-  // A method to retrieve a value transaction
-  rpc GetValue(value.v1.GetValueRequest) returns (value.v1.GetValueResponse) {}
-
-  // A method to hold some value to be obtained at a later date via ObtainHoldValue
-  rpc HoldValue(value.v1.HoldValueRequest) returns (value.v1.HoldValueResponse) {}
-
-  // A method to amend the value of a prior hold to be obtained at a later date via ObtainHoldValue
-  rpc AmendHoldValue(value.v1.AmendHoldValueRequest) returns (value.v1.AmendHoldValueResponse) {}
-
-  // A method to release previously held value
-  rpc ReleaseHoldValue(value.v1.ReleaseHoldValueRequest) returns (value.v1.ReleaseHoldValueResponse) {}
-
-  // A method to obtain value that was previously held
-  rpc ObtainHoldValue(value.v1.ObtainHoldValueRequest) returns (value.v1.ObtainHoldValueResponse) {}
-
-  // Complete a link between a user and an instrument operation using a code
-  rpc CompleteLinkingWithCode(instrument.v1.CompleteLinkingWithCodeRequest) returns (instrument.v1.CompleteLinkingWithCodeResponse) {}
-
-  // Retrieve a link record based on it's key
-  rpc GetLink(instrument.v1.GetLinkRequest) returns (instrument.v1.GetLinkResponse) {}
-
-  // Remove a instrument link preventing it from being used in the future
-  rpc RemoveInstrumentLink(instrument.v1.RemoveInstrumentLinkRequest) returns (instrument.v1.RemoveInstrumentLinkResponse) {}
-
-  // Provision a UUEK from a link in order to process a transaction
-  rpc ProvisionUUEKFromLink(instrument.v1.ProvisionUUEKFromLinkRequest) returns (instrument.v1.ProvisionUUEKFromLinkResponse){}
-
-  // A method to ping the server to ensure it's up and running and that the connection is good.
-  rpc Ping(PingRequest) returns (PingResponse) {}
 }
 
-message PingRequest {}
+// The details of a payment, shared by ObtainValueRequest and ReturnValueRequest.
+message ValueRequest {
+  reserved 3, 4, 5, 7, 13, 19;
 
-message PingResponse {
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_SUCCESS = 1;
+  // The UUEK to pay with. ObtainValue accepts only UUEKs issued by Mica's wallet service.
+  string uuek = 1;
+
+  // Your own unique reference for this transaction, 1 to 100 characters. Mica stores it with the transaction.
+  string transaction_ref = 2 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+
+  // The currency of total_amount, as an ISO 4217 code. Not yet enforced as required (MICA-2507), but you should
+  // always set it.
+  mica.common.v1.Currency currency = 22; // [(validate.rules).message = {required: true}]; MICA-2507
+
+  // The organization this operation is processed for. Set one of these.
+  oneof organization_identifier {
+    // Mica's key for the organization. At most 50 characters.
+    string organization_key = 16 [(validate.rules).string = {max_len: 50}];
+
+    // Your own reference for the organization. At most 100 characters.
+    string organization_ref = 15 [(validate.rules).string = {max_len: 100}];
   }
+
+  // The merchant category that applies to this transaction, in the form AAA-BBB (for example COM-GRO). Optional;
+  // passed on to the Issuers involved.
+  string category = 6 [(validate.rules).string.pattern = "^$|^[A-Z]{3}-[A-Z]{3}$"];
+
+  // Your identifier for the clerk or terminal operator that processed this transaction. Optional; passed on to the
+  // Issuers involved.
+  string clerk_identifier = 8;
+
+  // The total amount of the transaction, as a decimal string in the units of currency, for example "12.50". 1 to 50
+  // characters matching ([0-9]*[.])?[0-9]+.
+  //
+  // When line_items are present this should equal the sum of each line item's line_amount and line_tax_amount, plus
+  // surcharges.
+  string total_amount = 9 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50,
+    pattern: "^([0-9]*[.])?[0-9]+$"
+  }];
+
+  // An additional fee you impose on this transaction (for example as an acquirer). Optional.
+  PartnerFee partner_fee = 21;
+
+  // Zero or more fees added to the transaction, such as an ATM fee or a restaurant tip. Not currently used when the
+  // payment is processed.
+  repeated micashared.common.v1.Surcharge surcharges = 20;
+
+  // Your order number for this transaction. Optional; Mica stores it and passes it on to the Issuers involved.
+  string order_number = 10;
+
+  // The items bought or returned. Mica uses them, for example, to decide which items a tender or coupon applies to.
+  repeated micashared.common.v1.LineItem line_items = 11;
+
+  // Adjustments applied to the transaction, such as discounts. Not currently used when the payment is processed.
+  repeated micashared.common.v1.Adjustment adjustments = 12;
+
+  // Data for the user's receipt. Optional.
+  ReceiptTransactionData receipt_data = 14;
+}
+
+// Data for the user's receipt.
+message ReceiptTransactionData {
+  // Text Mica stores with the transaction so it can be rendered as a barcode on the user's receipt, letting the
+  // receipt be scanned later to find the transaction in the store's system. Optional.
+  string barcode_text = 1;
+}
+
+// An additional fee the Acceptor (for example an acquirer) imposes on a transaction. Mica records it with the
+// transaction and carries it into settlement.
+message PartnerFee {
+  // The fee amount as a non-negative decimal string, for example "0.25". Must match ([0-9]*[.])?[0-9]+. Leave empty
+  // for no fee.
+  string amount = 1;
+}
+
+// Request for ObtainValue.
+message ObtainValueRequest {
+  // Whether you accept approval for part of the amount. With APPROVAL_TYPE_FULL, anything less than the full amount
+  // is declined; with APPROVAL_TYPE_PARTIAL, Mica approves what it can. APPROVAL_TYPE_UNSPECIFIED is rejected.
+  micashared.common.enums.approvaltype.v1.ApprovalType approval_type = 1;
+
+  // The details of the payment.
+  ValueRequest value = 2;
+
+  // Details about where and how the transaction originated (device, location, user), passed on to the Issuers to help
+  // them assess risk. Optional.
+  micashared.common.v1.RiskSignal risk_signal = 3;
+}
+
+message ObtainValueResponse {
+  // The outcome of ObtainValue. Payments are now processed as in the v2 ObtainValue, which yields only
+  // STATUS_FULL_APPROVAL, STATUS_PARTIAL_APPROVAL, STATUS_INSUFFICIENT_VALUE (for any decline) and STATUS_ERROR. The
+  // other values are no longer returned.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The full amount was approved.
+    STATUS_FULL_APPROVAL = 1;
+    // An error occurred while processing the request; error says what. Do not treat the payment as approved.
+    STATUS_ERROR = 2;
+    // Part of the amount was approved; approved_amount says how much.
+    STATUS_PARTIAL_APPROVAL = 3;
+    // The payment was declined, for example because the user's instruments could not cover the amount.
+    STATUS_INSUFFICIENT_VALUE = 4;
+    // All the products were ineligible or age restricted.
+    STATUS_INELIGIBLE_PRODUCTS = 5;
+    // The instrument or account was not found.
+    STATUS_NOT_FOUND = 6;
+    // The user's instrument is closed.
+    STATUS_INSTRUMENT_CLOSED = 7;
+    // Declined by a transaction risk or fraud check.
+    STATUS_TRANSACTION_RISK_FRAUD = 8;
+    // Declined by a bad-actor risk or fraud check.
+    STATUS_BAD_ACTOR_RISK_FRAUD = 16;
+    // Declined by a user risk or fraud check.
+    STATUS_USER_RISK_FRAUD = 17;
+    // Declined by an instrument risk or fraud check.
+    STATUS_INSTRUMENT_RISK_FRAUD = 18;
+    // The user needs to contact their Issuer to resolve an issue.
+    STATUS_USER_CALL_SERVICE_PROVIDER = 9;
+    // The Issuer does not support this operation.
+    STATUS_UNSUPPORTED = 10;
+    // The Issuer is unavailable at this time.
+    STATUS_SERVICE_PROVIDER_UNAVAILABLE = 11;
+    // The UUEK is invalid or was not found.
+    STATUS_INVALID_UUEK = 12;
+    // A valid PIN is required for this transaction.
+    STATUS_PIN_REQUIRED = 13;
+    // An EBT transaction was sent without line items.
+    STATUS_MISSING_LINE_ITEMS = 14;
+    // Partial approval was requested but is not supported.
+    STATUS_PARTIAL_APPROVAL_INVALID = 15;
+    // The payment would exceed one or more limits at the Issuer.
+    STATUS_LIMIT_EXCEEDED = 19;
+    // The organization is not fully configured to process transactions.
+    STATUS_ORGANIZATION_NOT_CONFIGURED = 21;
+    // The line items do not add up to the transaction's total amount.
+    STATUS_LINE_ITEM_TOTAL_MISMATCH = 22;
+    // The call to the Issuer timed out.
+    STATUS_SERVICE_PROVIDER_TIMEOUT = 23;
+  }
+  // The outcome of the request.
   Status status = 1;
 
-  google.protobuf.Timestamp server_time = 2;
+  // Details of the failure when status is STATUS_ERROR.
+  micashared.common.v1.Error error = 2;
 
-  google.protobuf.Timestamp server_start_time = 7;
+  // Mica's key for the transaction it recorded.
+  string transaction_key = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
 
-  string build_version = 3;
+  // Mica's correlation ID for this request. Quote it, with global_transaction_id, when reporting a problem.
+  string cid = 4;
 
-  string build_sha = 4;
+  // The amount approved, as a decimal string in the request's currency. Set on STATUS_FULL_APPROVAL and
+  // STATUS_PARTIAL_APPROVAL.
+  string approved_amount = 5;
 
-  string build_time = 5;
+  // A summary of the discounts applied. Not currently populated.
+  micashared.common.v1.DiscountSummary discount_summary = 7;
 
-  string service_type = 6;
+  // The status of each line item, in the same order as the request. Currently every item is reported as
+  // LINE_ITEM_STATUS_ELIGIBLE.
+  repeated micashared.common.v1.LineItemSequenceAndStatus line_item_sequence_and_statuses = 6;
+
+  // Stable details of the instrument behind the UUEK, which let you recognise the same instrument across
+  // transactions. Not currently populated.
+  micashared.common.v1.ImmutableInstrumentDetails immutable_instrument_details = 8;
+
+  // Mica's network-wide identifier and time for the transaction.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 9;
 }

@@ -1,0 +1,81 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.issuer.service.v2;
+
+import "mica/common/v1/currency.proto";
+import "mica/issuer/instrument/v2/instrument.proto";
+import "mica/issuer/value/v2/value.proto";
+import "micashared/common/v1/error.proto";
+import "micashared/common/v1/transaction.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/issuer/servicev2";
+option java_outer_classname = "IssuerFromMicaWIPServiceProto";
+option java_package = "io.mica.issuer.service.v2";
+option objc_class_prefix = "MICA";
+
+// Work-in-progress and experimental operations Mica calls on the Issuer, hosted at the same callback address as
+// IssuerFromMicaService. They may change, or become standard product features, in future releases.
+service IssuerFromMicaWIPService {
+  // Asks the Issuer to credit the user's instrument for a chargeback. Mica calls this only when a dispute is resolved
+  // in the user's favor _and_ the money goes back to the user's instrument; if the dispute ends in a replacement or
+  // an in-store credit, the Issuer is not called.
+  rpc ApproveChargeback(ApproveChargebackRequest) returns (ApproveChargebackResponse) {}
+
+  // Asks the Issuer to credit a person-to-person transfer, sent with IssuerToMicaWIPService.SendValue, to one of its
+  // users' instruments.
+  rpc ReceiveValue(value.v2.ReceiveValueRequest) returns (value.v2.ReceiveValueResponse) {}
+}
+
+// A request to credit the user's instrument for a chargeback resolved in the user's favor.
+message ApproveChargebackRequest {
+
+  // Mica's key for the instrument to credit.
+  string issuer_instrument_key = 2 [(validate.rules).string = {max_len: 50}];
+
+  // The Issuer's own user and instrument references for the instrument to credit.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 22 [(validate.rules).message.required = true];
+
+  // The currency of `requested_amount`.
+  mica.common.v1.Currency currency = 5 [(validate.rules).message = {required: true}];
+
+  // The amount to credit, as a decimal string (format `([0-9]*[.])?[0-9]+`).
+  string requested_amount = 15;
+
+  // Mica's network-wide identifier and time for the original transaction being charged back.
+  micashared.common.v1.TransactionIdentifier original_transaction_identifier = 19;
+}
+
+message ApproveChargebackResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+
+    // The chargeback was approved and credited for the full amount.
+    STATUS_FULL_APPROVAL = 1;
+
+    // The chargeback was not approved.
+    STATUS_NOT_APPROVED = 2;
+
+    // An error occurred when processing the request.
+    STATUS_ERROR = 3;
+  }
+  // The Issuer's decision.
+  Status status = 1;
+
+  // Optional details when the request failed.
+  micashared.common.v1.Error error = 2;
+
+  // The Issuer's own reference for the chargeback credit (up to 100 characters).
+  string approval_operation_ref = 3 [(validate.rules).string.max_len = 100];
+
+  // An optional free-text message from the Issuer about its decision. Mica records it with the chargeback.
+  string message = 4;
+}

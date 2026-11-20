@@ -17,17 +17,21 @@ option java_outer_classname = "PaginationProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// Page-number pagination for search calls. Send it on the request to choose a page, and read it back on the response
+// to see the page returned and the total number of matches. If the request omits it, Mica returns the first page of
+// 25 records and does not count the total.
 message Pagination {
-  // the number of records requested per page returned. This field is ignored when page_token is given
+  // Maximum number of records to return in the page, at most 10000. 0 means no limit.
   int32 page_size = 1 [(validate.rules).int32 = {lte: 10000}];
 
-  // page number requested/returned
+  // Zero-based page number: 0 is the first page. Mica skips `page_number` x `page_size` records.
   int32 page_number = 2 [(validate.rules).int32 = {
     gte: 0,
     lte: 1000000
   }];
 
-  // set to -1 if the server hasn't counted the total count. This will be filled in on the first request that includes
-  // this type where the value is -1
+  // Total number of records that match the search, across all pages. Send 0 to have Mica count them and return the
+  // result here; send back the value you received to skip counting again on later pages. -1 means the total was not
+  // counted.
   int64 total_count = 3 [(validate.rules).int64 = {gte: -1}];
 }

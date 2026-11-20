@@ -1,0 +1,25 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.acceptor.service.v2;
+
+option go_package = "mica/acceptor/servicev2";
+option java_outer_classname = "AcceptorFromMicaServiceProto";
+option java_package = "io.mica.acceptor.service.v2";
+option objc_class_prefix = "MICA";
+
+// The service an Acceptor would implement for Mica to call. It has no operations yet, so there is nothing to
+// implement.
+service AcceptorFromMicaService {
+  // Possible operations:
+  //  - operation to support reverse onboarding. Instead of the Acceptor calling Mica, Mica will call the Acceptor with a
+  //    new enrollment. For example, a User starting at the Mica user website could sign up for Netflix assuming that
+  //    Netflix supported Mica and have implemented this API.
+}

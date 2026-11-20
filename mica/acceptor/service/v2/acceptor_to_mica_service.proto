@@ -1,0 +1,400 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.acceptor.service.v2;
+
+import "google/protobuf/timestamp.proto";
+import "mica/acceptor/acceptor/v2/acceptor.proto";
+import "micashared/common/enums/organizationstatus/v1/organization_status.proto";
+import "micashared/common/v1/address.proto";
+import "micashared/common/v1/error.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/acceptor/servicev2";
+option java_outer_classname = "AcceptorToMicaServiceProto";
+option java_package = "io.mica.acceptor.service.v2";
+option objc_class_prefix = "MICA";
+
+// The service an Acceptor calls to manage its own details and its organizations. Links are in
+// AcceptorToMicaLinkService, payments in AcceptorToMicaValueService, and the connectivity check in
+// mica.member.ping.v1.PingService.
+//
+// Most operations report their outcome in the response's status, with details in error. A request that breaks a
+// validation rule, carries a malformed key or omits a required identifier is rejected with the gRPC status
+// INVALID_ARGUMENT; a caller not permitted to use an operation gets PERMISSION_DENIED, and an unexpected server
+// failure INTERNAL.
+service AcceptorToMicaService {
+  // Returns the details Mica holds about you, the calling Acceptor.
+  rpc GetAcceptor(acceptor.v2.GetAcceptorRequest) returns (acceptor.v2.GetAcceptorResponse) {}
+
+  // Creates an organization: a business you accept payments for. It is created inactive; call ActivateOrganization
+  // before using it. Returns Mica's organization_key and the version to pass to later changes.
+  rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse) {}
+
+  // Retrieves one of your organizations by its organization_key or organization_ref. Setting neither is rejected
+  // with INVALID_ARGUMENT.
+  rpc GetOrganization(GetOrganizationRequest) returns (GetOrganizationResponse) {}
+
+  // Replaces an organization's name, address, categories and phone; a field left empty is cleared. Pass the
+  // organization's current version: if it has changed since you read it, the update is rejected with
+  // STATUS_VERSION_MISMATCH.
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {}
+
+  // Activates an inactive organization. Activating an organization that is already active succeeds without changing
+  // it. Pass the organization's current version.
+  rpc ActivateOrganization(ActivateOrganizationRequest) returns (ActivateOrganizationResponse) {}
+
+  // Deactivates an active organization. Deactivating an organization that is already inactive succeeds without
+  // changing it. Pass the organization's current version.
+  rpc DeactivateOrganization(DeactivateOrganizationRequest) returns (DeactivateOrganizationResponse) {}
+
+  // Lists your organizations, optionally filtered by name and category. With no criteria it returns all of them.
+  rpc SearchOrganization(SearchOrganizationRequest) returns (SearchOrganizationResponse) {}
+}
+
+message CreateOrganizationRequest {
+  // Your own unique reference for the organization, 1 to 100 characters. Other calls accept it in place of
+  // organization_key. A reference that is already in use is rejected with STATUS_DUPLICATE.
+  string organization_ref = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+
+  // The organization's name, 1 to 100 characters.
+  string name = 2 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 100,
+  }];
+
+  // The organization's street address. Required.
+  micashared.common.v1.Address address = 3 [(validate.rules).message.required = true];
+
+  // The organization's parent, if it has one. The parent must already exist. Omit for a top-level organization.
+  oneof parent_organization_identifier {
+    // Mica's key for the parent organization. At most 50 characters.
+    string parent_organization_key = 4 [(validate.rules).string = {max_len: 50}];
+
+    // Your own reference for the parent organization. At most 100 characters.
+    string parent_organization_ref = 5 [(validate.rules).string = {max_len: 100}];
+  }
+
+  // Every kind of business the organization operates, as organization categories in the form AAA-BBB (for example
+  // COM-GRO); none is primary. Each transaction then names the one it is for. Optional. Mica rejects a category that
+  // is well formed but not one of its organization categories. The codes are listed at
+  // https://developer.mica.io/apis/organization-categories/
+  repeated string categories = 6 [(validate.rules).repeated.items.string.pattern = "^[A-Z]{3}-[A-Z]{3}$"];
+
+  // The organization's phone number in E.164 format: a + followed by 11 to 15 digits. Optional.
+  string phone = 7 [(validate.rules).string.pattern = "^$|^\\+[1-9]\\d{10,14}$"];
+}
+
+message CreateOrganizationResponse {
+  // The outcome of CreateOrganization.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The organization was created.
+    STATUS_SUCCESS = 1;
+    // The organization was not created; error says why (for example an unknown category or parent organization).
+    STATUS_ERROR = 2;
+    // An organization with this organization_ref already exists.
+    STATUS_DUPLICATE = 3;
+    // Not currently returned. A parent organization that cannot be found is reported as STATUS_ERROR.
+    STATUS_NOT_FOUND = 4;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // Mica's key for the new organization.
+  string organization_key = 3;
+
+  // The new organization's version. Pass it to the next UpdateOrganization, ActivateOrganization or
+  // DeactivateOrganization.
+  int64 version = 4;
+}
+
+// Identifies an organization's parent.
+message ParentOrganization {
+  // Mica's key for the parent organization.
+  string organization_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // Your own reference for the parent organization.
+  string organization_ref = 2 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+}
+
+// A business you accept payments for, as Mica holds it.
+message Organization {
+  // Mica's key for the organization.
+  string organization_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // The organization's current version. It increases with every change; pass it to UpdateOrganization,
+  // ActivateOrganization and DeactivateOrganization.
+  int64 version = 2;
+
+  // When Mica created the organization.
+  google.protobuf.Timestamp created = 3;
+
+  // When Mica last changed the organization.
+  google.protobuf.Timestamp updated = 4;
+
+  // Mica's key for the Acceptor that owns the organization.
+  string acceptor_key = 5 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // The organization's parent. Absent for a top-level organization.
+  ParentOrganization parent_organization = 6;
+
+  // Your own reference for the organization.
+  string organization_ref = 7 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+
+  // The organization's name.
+  string name = 8;
+
+  // Whether the organization is active. A new organization is inactive until ActivateOrganization is called.
+  micashared.common.enums.organizationstatus.v1.OrganizationStatus status = 9;
+
+  // The organization's street address.
+  micashared.common.v1.Address address = 10;
+
+  // Every kind of business the organization operates, as organization categories in the form AAA-BBB. See
+  // https://developer.mica.io/apis/organization-categories/
+  repeated string categories = 11 [(validate.rules).repeated.items.string.pattern = "^[A-Z]{3}-[A-Z]{3}$"];
+
+  //  micashared.common.v1.BankAccountDetail operating_account = 15;
+  //  micashared.common.v1.BankAccountDetail revenue_account = 16;
+  //  micashared.common.v1.BankAccountDetail acceptor_fee_account = 19;
+  //  string icon_image_url = 9 [(validate.rules).string={ignore_empty: true, max_len: 500, uri:true}];
+  //  micashared.common.enums.barcodetype.v1.BarcodeType barcode_type = 17 [(validate.rules).enum = { not_in: [0] }];
+  //  micashared.common.enums.barcodelocation.v1.BarcodeLocation barcode_location = 18 [(validate.rules).enum = { not_in: [0] }];
+}
+
+message GetOrganizationRequest {
+  // The organization to retrieve. Set one of these.
+  oneof organization_identifier {
+    // Mica's key for the organization. At most 50 characters.
+    string organization_key = 1 [(validate.rules).string = {max_len: 50}];
+
+    // Your own reference for the organization. At most 100 characters.
+    string organization_ref = 2 [(validate.rules).string = {max_len: 100}];
+  }
+}
+
+message GetOrganizationResponse {
+  // The outcome of GetOrganization.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The organization was found.
+    STATUS_SUCCESS = 1;
+    // The organization could not be retrieved; error says why.
+    STATUS_ERROR = 2;
+    // Not currently returned.
+    STATUS_INVALID_ACCEPTOR_ID = 3;
+    // No organization has this key or reference.
+    STATUS_NOT_FOUND = 4;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The organization. Present when status is STATUS_SUCCESS.
+  Organization organization = 3;
+}
+
+message UpdateOrganizationRequest {
+  // The organization to update. Set one of these.
+  oneof organization_identifier {
+    // Mica's key for the organization. At most 50 characters.
+    string organization_key = 1 [(validate.rules).string = {max_len: 50}];
+
+    // Your own reference for the organization. At most 100 characters.
+    string organization_ref = 2 [(validate.rules).string.max_len = 100];
+  }
+
+  // The organization's current version, as last returned by Mica.
+  int64 version = 3;
+
+  // The organization's new name, 1 to 100 characters.
+  string name = 4 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 100,
+  }];
+
+  // The organization's new street address. Required.
+  micashared.common.v1.Address address = 5 [(validate.rules).message.required = true];
+
+  // The organization's new organization categories, each in the form AAA-BBB (see
+  // https://developer.mica.io/apis/organization-categories/). Replaces the existing list; send an empty
+  // list to clear it.
+  repeated string categories = 6 [(validate.rules).repeated.items.string.pattern = "^[A-Z]{3}-[A-Z]{3}$"];
+
+  // The organization's new phone number in E.164 format: a + followed by 11 to 15 digits. Empty clears it.
+  string phone = 7 [(validate.rules).string.pattern = "^$|^\\+[1-9]\\d{10,14}$"];
+}
+
+message UpdateOrganizationResponse {
+  // The outcome of UpdateOrganization.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The organization was updated.
+    STATUS_SUCCESS = 1;
+    // The organization was not updated; error says why (for example an unknown category).
+    STATUS_ERROR = 2;
+    // No organization has this key or reference.
+    STATUS_NOT_FOUND = 3;
+    // The organization has changed since the version you sent. Retrieve it again and retry with its current version.
+    STATUS_VERSION_MISMATCH = 4;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The organization's version after the update.
+  int64 version = 3;
+}
+
+message ActivateOrganizationRequest {
+  // The organization to activate. Set one of these.
+  oneof organization_identifier {
+    option (validate.required) = true;
+
+    // Mica's key for the organization. At most 50 characters.
+    string organization_key = 1 [(validate.rules).string = {max_len: 50}];
+
+    // Your own reference for the organization. At most 100 characters.
+    string organization_ref = 2 [(validate.rules).string.max_len = 100];
+  }
+
+  // The organization's current version, as last returned by Mica.
+  int64 version = 3;
+}
+
+message ActivateOrganizationResponse {
+  // The outcome of ActivateOrganization.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The organization is active.
+    STATUS_SUCCESS = 1;
+    // The organization was not activated; error says why.
+    STATUS_ERROR = 2;
+    // No organization has this key or reference.
+    STATUS_NOT_FOUND = 3;
+    // The organization has changed since the version you sent. Retrieve it again and retry with its current version.
+    STATUS_VERSION_MISMATCH = 4;
+    // The organization is in a state that cannot be activated.
+    STATUS_INVALID_STATE_TRANSITION = 5;
+    // Reserved for an organization that lacks the settlement account details it needs. Not currently returned.
+    STATUS_MISSING_ACCOUNT_DETAILS = 6;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The organization's new version. -1 when the organization was already active and nothing changed.
+  int64 version = 3;
+}
+
+message DeactivateOrganizationRequest {
+  // The organization to deactivate. Set one of these.
+  oneof organization_identifier {
+    option (validate.required) = true;
+
+    // Mica's key for the organization. At most 50 characters.
+    string organization_key = 1 [(validate.rules).string = {max_len: 50}];
+
+    // Your own reference for the organization. At most 100 characters.
+    string organization_ref = 2 [(validate.rules).string.max_len = 100];
+  }
+
+  // The organization's current version, as last returned by Mica.
+  int64 version = 3;
+}
+
+message DeactivateOrganizationResponse {
+  // The outcome of DeactivateOrganization.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The organization is inactive.
+    STATUS_SUCCESS = 1;
+    // The organization was not deactivated; error says why.
+    STATUS_ERROR = 2;
+    // No organization has this key or reference.
+    STATUS_NOT_FOUND = 3;
+    // The organization has changed since the version you sent. Retrieve it again and retry with its current version.
+    STATUS_VERSION_MISMATCH = 4;
+    // The organization is in a state that cannot be deactivated.
+    STATUS_INVALID_STATE_TRANSITION = 5;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The organization's version after the change.
+  int64 version = 3;
+}
+
+message SearchOrganizationRequest {
+  // Return only organizations whose name starts with this text, ignoring case. Optional.
+  string name = 1;
+
+  // Return only organizations that have this organization category, in the form AAA-BBB (see
+  // https://developer.mica.io/apis/organization-categories/). Optional.
+  string category = 2 [(validate.rules).string.pattern = "^$|^[A-Z]{3}-[A-Z]{3}$"];
+}
+
+message SearchOrganizationResponse {
+  // The outcome of SearchOrganization.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The search ran. organizations may be empty.
+    STATUS_SUCCESS = 1;
+    // The search could not be run; error says why.
+    STATUS_ERROR = 2;
+    // Not currently returned.
+    STATUS_INVALID_ACCEPTOR_ID = 3;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The matching organizations.
+  repeated Organization organizations = 3;
+}

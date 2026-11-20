@@ -1,0 +1,259 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.issuer.service.v2;
+
+import "google/protobuf/timestamp.proto";
+import "mica/common/v1/currency.proto";
+import "mica/issuer/instrument/v2/instrument.proto";
+import "micashared/common/v1/error.proto";
+import "micashared/common/v1/risk_signals.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/issuer/servicev2";
+option java_outer_classname = "IssuerToMicaWIPServiceProto";
+option java_package = "io.mica.issuer.service.v2";
+option objc_class_prefix = "MICA";
+
+// Work-in-progress and experimental operations the Issuer calls on Mica. They may change, or become standard product
+// features, in future releases.
+service IssuerToMicaWIPService {
+
+  // Returns the recurring payments set up against a user's instruments.
+  rpc SearchRecurringPayments(SearchRecurringPaymentsRequest) returns (SearchRecurringPaymentsResponse) {}
+
+  // Sends value from one of the Issuer's users to the holder of a UUEK (person-to-person).
+  // Deprecated.
+  rpc SendValue(SendValueRequest) returns (SendValueResponse) {option deprecated = true;}
+
+  // Starts a session in Mica's embedded web experience for one of the Issuer's users and returns a token for it. Fails
+  // with gRPC UNIMPLEMENTED if the embedded experience is not enabled for the Issuer, NOT_FOUND if the user does not
+  // exist, and PERMISSION_DENIED if the user is not active.
+  rpc InitializeWebSession(InitializeWebSessionRequest) returns (InitializeWebSessionResponse) {}
+}
+
+// A recurring payment an Acceptor has set up against one of the user's instruments, for example a subscription.
+message RecurringPayment {
+  // Mica's key for the recurring payment.
+  string recurring_payment_key = 1;
+
+  // A display name for the recurring payment.
+  string nickname = 2;
+
+  // Mica's key for the instrument the recurring payment draws from.
+  string instrument_key = 3;
+
+  // The Issuer's own user and instrument references for the instrument.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_ref = 4;
+
+  // The currency of the payments.
+  mica.common.v1.Currency currency = 5 [(validate.rules).message = {required: true}];
+
+  // When the recurring payment was set up.
+  google.protobuf.Timestamp created_at = 6;
+
+  // Payments made so far.
+  RecurringPaymentUsage usage = 7;
+
+  // The limits agreed for the recurring payment.
+  RecurringPaymentTerms terms = 8;
+}
+
+// Payments made so far under a recurring payment.
+message RecurringPaymentUsage {
+  // When the most recent payment was made.
+  google.protobuf.Timestamp last_payment = 1;
+
+  // The amount of the most recent payment, as a decimal string.
+  string last_payment_amount = 2;
+
+  // How many payments have been made.
+  uint32 number_of_payments_made = 3;
+
+  // The total paid so far, as a decimal string.
+  string total_payment_amount = 4;
+}
+
+// The limits agreed for a recurring payment.
+message RecurringPaymentTerms {
+  // The most that may be paid in total over the life of the recurring payment, as a decimal string.
+  string total_spend_limit = 1;
+}
+
+message SearchRecurringPaymentsRequest {
+  // The search criteria. Currently only by user.
+  oneof by {
+    // Return recurring payments for this user.
+    ByUser user = 1;
+  }
+
+  // Identifies the user whose recurring payments to return.
+  message ByUser {
+    // One identifier is required.
+    oneof id {
+      // The Issuer's own identifier for the user.
+      string user_ref = 1 [(validate.rules).string.max_len = 100];
+      // Mica's key for the user.
+      string user_key = 2 [(validate.rules).string = {
+        min_len: 30,
+        max_len: 50
+      }];
+    }
+  }
+}
+
+message SearchRecurringPaymentsResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The matching recurring payments are returned (possibly none).
+    STATUS_SUCCESS = 1;
+    // No recurring payments were found.
+    STATUS_NOT_FOUND = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The user's recurring payments. At most 10 are returned.
+  repeated RecurringPayment recurring_payments = 4;
+}
+
+message SendValueRequest {
+  // Mica's key for the sending user. Required.
+  string from_issuer_user_key = 1 [(validate.rules).string = {max_len: 50}];
+  oneof user_identifier {
+    // Mica's key for the sending user. Not currently read; use `from_issuer_user_key`.
+    string issuer_user_key = 6 [(validate.rules).string = {max_len: 50}];
+
+    // The Issuer's own identifier for the sending user. Not currently read; use `from_issuer_user_key`.
+    string issuer_user_ref = 7 [(validate.rules).string = {max_len: 100}];
+  }
+
+  // Mica's key for the instrument to send from. Required.
+  string from_issuer_instrument_key = 2 [(validate.rules).string = {max_len: 50}];
+  oneof instrument_identifier {
+    // Mica's key for the instrument to send from. Not currently read; use `from_issuer_instrument_key`.
+    string issuer_instrument_key = 8 [(validate.rules).string = {max_len: 50}];
+
+    // The Issuer's own identifier for the instrument to send from. Not currently read; use
+    // `from_issuer_instrument_key`.
+    string issuer_instrument_ref = 9 [(validate.rules).string = {max_len: 100}];
+  }
+
+  // The recipient's UUEK. It must be a UUEK provisioned by an Issuer.
+  // @gotags: mask:"security"
+  string to_uuek = 3;
+
+  // The currency of `amount`.
+  mica.common.v1.Currency currency = 4 [(validate.rules).message = {required: true}];
+
+  // The amount to send, as a decimal string (format `([0-9]*[.])?[0-9]+`).
+  string amount = 5;
+
+  // Information about where and how the transfer originated, for risk and fraud checks. May be empty.
+  micashared.common.v1.RiskSignal risk_signal = 10;
+}
+
+message SendValueResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The value was sent.
+    STATUS_SUCCESS = 1;
+    // The transfer failed; see `error`.
+    STATUS_ERROR = 2;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // Mica's key for the transfer.
+  string transaction_key = 3;
+}
+
+// A full postal address, passed to the embedded web experience by InitializeWebSession. Mica does not store it.
+message Address {
+  // Street address lines.
+  repeated string street_lines = 1;
+
+  // City or locality.
+  string locality = 2;
+
+  // The subdivision part of the ISO 3166-2 code, without the country prefix (1-3 characters): the state in the US
+  // (ISO 3166-2:US), the prefecture in Japan (ISO 3166-2:JP) or the state or territory in Australia (ISO 3166-2:AU).
+  string region_code = 6 [(validate.rules).string = {max_len: 3}];
+
+  // Postal code; the ZIP code in the US.
+  string postal_code = 4;
+
+  // The ISO 3166-1 alpha-2 country code (2 characters), for example "US".
+  string country_code = 7 [(validate.rules).string.max_len = 2];
+}
+
+// Personal details of a user, passed to the embedded web experience by InitializeWebSession. Mica does not store them.
+message UserDemographic {
+  // The first name of the user.
+  string first_name = 1; // @gotags: mask:"pii"
+
+  // The last name of the user.
+  string last_name = 2; // @gotags: mask:"pii"
+
+  // The email of the user.
+  string email = 3; // @gotags: mask:"pii"
+
+  // The user's postal address.
+  Address address = 4;
+
+  // The user's phone number in E.164 format, for example "+15555550123", or empty.
+  string phone = 6 [(validate.rules).string.pattern = "^$|^\\+[1-9]\\d{10,14}$"]; // @gotags: mask:"pii"
+
+  // The user's username at the Issuer.
+  string username = 7;
+}
+
+message InitializeWebSessionRequest {
+  // The registered user to start the session for. One identifier is required.
+  oneof user_identifier {
+    // Mica's key for the user.
+    string issuer_user_key = 1 [(validate.rules).string = {max_len: 50}];
+
+    // The Issuer's own identifier for the user.
+    string issuer_user_ref = 2 [(validate.rules).string = {max_len: 100}];
+  }
+
+  // Optional personal details to show in the session, for example to prefill forms.
+  UserDemographic user_demographic = 3;
+
+  // Optional key/value context for the session, for example a theme.
+  WebSessionMetaData meta_data = 4;
+}
+
+message InitializeWebSessionResponse {
+  // The session token to hand to the embedded web experience.
+  string token = 1;
+
+  // When the session token expires.
+  google.protobuf.Timestamp expires_at = 2;
+}
+
+// A flexible key/value field for passing additional context about a web session (e.g. "theme") through to the
+// downstream embedded experience without needing a dedicated proto field for each one.
+message WebSessionMetaData {
+  // One key/value entry.
+  message KeyValuePair {
+    // The entry name, for example "theme".
+    string key = 1;
+    // The entry value.
+    string value = 2;
+  }
+  // The entries, passed through in order.
+  repeated KeyValuePair key_value_pairs = 1;
+}
