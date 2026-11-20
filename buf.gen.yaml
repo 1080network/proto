@@ -55,10 +55,11 @@ plugins:
   - remote: buf.build/grpc/kotlin
     out: gen/kotlin
 
-  # Python
-  - remote: buf.build/protocolbuffers/python
+  # Python. Pinned to protobuf 6.x gencode (v32.x): generated code needs a runtime of the same major version
+  # or newer, so this works with protobuf 6 and 7 instead of forcing everyone onto the newest release.
+  - remote: buf.build/protocolbuffers/python:v32.1
     out: gen/python
-  - remote: buf.build/protocolbuffers/pyi
+  - remote: buf.build/protocolbuffers/pyi:v32.1
     out: gen/python
   - remote: buf.build/grpc/python
     out: gen/python
