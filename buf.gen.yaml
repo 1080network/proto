@@ -44,12 +44,15 @@ plugins:
     out: gen/go
     opt: paths=source_relative
 
-  # Java and Kotlin (Kotlin is an extension over the Java classes)
+  # Java and Kotlin (Kotlin is an extension over the Java classes: both are needed for Kotlin)
   - remote: buf.build/protocolbuffers/java
     out: gen/java
   - remote: buf.build/grpc/java
     out: gen/java
   - remote: buf.build/protocolbuffers/kotlin
+    out: gen/kotlin
+  # Coroutine-based gRPC stubs for Kotlin
+  - remote: buf.build/grpc/kotlin
     out: gen/kotlin
 
   # Python
