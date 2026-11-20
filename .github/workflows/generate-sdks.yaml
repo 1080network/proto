@@ -1,6 +1,8 @@
 name: "Generate SDKs"
 
-# Generates client code for every supported language from the protos at a given tag, using buf.gen.yaml.
+# Generates client code for every supported language from the protos at a given tag, using the
+# buf.gen.yaml of the branch this workflow runs on. Taking the protos from the tag and the generation
+# config from the branch means a release can be regenerated after the config is improved.
 # Run manually from the Actions tab. The generated code is attached to the run as one artifact per
 # language so it can be inspected before anything is published.
 on:
@@ -18,7 +20,17 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Use the protos from ${{ inputs.ref }}
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          set -euo pipefail
+          # Replace (not merge) the proto directories so nothing from the branch lingers
+          git rm -r -q mica micashared validate google
+          git checkout "$REF" -- mica micashared validate google buf.yaml
 
       - uses: bufbuild/buf-setup-action@v1
         with:
