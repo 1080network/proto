@@ -1,0 +1,60 @@
+name: "Generate SDKs"
+
+# Generates client code for every supported language from the protos at a given tag, using buf.gen.yaml.
+# Run manually from the Actions tab. The generated code is attached to the run as one artifact per
+# language so it can be inspected before anything is published.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Tag or branch of this repository to generate from (for example v2.0.0-pre0)"
+        required: true
+        type: string
+
+jobs:
+  generate:
+    name: Generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Lint protos
+        run: buf lint
+
+      - name: Generate all languages
+        run: ./generate.sh
+
+      - name: Check the Go code compiles
+        run: |
+          set -euo pipefail
+          # Lay the generated files out as the three Go modules published from the golang repository.
+          mkdir -p gomod/common gomod/issuer gomod/acceptor
+          cp -r gen/go/micashared gomod/common/
+          mkdir -p gomod/common/mica gomod/issuer/mica gomod/acceptor/mica
+          cp -r gen/go/mica/common gen/go/mica/member gomod/common/mica/
+          cp -r gen/go/mica/issuer gomod/issuer/mica/
+          cp -r gen/go/mica/acceptor gomod/acceptor/mica/
+          cd gomod
+          for m in common issuer acceptor; do
+            (cd $m && go mod init github.com/1080network/golang/$m/v2 \
+              && go get google.golang.org/grpc google.golang.org/protobuf github.com/envoyproxy/protoc-gen-validate)
+          done
+          # issuer and acceptor import common; resolve it from the workspace rather than from a tag
+          go work init ./common ./issuer ./acceptor
+          for m in common issuer acceptor; do (cd $m && go build ./...); done
+
+      - name: Upload generated code
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-sdks-${{ inputs.ref }}
+          path: gen/
