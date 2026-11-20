@@ -15,14 +15,20 @@ option java_outer_classname = "LineItemStatusEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// Whether a line item may be paid for with the instrument used, for instruments that restrict what can be bought.
 enum LineItemStatus {
+  // Not set.
   LINE_ITEM_STATUS_UNSPECIFIED = 0;
 
+  // No eligibility decision has been made for this item.
   LINE_ITEM_STATUS_NOT_ASSESSED = 1;
 
+  // The item may be paid for with the instrument.
   LINE_ITEM_STATUS_ELIGIBLE = 2;
 
+  // The item may not be paid for with the instrument.
   LINE_ITEM_STATUS_INELIGIBLE = 3;
 
+  // The item is age-restricted.
   LINE_ITEM_STATUS_AGE_RESTRICTED = 4;
 }

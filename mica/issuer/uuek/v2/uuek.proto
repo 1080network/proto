@@ -1,0 +1,93 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.issuer.uuek.v2;
+
+import "google/protobuf/timestamp.proto";
+import "mica/issuer/instrument/v2/instrument.proto";
+import "micashared/common/v1/error.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/issuer/uuekv2";
+option java_outer_classname = "ProvisionIssuerUUEKProto";
+option java_package = "io.mica.issuer.uuek.v2";
+option objc_class_prefix = "MICA";
+
+// Request to create a UUEK for one of the Issuer's instruments. Identify the instrument and choose the use criteria;
+// the validity window and spend limit are optional. Mica recommends a single-use UUEK with a short `valid_to`.
+message ProvisionIssuerUUEKRequest {
+  reserved 2;
+
+  // The instrument the UUEK pays from. Exactly one identifier is required.
+  oneof instrument_identifier {
+    option (validate.required) = true;
+
+    // Mica's key for the instrument, as returned by RegisterInstrument.
+    string issuer_instrument_key = 1 [(validate.rules).string = {
+      min_len: 30,
+      max_len: 50
+    }];
+
+    // The Issuer's own user and instrument references for the instrument.
+    mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 8;
+  }
+
+  // Time from which the UUEK can be used. If unset, the UUEK is valid immediately.
+  google.protobuf.Timestamp valid_from = 3;
+
+  // Time after which the UUEK can no longer be used. If unset, the UUEK does not expire. Mica recommends setting this
+  // to a few minutes or hours in the future.
+  google.protobuf.Timestamp valid_to = 4;
+
+  // Maximum amount allowed in a single transaction with this UUEK, as a decimal string in the instrument's currency
+  // (for example "25.00"). Mica declines a transaction whose total amount, before discounts, exceeds it. If unset,
+  // any amount is allowed. A value that is not a valid decimal is rejected as an invalid argument.
+  string spend_limit = 5;
+
+  // How many transactions the UUEK can be used for. Exactly one option is required. Values other than a single use
+  // require the multi-use UUEK feature to be enabled for the Issuer; otherwise the request returns
+  // STATUS_INCORRECT_USE_CRITERIA.
+  oneof use_criteria {
+    option (validate.required) = true;
+
+    // Maximum number of transactions the UUEK can be used for; must be greater than 0. Mica recommends 1.
+    uint32 number_of_uses = 6 [(validate.rules).uint32.gt = 0];
+
+    // Set to true to allow unlimited uses, still subject to `valid_to` and `spend_limit`. Use with caution. Setting it
+    // to false is rejected as an invalid argument.
+    bool unlimited = 7;
+  }
+}
+
+message ProvisionIssuerUUEKResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The UUEK was created and is returned in `issuer_uuek`.
+    STATUS_SUCCESS = 1;
+    // The request failed for another reason; see `error`.
+    STATUS_ERROR = 2;
+    // No registered instrument matches the instrument identifier.
+    STATUS_INSTRUMENT_NOT_FOUND = 3;
+    // The use criteria are not allowed, for example multiple or unlimited uses without the multi-use UUEK feature.
+    STATUS_INCORRECT_USE_CRITERIA = 4;
+    // A field is malformed, for example an undecodable instrument key or a non-decimal `spend_limit`.
+    STATUS_INVALID_ARGUMENT = 5;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The new UUEK. Give it to the user to present at any Acceptor on the network. Set only on STATUS_SUCCESS.
+  string issuer_uuek = 3 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+}

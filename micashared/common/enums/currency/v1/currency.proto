@@ -15,8 +15,10 @@ option java_outer_classname = "CurrencyEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
-// From: ISO 4217 (see: https://en.wikipedia.org/wiki/ISO_4217)
+// ISO 4217 currency codes (see https://en.wikipedia.org/wiki/ISO_4217). Each value's number is the currency's ISO 4217
+// numeric code, for example CURRENCY_USD = 840.
 enum Currency {
+  // Not set.
   CURRENCY_UNSPECIFIED = 0;
   CURRENCY_ALL = 8;
   CURRENCY_DZD = 12;

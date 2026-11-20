@@ -15,12 +15,17 @@ option java_outer_classname = "BarcodeLocationEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// Where to display a barcode.
 enum BarcodeLocation {
+  // Not set.
   BARCODE_LOCATION_UNSPECIFIED = 0;
 
+  // Do not display a barcode.
   BARCODE_LOCATION_NONE = 1;
 
+  // At the top.
   BARCODE_LOCATION_TOP = 2;
 
+  // At the bottom.
   BARCODE_LOCATION_BOTTOM = 3;
 }

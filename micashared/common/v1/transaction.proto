@@ -17,13 +17,14 @@ option java_outer_classname = "TransactionProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// Identifies a transaction across the whole network. Mica assigns both values when a request first arrives, and every
+// member and service involved in the transaction sees the same pair.
 message TransactionIdentifier {
-  // Global transaction ID passed that reflects the ID of this transaction across the entire path through the network.
-  // This can be used report issues and debug transactions
+  // Network-wide ID of this transaction, a UUID string. It is the same at every hop through the network, so store it
+  // and quote it when reporting a problem or reconciling with another member.
   string global_transaction_id = 1;
 
-  // Global timestamp passed that reflects the time when the request arrived at the network and is the same for all
-  // services that are involved with processing a transaction. This field can be used when trying to reconcile data
-  // between you and the network (assuming you store this timestamp).
+  // Time the request arrived at the network. It is the same for every service involved in the transaction; store it
+  // alongside `global_transaction_id` if you want to reconcile your records with Mica's.
   google.protobuf.Timestamp global_transaction_time = 2;
 }

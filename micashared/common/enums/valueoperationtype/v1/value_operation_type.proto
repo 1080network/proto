@@ -15,22 +15,32 @@ option java_outer_classname = "ValueOperationTypeEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// The kind of value movement a transaction represents.
 enum ValueOperationType {
+  // Not set, or a kind of transaction with no value below (for example a hold amendment).
   VALUE_OPERATION_TYPE_UNSPECIFIED = 0;
 
+  // A payment: value taken from the user's instrument.
   VALUE_OPERATION_TYPE_OBTAIN = 1;
 
+  // A refund: value credited back to the user's instrument, for example for a returned purchase.
   VALUE_OPERATION_TYPE_RETURN = 2;
 
+  // Reversal of an earlier OBTAIN.
   VALUE_OPERATION_TYPE_REVERSE_OBTAIN = 3;
 
+  // Reversal of an earlier RETURN.
   VALUE_OPERATION_TYPE_REVERSE_RETURN = 4;
 
+  // A person-to-person transfer.
   VALUE_OPERATION_TYPE_P2P = 5;
 
+  // Value reserved on the instrument for a later capture.
   VALUE_OPERATION_TYPE_HOLD = 6;
 
+  // A hold released without being captured.
   VALUE_OPERATION_TYPE_RELEASE = 7;
 
+  // Capture of value against an earlier HOLD.
   VALUE_OPERATION_TYPE_OBTAIN_HOLD = 8;
 }

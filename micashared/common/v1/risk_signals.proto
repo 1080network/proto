@@ -15,8 +15,11 @@ option java_outer_classname = "RiskSignalsProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// Operating system of a device involved in a transaction.
 enum OperatingSystem {
+  // Not provided.
   OPERATING_SYSTEM_UNSPECIFIED = 0;
+  // Known, but not one of the values below.
   OPERATING_SYSTEM_OTHER = 1;
   OPERATING_SYSTEM_ANDROID = 2;
   OPERATING_SYSTEM_IOS = 3;
@@ -26,22 +29,33 @@ enum OperatingSystem {
   OPERATING_SYSTEM_CHROMEOS = 7;
 }
 
+// Kind of device involved in a transaction.
 enum DeviceType {
+  // Not provided.
   DEVICE_TYPE_UNSPECIFIED = 0;
+  // Known, but not one of the values below.
   DEVICE_TYPE_OTHER = 1;
   DEVICE_TYPE_TABLET = 2;
+  // A payment terminal or point-of-sale device.
   DEVICE_TYPE_TERMINAL = 3;
   DEVICE_TYPE_SMARTPHONE = 4;
   DEVICE_TYPE_COMPUTER = 5;
   DEVICE_TYPE_WEARABLE = 6;
+  // A web browser, when the underlying hardware is not known.
   DEVICE_TYPE_BROWSER = 7;
 }
 
+// How a user proved their identity to a device. Whether a factor counts as weak or strong is the reporting member's
+// assessment.
 enum AuthenticationType {
+  // Not provided.
   AUTHENTICATION_TYPE_UNSPECIFIED = 0;
+  // Known, but not one of the values below.
   AUTHENTICATION_TYPE_OTHER = 1;
+  // The user was not authenticated.
   AUTHENTICATION_TYPE_NONE = 2;
   AUTHENTICATION_TYPE_PIN = 3;
+  // A password or similar credential.
   AUTHENTICATION_TYPE_CREDENTIAL = 4;
   AUTHENTICATION_TYPE_BIOMETRIC_WEAK = 5;
   AUTHENTICATION_TYPE_BIOMETRIC_STRONG = 6;
@@ -50,41 +64,58 @@ enum AuthenticationType {
   AUTHENTICATION_TYPE_MFA_STRONG = 9;
 }
 
+// Kind of actor using a device.
 enum UserType {
+  // Not provided.
   USER_TYPE_UNSPECIFIED = 0;
+  // Known, but not one of the values below.
   USER_TYPE_OTHER = 1;
+  // A human, such as a cashier or the customer.
   USER_TYPE_PERSON = 2;
+  // An automated system acting without a human.
   USER_TYPE_SERVICE_ACCOUNT = 3;
 }
 
+// Describes a device in the path of a transaction.
 message DeviceIdentifier {
+  // Kind of device.
   DeviceType device_type = 1;
-  //The device_os identifies the operating system of the device where the transaction originates
+  // Operating system of the device where the transaction originates.
   OperatingSystem device_os = 2;
-  //The device_name identifes either a model or the name of the transaction originating devide, for example PAX A920Pro terminal, etc
+  // Model or name of the device where the transaction originates, for example "PAX A920Pro".
   string device_name = 3;
-  //The device_idenfifier represents a unique identifier for the device, this can be terminal id or the serial number or any other available identifier, etc
+  // Identifier that is unique to the device, such as a terminal ID or serial number.
   string device_identifier = 4;
-  //The device_user_agent identifies the user agent used to make a request from a device to the backend, this could be a browser user agent or the client used to submit the request etc
+  // User agent of the client that sent the request from the device to your backend, such as a browser user agent
+  // string or the name and version of your app.
   string device_user_agent = 5;
-  //The ip_address represents the ip address of the remote device sending the transaction
+  // IP address of the remote device that sent the transaction.
   string ip_address = 6;
 }
 
+// Describes the actor using a device.
 message DeviceUser {
+  // Kind of actor.
   UserType user_type = 1;
-  //The user_identifier consistently identifies a user. This can be a clerk id, etc. Avoid usernames or any operable credential
+  // Identifier that consistently identifies this user, such as a clerk ID. Do not send usernames or anything that
+  // could be used as a credential.
   string user_identifier = 2;
-  //The user_authentication captures how the user was authenticated into the device, all factors can be represented
+  // Every factor the user presented to authenticate to the device.
   repeated AuthenticationType user_authentication = 3;
 }
 
-//Origin is a tuple of a actor/user on a device in the path of the transaction
+// One actor on one device in the path of the transaction.
 message Origin {
+  // The device.
   DeviceIdentifier device_data = 1;
+  // The actor using the device.
   DeviceUser user_data = 2;
 }
 
+// Optional data about where a transaction came from, which the Issuer can use in its risk and fraud decisions. The
+// Acceptor supplies it on value requests and Mica passes it to the Issuer unchanged; Mica does not validate or act on
+// it. Every field is optional: send what you have.
 message RiskSignal {
+  // Each device and actor the transaction passed through, for example the customer's phone and the store terminal.
   repeated Origin origins = 1;
 }

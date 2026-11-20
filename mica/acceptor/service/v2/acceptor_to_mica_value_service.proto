@@ -1,0 +1,671 @@
+syntax = "proto3";
+
+package mica.acceptor.service.v2;
+
+import "google/protobuf/timestamp.proto";
+import "mica/common/v1/currency.proto";
+import "micashared/common/enums/approvaltype/v1/approval_type.proto";
+import "micashared/common/v1/error.proto";
+import "micashared/common/v1/line_item.proto";
+import "micashared/common/v1/risk_signals.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/acceptor/servicev2";
+option java_outer_classname = "AcceptorToMicaValueServiceProto";
+option java_package = "io.mica.acceptor.service.v2";
+option objc_class_prefix = "MICA";
+
+// The service an Acceptor calls to move value using UUEKs provisioned from a link on AcceptorToMicaLinkService. It
+// replaces the value operations of the v1 PartnerToMicaService.
+//
+// Unlike the v1 service, failures are reported as gRPC status codes rather than a status enum in the response. A
+// request that breaks a validation rule on its fields is rejected with INVALID_ARGUMENT before it is processed.
+service AcceptorToMicaValueService {
+  // Obtains value from the user behind a UUEK to pay for goods or services. Mica may split the payment across several
+  // of the user's tenders; the response reports the combined outcome.
+  //
+  // A business outcome is reported in the response's result: approved (possibly for part of the amount), declined, or
+  // error. Once Mica has recorded a transaction, the outcome is normally reported there rather than as a status code.
+  //
+  // Failures before a transaction is recorded are reported as gRPC status codes:
+  //   INVALID_ARGUMENT - the request failed validation, or the UUEK is missing, malformed or cannot be used to pay
+  //   INTERNAL         - the UUEK could not be exchanged or the payment could not be started. Other problems with
+  //                      the request found during processing, such as an unknown organization or an
+  //                      APPROVAL_TYPE_UNSPECIFIED approval_type, currently also surface as INTERNAL.
+  rpc ObtainValue(ObtainValueRequest) returns (ObtainValueResponse);
+
+  // Intended to reverse an earlier ObtainValue, returning the value it obtained to the user.
+  rpc ReverseObtainValue(ReverseObtainValueRequest) returns (ReverseObtainValueResponse) {}
+
+  // Intended to refund the user, in whole or in part, for an earlier transaction.
+  rpc RefundValue(RefundValueRequest) returns (RefundValueResponse);
+
+  // Intended to send value to the user behind a UUEK without referring to an earlier transaction.
+  rpc PayoutValue(PayoutValueRequest) returns (PayoutValueResponse);
+
+  // Intended to place a hold on value from the user behind a UUEK, to be obtained later with ObtainHoldValue or
+  // released with ReleaseHoldValue.
+  rpc HoldValue(HoldValueRequest) returns (HoldValueResponse);
+
+  // Intended to release value held by an earlier HoldValue back to the user.
+  rpc ReleaseHoldValue(ReleaseHoldValueRequest) returns (ReleaseHoldValueResponse) {}
+
+  // Intended to obtain value held by an earlier HoldValue.
+  rpc ObtainHoldValue(ObtainHoldValueRequest) returns (ObtainHoldValueResponse) {}
+}
+
+// Identifies a transaction Mica recorded. Returned by every value operation.
+message TransactionIdentifier {
+  // Mica's identifier for this transaction across every service that handled it on the network. Quote it when
+  // reporting a problem with a transaction.
+  string global_transaction_id = 1;
+
+  // When the request arrived at the network. Every service involved in the transaction records the same time, so
+  // store it if you want to reconcile your records with Mica's.
+  google.protobuf.Timestamp global_transaction_time = 2;
+
+  // Mica's key for the transaction.
+  string transaction_key = 3;
+}
+
+// Identifies the earlier transaction that a follow-up operation (ReverseObtainValue or RefundValue) applies to, using
+// the values Mica returned for it in TransactionIdentifier.
+//
+// This is a placeholder: the operations that use it are not implemented yet, and which of its fields they will require
+// has not been decided.
+message OriginalTransactionIdentifier {
+  // The global_transaction_id Mica returned for the original transaction.
+  string global_transaction_id = 1;
+
+  // The transaction_key Mica returned for the original transaction.
+  string transaction_key = 3;
+}
+
+// Not used by any operation in this service yet. Intended to carry an opaque token that authorizes Mica to apply a
+// particular discount selection to a transaction; its format is not defined.
+message DiscountSelection {
+  // An opaque token. Its format is not defined yet.
+  string token = 1;
+}
+
+// Where an operation takes place: the organization it is processed for, and optionally the organization category and
+// clerk. Mica passes the category and clerk on to the Issuers involved.
+message LocationDetails {
+  // The organization this operation is processed for. Set one of these.
+  oneof organization_identifier {
+    // Mica's key for the organization, as returned by CreateOrganization. At most 50 characters.
+    string organization_key = 1 [(validate.rules).string = {max_len: 50}];
+
+    // Your own reference for the organization (its organization_ref). At most 100 characters.
+    string organization_ref = 2 [(validate.rules).string = {max_len: 100}];
+  }
+
+  // Which of the organization's categories this operation is for, in the form AAA-BBB (for example COM-GRO).
+  // Optional. See https://developer.mica.io/apis/organization-categories/
+  string category = 3 [(validate.rules).string.pattern = "^$|^[A-Z]{3}-[A-Z]{3}$"];
+
+  // Your identifier for the clerk or terminal operator that processed this operation. Optional.
+  string clerk_identifier = 6;
+}
+
+// An additional fee the Acceptor (for example an acquirer) imposes on a transaction. Mica records it with the
+// transaction and carries it into settlement.
+message AcceptorFee {
+  // The fee amount as a non-negative decimal string, for example "0.25". Must match ([0-9]*[.])?[0-9]+. Leave empty
+  // for no fee.
+  string amount = 1;
+}
+
+// Free-form key/value data you attach to a transaction. Mica stores it with the transaction.
+message ValueMetaData {
+  // One entry of metadata. Mica recognises some keys: for example, the value of "barcode_text" can be rendered as a
+  // barcode on the user's receipt so the transaction can later be found in the store's system.
+  message KeyValuePair {
+    // The metadata key.
+    string key = 1;
+    // The value for the key.
+    string value = 2;
+  }
+  // The metadata entries. If a key appears more than once, the last value is kept.
+  repeated KeyValuePair key_value_pairs = 2;
+}
+
+// The contents of the user's basket for a transaction.
+message BasketDetails {
+  // Your order number for this transaction. Optional; Mica stores it and passes it on to the Issuers involved.
+  string order_number = 1;
+
+  // The items bought or returned. Mica uses them, for example, to decide which items a tender or coupon applies to.
+  repeated micashared.common.v1.LineItem line_items = 2;
+
+  // Adjustments applied to the basket, such as discounts. ObtainValue does not currently use them.
+  repeated micashared.common.v1.Adjustment adjustments = 3;
+
+  // Zero or more fees added to the basket, such as an ATM fee or a restaurant tip. ObtainValue does not currently use
+  // them.
+  repeated micashared.common.v1.Surcharge surcharges = 4;
+}
+
+message ObtainValueRequest {
+  // The UUEK to pay with, as returned by ProvisionUUEKFromLink or by CompleteLinkingWithCode with create_uuek set, on
+  // AcceptorToMicaLinkService.
+  string uuek = 4;
+
+  // Whether you accept approval for part of requested_amount. With APPROVAL_TYPE_FULL, anything less than the full
+  // amount is declined; with APPROVAL_TYPE_PARTIAL, Mica approves what it can. Required: APPROVAL_TYPE_UNSPECIFIED is
+  // rejected.
+  micashared.common.enums.approvaltype.v1.ApprovalType approval_type = 1; // can this be moved to non-shared?
+
+  // Your own unique reference for this transaction. 1 to 100 characters. Mica stores it with the transaction.
+  string transaction_ref = 5 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+
+  // The currency of requested_amount, as an ISO 4217 code. Not yet enforced as required (MICA-2507), but you should
+  // always set it.
+  mica.common.v1.Currency currency = 6; // [(validate.rules).message = {required: true}]; MICA-2507
+
+  // The total amount to obtain from the user, as a decimal string in the units of currency, for example "12.50". 1 to
+  // 50 characters matching ([0-9]*[.])?[0-9]+.
+  //
+  // When basket_details are present this should equal the sum of each line item's line_amount and line_tax_amount,
+  // plus surcharges.
+  string requested_amount = 7 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50,
+    pattern: "^([0-9]*[.])?[0-9]+$"
+  }];
+
+  // An additional fee you impose on this transaction. Optional.
+  AcceptorFee acceptor_fee = 8;
+
+  // The organization the payment is made to, and optionally the category and clerk. Required.
+  LocationDetails location_details = 9 [(validate.rules).message = {required: true}];
+
+  // The basket being paid for. Optional, but needed for tenders or coupons that apply only to particular items.
+  BasketDetails basket_details = 10;
+
+  // Free-form data to store with the transaction. Optional.
+  ValueMetaData meta_data = 11;
+
+  // Details about where and how the transaction originated (device, location, user), passed on to the Issuers to help
+  // them assess risk. Optional.
+  micashared.common.v1.RiskSignal risk_signal = 3;
+}
+
+message ObtainValueResponse {
+  // Identifies the transaction Mica recorded for this request.
+  TransactionIdentifier transaction_identifier = 1;
+
+  // Mica's correlation ID for this request. Quote it, with global_transaction_id, when reporting a problem.
+  string cid = 3;
+
+  // The outcome. Exactly one is set.
+  oneof result {
+    // The payment was approved, for all or part of requested_amount.
+    ApprovedResult approved = 4;
+    // The payment was declined and no value was obtained.
+    DeclinedResult declined = 6;
+    // The payment could not be completed cleanly. Do not treat it as approved; quote cid and global_transaction_id if
+    // you contact Mica about it.
+    ErrorResult error = 7;
+  }
+
+  // Details of an approval.
+  message ApprovedResult {
+    // The amount obtained, as a decimal string in the request's currency. Equal to requested_amount unless was_partial
+    // is true.
+    string approved_amount = 2;
+
+    // True when less than requested_amount was approved. Only possible when approval_type was APPROVAL_TYPE_PARTIAL;
+    // collect the remainder some other way.
+    bool was_partial = 3;
+  }
+
+  // Details of a decline. Returned, for example, when approval_type was APPROVAL_TYPE_FULL and the user's tenders
+  // could not cover requested_amount.
+  message DeclinedResult {
+    // A code for the reason for the decline. Not populated yet: currently always empty.
+    string decline_code = 2; // TODO decline details
+
+    // A human-readable reason for the decline. Not populated yet: currently always empty.
+    string decline_reason = 3;
+  }
+
+  // Details of an error.
+  message ErrorResult {
+    // A description of the error.
+    micashared.common.v1.Error error = 1;
+  }
+}
+
+// Request for ReverseObtainValue, which is not implemented yet.
+message ReverseObtainValueRequest {
+  // The ObtainValue transaction to reverse.
+  OriginalTransactionIdentifier original_transaction_identifier = 1;
+
+  // Your own reference for this reversal. At most 100 characters.
+  string transaction_ref = 3 [(validate.rules).string.max_len = 100];
+
+  // Details about where and how the reversal originated, passed on to the Issuers to help them assess risk. Optional.
+  micashared.common.v1.RiskSignal risk_signal = 4;
+}
+
+// Response for ReverseObtainValue, which is not implemented yet.
+message ReverseObtainValueResponse {
+  // Identifies the reversal transaction Mica recorded.
+  TransactionIdentifier transaction_identifier = 1;
+
+  // Mica's correlation ID for this request.
+  string cid = 3;
+
+  // The outcome. Exactly one is set.
+  oneof result {
+    // The reversal succeeded.
+    ApprovedResult approved = 4;
+    // The reversal could not be completed.
+    ErrorResult error = 7;
+  }
+
+  // Details of a successful reversal.
+  message ApprovedResult {
+    // The amount returned to the user, as a decimal string.
+    string approved_amount = 2;
+    // TODO list of discounts that were reversed
+  }
+
+  // Details of an error.
+  message ErrorResult {
+    // A description of the error.
+    micashared.common.v1.Error error = 1;
+  }
+}
+
+// RefundValue is for returning/refunding a consumer based on a prior transaction
+// Assumptions/open questions:
+//   - A UUEK isn't required because a refund refers back to the original transaction
+//   - If we allow partial capture/completions, what does that mean for refunds (i.e., can you refund a partial
+//     capture/completion)?
+//   - Do we want to allow partial approvals on a refund?
+//   - How can we handle a refund that is for a greater or lesser amount than the original transaction?
+//   - How do we handle the case where we aren't able to complete a refund (e.g., the issuers reject the refund)?
+
+// Request for RefundValue, which is not implemented yet. A refund refers to an earlier transaction, so no UUEK is
+// needed.
+message RefundValueRequest {
+  // The transaction being refunded.
+  OriginalTransactionIdentifier original_transaction_identifier = 1;
+
+  // Your own unique reference for this refund. 1 to 100 characters.
+  string transaction_ref = 2 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+
+  // The currency of requested_amount, as an ISO 4217 code. Not yet enforced as required (MICA-2507).
+  mica.common.v1.Currency currency = 3; // [(validate.rules).message = {required: true}]; MICA-2507
+
+  // The amount to refund, as a decimal string in the units of currency. 1 to 50 characters matching
+  // ([0-9]*[.])?[0-9]+.
+  //
+  // When basket_details are present this should equal the sum of each line item's line_amount and line_tax_amount,
+  // plus surcharges.
+  string requested_amount = 4 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50,
+    pattern: "^([0-9]*[.])?[0-9]+$"
+  }];
+
+  // An additional fee you impose on this refund. Optional.
+  AcceptorFee acceptor_fee = 5;
+
+  // The items being refunded. Optional.
+  BasketDetails basket_details = 6;
+
+  // Free-form data to store with the refund. Optional.
+  ValueMetaData meta_data = 7;
+
+  // Details about where and how the refund originated, passed on to the Issuers to help them assess risk. Optional.
+  micashared.common.v1.RiskSignal risk_signal = 8;
+}
+
+// Response for RefundValue, which is not implemented yet.
+message RefundValueResponse {
+  // Identifies the refund transaction Mica recorded.
+  TransactionIdentifier transaction_identifier = 1;
+
+  // Mica's correlation ID for this request.
+  string cid = 3;
+
+  // The outcome. Exactly one is set.
+  oneof result {
+    // The refund succeeded.
+    ApprovedResult approved = 4;
+    // The refund could not be completed.
+    ErrorResult error = 7;
+  }
+
+  // Details of a successful refund.
+  message ApprovedResult {
+    // The amount refunded to the user, as a decimal string.
+    string approved_amount = 2;
+  }
+
+  // Details of an error.
+  message ErrorResult {
+    // A description of the error.
+    micashared.common.v1.Error error = 1;
+  }
+}
+
+// ReturnValue is for sending money back to a consumer. A UUEK is requested but a previous transaction is not required
+// Assumptions/open questions:
+//   - Do we want to allow partial approvals on a return?
+
+// Request for PayoutValue, which is not implemented yet. A payout sends value to the user behind a UUEK and does not
+// refer to an earlier transaction.
+message PayoutValueRequest {
+  // The UUEK of the user to pay.
+  string uuek = 4;
+
+  // Whether you accept a payout of part of requested_amount.
+  micashared.common.enums.approvaltype.v1.ApprovalType approval_type = 1; // can this be moved to non-shared?
+
+  // Your own unique reference for this payout. 1 to 100 characters.
+  string transaction_ref = 5 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+
+  // The currency of requested_amount, as an ISO 4217 code. Not yet enforced as required (MICA-2507).
+  mica.common.v1.Currency currency = 6; // [(validate.rules).message = {required: true}]; MICA-2507
+
+  // The amount to pay out, as a decimal string in the units of currency. 1 to 50 characters matching
+  // ([0-9]*[.])?[0-9]+.
+  //
+  // When basket_details are present this should equal the sum of each line item's line_amount and line_tax_amount,
+  // plus surcharges.
+  string requested_amount = 7 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50,
+    pattern: "^([0-9]*[.])?[0-9]+$"
+  }];
+
+  // An additional fee you impose on this payout. Optional.
+  AcceptorFee acceptor_fee = 8;
+
+  // The organization making the payout, and optionally the category and clerk. Required.
+  LocationDetails location_details = 9 [(validate.rules).message = {required: true}];
+
+  // The items the payout relates to. Optional.
+  BasketDetails basket_details = 10;
+
+  // Free-form data to store with the payout. Optional.
+  ValueMetaData meta_data = 11;
+
+  // Details about where and how the payout originated, passed on to the Issuers to help them assess risk. Optional.
+  micashared.common.v1.RiskSignal risk_signal = 3;
+}
+
+// Response for PayoutValue, which is not implemented yet.
+message PayoutValueResponse {
+  // Identifies the payout transaction Mica recorded.
+  TransactionIdentifier transaction_identifier = 1;
+
+  // Mica's correlation ID for this request.
+  string cid = 3;
+
+  // The outcome. Exactly one is set.
+  oneof result {
+    // The payout was approved, for all or part of requested_amount.
+    ApprovedResult approved = 4;
+    // The payout was declined.
+    DeclinedResult declined = 6;
+    // The payout could not be completed.
+    ErrorResult error = 7;
+  }
+
+  // Details of an approval.
+  message ApprovedResult {
+    // The amount paid out, as a decimal string.
+    string approved_amount = 2;
+
+    // True when less than requested_amount was approved.
+    bool was_partial = 3;
+  }
+
+  // Details of a decline.
+  message DeclinedResult {
+    // A code for the reason for the decline.
+    string decline_code = 2; // TODO decline details
+
+    // A human-readable reason for the decline.
+    string decline_reason = 3;
+  }
+
+  // Details of an error.
+  message ErrorResult {
+    // A description of the error.
+    micashared.common.v1.Error error = 1;
+  }
+}
+
+// Open questions:
+//   - How do we want to handle the basket with holds? In particular, the impact of changing the basket later or not
+//     capturing/completing the whole basket. We could simply ignore this.
+//  - Are there any constraints on the hold expiration?
+
+// Request for HoldValue, which is not implemented yet.
+message HoldValueRequest {
+  // The UUEK of the user whose value is held.
+  string uuek = 1;
+
+  // Whether you accept a hold on part of total_amount.
+  micashared.common.enums.approvaltype.v1.ApprovalType approval_type = 2; // can this be moved to non-shared?
+
+  // Your own reference for this hold. At most 100 characters. It can later identify the hold to ReleaseHoldValue and
+  // ObtainHoldValue as hold_transaction_ref.
+  string transaction_ref = 3 [(validate.rules).string.max_len = 100];
+
+  // When the hold expires and the value is released back to the user. Required.
+  google.protobuf.Timestamp expiration = 4 [(validate.rules).timestamp = {required: true}];
+
+  // The currency of total_amount, as an ISO 4217 code. Required.
+  mica.common.v1.Currency currency = 5 [(validate.rules).message = {required: true}];
+
+  // The amount to hold, as a decimal string in the units of currency. 1 to 50 characters matching
+  // ([0-9]*[.])?[0-9]+.
+  //
+  // When basket_details are present this should equal the sum of each line item's line_amount and line_tax_amount,
+  // plus surcharges.
+  string total_amount = 6 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50,
+    pattern: "^([0-9]*[.])?[0-9]+$"
+  }];
+
+  // An additional fee you impose on this transaction. Optional.
+  AcceptorFee acceptor_fee = 7;
+
+  // The organization placing the hold, and optionally the category and clerk. Required.
+  LocationDetails location_details = 8 [(validate.rules).message = {required: true}];
+
+  // The items the hold is for. For information only: no business logic applies to them, and they may change when the
+  // hold is obtained.
+  BasketDetails basket_details = 9;
+
+  // Details about where and how the hold originated, passed on to the Issuers to help them assess risk. Optional.
+  micashared.common.v1.RiskSignal risk_signal = 10;
+}
+
+// Response for HoldValue, which is not implemented yet.
+message HoldValueResponse{
+  // Identifies the hold transaction Mica recorded. Its transaction_key can later identify the hold to
+  // ReleaseHoldValue and ObtainHoldValue as hold_transaction_key.
+  TransactionIdentifier transaction_identifier = 1;
+
+  // Mica's correlation ID for this request.
+  string cid = 3;
+
+  // The outcome. Exactly one is set.
+  oneof result {
+    // The hold was approved, for all or part of total_amount.
+    ApprovedResult approved = 4;
+    // The hold was declined.
+    DeclinedResult declined = 6;
+    // The hold could not be completed.
+    ErrorResult error = 7;
+  }
+
+  // Details of an approval.
+  message ApprovedResult {
+    // The amount held, as a decimal string.
+    string approved_amount = 2;
+
+    // True when less than total_amount was held.
+    bool was_partial = 3;
+  }
+
+  // Details of a decline.
+  message DeclinedResult {
+    // A code for the reason for the decline.
+    string decline_code = 2; // TODO decline details
+
+    // A human-readable reason for the decline.
+    string decline_reason = 3;
+  }
+
+  // Details of an error.
+  message ErrorResult {
+    // A description of the error.
+    micashared.common.v1.Error error = 1;
+  }
+}
+
+// Request for ReleaseHoldValue, which is not implemented yet.
+message ReleaseHoldValueRequest {
+  // The hold to release. Set one of these.
+  oneof hold_transaction_identifier {
+    option (validate.required) = true;
+
+    // The transaction_key Mica returned for the hold.
+    string hold_transaction_key = 1;
+
+    // The transaction_ref you gave the hold. At most 100 characters.
+    string hold_transaction_ref = 2 [(validate.rules).string.max_len = 100];
+  }
+
+  // Your own reference for this release. At most 100 characters.
+  string transaction_ref = 3 [(validate.rules).string.max_len = 100];
+
+  // Details about where and how the release originated, passed on to the Issuers to help them assess risk. Optional.
+  micashared.common.v1.RiskSignal risk_signal = 5;
+
+}
+
+// Response for ReleaseHoldValue, which is not implemented yet.
+message ReleaseHoldValueResponse {
+  // Identifies the release transaction Mica recorded.
+  TransactionIdentifier transaction_identifier = 1;
+
+  // Mica's correlation ID for this request.
+  string cid = 3;
+
+  // The outcome. Exactly one is set.
+  oneof result {
+    // The hold was released.
+    ApprovedResult approved = 4;
+    // The release could not be completed.
+    ErrorResult error = 7;
+  }
+
+  // Details of a successful release.
+  message ApprovedResult {
+    // The amount released back to the user, as a decimal string.
+    string approved_amount = 2;
+  }
+
+  // Details of an error.
+  message ErrorResult {
+    // A description of the error.
+    micashared.common.v1.Error error = 1;
+  }
+}
+
+// Request for ObtainHoldValue, which is not implemented yet.
+message ObtainHoldValueRequest {
+  // The hold to obtain value from. Set one of these.
+  oneof hold_transaction_identifier {
+    option (validate.required) = true;
+
+    // The transaction_key Mica returned for the hold.
+    string hold_transaction_key = 1;
+
+    // The transaction_ref you gave the hold. At most 100 characters.
+    string hold_transaction_ref = 2 [(validate.rules).string.max_len = 100];
+  }
+
+  // Your own reference for this transaction. At most 100 characters.
+  string transaction_ref = 3 [(validate.rules).string.max_len = 100];
+
+  // The currency of total_amount, as an ISO 4217 code. Required.
+  mica.common.v1.Currency currency = 4 [(validate.rules).message = {required: true}];
+
+  // The amount to obtain from the hold, as a decimal string in the units of currency. 1 to 50 characters matching
+  // ([0-9]*[.])?[0-9]+.
+  //
+  // When basket_details are present this should equal the sum of each line item's line_amount and line_tax_amount,
+  // plus surcharges.
+  string total_amount = 5 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 50,
+    pattern: "^([0-9]*[.])?[0-9]+$"
+  }];
+
+  // An additional fee you impose on this transaction. Optional.
+  AcceptorFee acceptor_fee = 6;
+
+  // The organization obtaining the value, and optionally the category and clerk. Required.
+  LocationDetails location_details = 7 [(validate.rules).message = {required: true}];
+
+  // The items bought or returned.
+  BasketDetails basket_details = 8;
+
+  // Details about where and how the transaction originated, passed on to the Issuers to help them assess risk.
+  // Optional.
+  micashared.common.v1.RiskSignal risk_signal = 9;
+}
+
+// Open questions:
+//  - We will need to decide if a decline is allowed to happen on a hold transaction in the event of either a partial
+//    capture/completion or a material change in the basket details resulting in a decline
+
+// Response for ObtainHoldValue, which is not implemented yet.
+message ObtainHoldValueResponse {
+  // Identifies the transaction Mica recorded.
+  TransactionIdentifier transaction_identifier = 1;
+
+  // Mica's correlation ID for this request.
+  string cid = 3;
+
+  // The outcome. Exactly one is set.
+  oneof result {
+    // The value was obtained.
+    ApprovedResult approved = 4;
+    // The transaction could not be completed.
+    ErrorResult error = 7;
+  }
+
+  // Details of a successful obtain.
+  message ApprovedResult {
+    // The amount obtained, as a decimal string.
+    string approved_amount = 5;
+  }
+
+  // Details of an error.
+  message ErrorResult {
+    // A description of the error.
+    micashared.common.v1.Error error = 1;
+  }
+}

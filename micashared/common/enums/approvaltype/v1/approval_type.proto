@@ -15,8 +15,12 @@ option java_outer_classname = "ApprovalTypeEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// Whether a payment may be approved for less than the amount requested.
 enum ApprovalType {
+  // Not set. Requests that need an approval type reject this value.
   APPROVAL_TYPE_UNSPECIFIED = 0;
+  // Only the full requested amount is acceptable: if it cannot all be approved, the payment is declined.
   APPROVAL_TYPE_FULL = 1;
+  // An approval for less than the requested amount is acceptable; the Acceptor collects the remainder another way.
   APPROVAL_TYPE_PARTIAL = 2;
 }

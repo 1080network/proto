@@ -15,7 +15,10 @@ option java_outer_classname = "AgeBandEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// A coarse age bracket, shared instead of a date of birth. UNDER_n values say the user is under age n; OVER_n values
+// say the user is over age n.
 enum AgeBand {
+  // Not known or not shared.
   AGE_BAND_UNSPECIFIED = 0;
   AGE_BAND_UNDER_13 = 1;
   AGE_BAND_UNDER_14 = 2;

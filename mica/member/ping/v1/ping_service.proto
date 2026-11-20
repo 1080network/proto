@@ -17,29 +17,42 @@ option java_outer_classname = "PingServiceProto";
 option java_package = "io.mica.member.ping.v1";
 option objc_class_prefix = "MICA";
 
+// Connectivity check available on every Issuer and Acceptor endpoint.
 service PingService {
-  // Test connectivity to the Mica network
+  // Checks that you can reach Mica and that your client certificate is accepted. Needs no role beyond a valid
+  // certificate, so it is a good first call when setting up a connection.
   rpc Ping(PingRequest) returns (PingResponse) {}
 }
 
+// Takes no parameters.
 message PingRequest {}
 
+// Information about the Mica instance that answered.
 message PingResponse {
   enum Status {
     STATUS_UNSPECIFIED = 0;
+    // The service is up and the connection, including mutual TLS, works.
     STATUS_SUCCESS = 1;
   }
+  // Always STATUS_SUCCESS when the call returns; any problem surfaces as a gRPC error instead.
   Status status = 1;
 
+  // Current time on the server, in UTC. Useful for spotting clock skew.
   google.protobuf.Timestamp server_time = 2;
 
+  // When the server process started, in UTC.
   google.protobuf.Timestamp server_start_time = 7;
 
+  // Release version of the Mica software.
   string build_version = 3;
 
+  // Git commit the Mica software was built from.
   string build_sha = 4;
 
+  // Commit time of that revision, in RFC 3339 format, or "N/A" if unknown.
   string build_time = 5;
 
+  // Kind of Mica service that answered: "ServiceProvider" for an Issuer endpoint, "Partner" for an Acceptor
+  // endpoint.
   string service_type = 6;
 }

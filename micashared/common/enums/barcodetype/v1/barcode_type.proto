@@ -15,12 +15,17 @@ option java_outer_classname = "BarcodeTypeEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// Symbology of a barcode to display.
 enum BarcodeType {
+  // Not set.
   BARCODE_TYPE_UNSPECIFIED = 0;
 
+  // No barcode.
   BARCODE_TYPE_NONE = 1;
 
+  // QR code.
   BARCODE_TYPE_QR = 2;
 
+  // GS1-128 (formerly EAN-128) linear barcode.
   BARCODE_TYPE_EAN128 = 3;
 }

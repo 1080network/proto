@@ -1,0 +1,231 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.issuer.value.v2;
+
+import "google/protobuf/timestamp.proto";
+import "mica/common/v1/currency.proto";
+import "mica/issuer/instrument/v2/instrument.proto";
+import "micashared/common/enums/valueoperationtype/v1/value_operation_type.proto";
+import "micashared/common/v1/address.proto";
+import "micashared/common/v1/error.proto";
+import "micashared/common/v1/risk_signals.proto";
+import "micashared/common/v1/transaction.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/issuer/valuev2";
+option java_outer_classname = "ValueProto";
+option java_package = "io.mica.issuer.value.v2";
+option objc_class_prefix = "MICA";
+
+// A past value transaction as Mica recorded it, returned by GetValue.
+message Value {
+  reserved 9, 14, 15, 16;
+
+  // Mica's key for the transaction.
+  string transaction_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // Record version, incremented by Mica on every change.
+  int64 version = 2;
+
+  // When Mica created the transaction record.
+  google.protobuf.Timestamp created = 3;
+
+  // When Mica last updated the transaction record.
+  google.protobuf.Timestamp updated = 4;
+
+  // The kind of value operation, for example a return.
+  micashared.common.enums.valueoperationtype.v1.ValueOperationType operation_type = 5;
+
+  // Mica's key for the instrument the transaction used.
+  string issuer_instrument_key = 6 [(validate.rules).string = {max_len: 50}];
+
+  // The Issuer's own identifier for the instrument the transaction used.
+  string issuer_instrument_ref = 7 [(validate.rules).string.max_len = 100];
+
+  // The Issuer-provisioned UUEK the user presented, if the transaction used one. Lets the Issuer match the
+  // transaction to the UUEK it issued.
+  string issuer_uuek = 24;
+
+  // The Acceptor's own reference for this transaction, if it supplied one. Unique within that Acceptor.
+  string acceptor_transaction_ref = 23 [(validate.rules).string.max_len = 100];
+
+  // Mica's key for the Acceptor organization where the transaction took place.
+  string organization_key = 10 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // Name of the organization where the transaction took place.
+  string organization_name = 11;
+
+  // Address of the organization where the transaction took place.
+  micashared.common.v1.Address organization_address = 12;
+
+  // The organization category this transaction is for, in the form AAA-BBB (for example COM-GRO). See
+  // https://developer.mica.io/apis/organization-categories/
+  string category = 13;
+
+  // Identifier of the clerk who processed the transaction, if the Acceptor supplied one.
+  string clerk_identifier = 17;
+
+  // The full amount the Acceptor requested, before discounts and ineligible items are removed.
+  // Decimal string in the transaction currency, for example "12.34" (format `([0-9]*[.])?[0-9]+`).
+  string total_amount = 18;
+
+  // The part of `total_amount` covered by discounts, for information only. Zero if none applied.
+  // Decimal string in the transaction currency, for example "12.34" (format `([0-9]*[.])?[0-9]+`).
+  string discount_amount = 21;
+
+  // The part of `total_amount` for items this instrument may not pay for, for example under an adjudicated benefit
+  // program. Zero if none.
+  // Decimal string in the transaction currency, for example "12.34" (format `([0-9]*[.])?[0-9]+`).
+  string ineligible_amount = 22;
+
+  // The amount the Issuer is asked to authorize, calculated as
+  // `requested_amount = total_amount - discount_amount - ineligible_amount`.
+  // Decimal string in the transaction currency, for example "12.34" (format `([0-9]*[.])?[0-9]+`).
+  string requested_amount = 19;
+
+  // The Acceptor's order number, for reference only.
+  string order_number = 20;
+
+  // When the hold expires. Set only for hold transactions.
+  google.protobuf.Timestamp expiration = 25;
+
+  // For a return, the Acceptor's reference for the original transaction being returned (typically the first
+  // ObtainValue), so the Issuer can match the return to the original payment. May be empty.
+  string initial_acceptor_transaction_ref = 26 [(validate.rules).string.max_len = 100];
+
+  // The currency of all amounts in this transaction.
+  mica.common.v1.Currency currency = 27 [(validate.rules).message = {required: true}];
+}
+
+// Result of a PIN check.
+enum PINStatus {
+  PIN_STATUS_UNSPECIFIED = 0;
+
+  // The PIN matched.
+  PIN_STATUS_MATCH = 1;
+}
+
+// The sender of a person-to-person transfer.
+message From {
+  // The UUEK the sender paid with.
+  string uuek = 4;
+
+  // The first name of the sender.
+  string first_name = 5;
+
+  // The last name of the sender.
+  string last_name = 6;
+
+  // The email of the sender.
+  string email = 7;
+
+  // Name of the sender's Issuer.
+  string issuer_name = 8;
+}
+
+// A request to credit a person-to-person transfer to one of the Issuer's instruments.
+message ReceiveValueRequest {
+  // Mica's key for the instrument to credit.
+  string to_issuer_instrument_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // The Issuer's own identifier for the instrument to credit.
+  string to_issuer_instrument_ref = 2 [(validate.rules).string.max_len = 100];
+
+  // The Issuer's own user and instrument references for the instrument to credit.
+  mica.issuer.instrument.v2.InstrumentExternalReference instrument_external_reference = 8 [(validate.rules).message.required = true];
+
+  // The currency of `amount`.
+  mica.common.v1.Currency currency = 3 [(validate.rules).message = {required: true}];
+
+  // The amount to credit.
+  // Decimal string in the transaction currency, for example "12.34" (format `([0-9]*[.])?[0-9]+`).
+  string amount = 4;
+
+  // Who sent the transfer.
+  issuer.value.v2.From from = 5;
+
+  // Information about where and how the transaction originated, supplied by the Acceptor for the Issuer's risk and
+  // fraud checks. May be empty.
+  micashared.common.v1.RiskSignal risk_signal = 6;
+
+  // Mica's network-wide identifier and time for the transfer.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 7;
+}
+
+message ReceiveValueResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The transfer was credited
+    STATUS_SUCCESS = 1;
+    // The transfer could not be credited
+    STATUS_ERROR = 2;
+  }
+  // The Issuer's result. Must not be STATUS_UNSPECIFIED.
+  Status status = 1;
+
+  // Optional details when the transfer could not be credited.
+  micashared.common.v1.Error error = 2;
+
+  // The Issuer's own reference for the credit (up to 100 characters).
+  string transaction_ref = 3 [(validate.rules).string.max_len = 100];
+}
+
+message GetValueRequest {
+  reserved 1;
+  reserved "transaction_key";
+
+  // The transaction to return. Exactly one identifier is required.
+  oneof identifier {
+    option (validate.required) = true;
+
+    // Mica's network-wide identifier for the transaction, as sent in the value operation's
+    // `transaction_identifier.global_transaction_id`.
+    string global_transaction_id = 3 [(validate.rules).string.uuid = true];
+
+    // The Issuer's own reference for the transaction, as the Issuer returned it in the value response.
+    string transaction_ref = 2 [(validate.rules).string.max_len = 100];
+  }
+}
+
+message GetValueResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The matching transaction records are returned in `values`.
+    STATUS_SUCCESS = 1;
+    // The request failed for another reason; see `error`.
+    STATUS_ERROR = 2;
+    // No transaction matches, possibly because it is older than `oldest_transaction_time` and has been purged.
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // Every transaction record that matches, in no particular order. A transaction can have more than one, for example
+  // one for each step of an operation or one for each instrument it used. Set only on STATUS_SUCCESS.
+  repeated Value values = 3;
+
+  // The time of the oldest transaction Mica still holds. Older transactions have been purged and cannot be retrieved.
+  google.protobuf.Timestamp oldest_transaction_time = 4;
+
+  // Mica's network-wide identifier and time for the transaction.
+  micashared.common.v1.TransactionIdentifier transaction_identifier = 5;
+}

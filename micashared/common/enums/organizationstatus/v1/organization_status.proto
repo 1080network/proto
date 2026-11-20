@@ -15,12 +15,17 @@ option java_outer_classname = "OrganizationStatusEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// Lifecycle state of an Acceptor's organization, such as a store or location.
+//
 // State transition diagram:
 //   INACTIVE (initial state) -> ACTIVE
 //   ACTIVE -> INACTIVE
 enum OrganizationStatus {
   reserved 1, 2, 4;
+  // Not set.
   ORGANIZATION_STATUS_UNSPECIFIED = 0;
+  // The organization can transact.
   ORGANIZATION_STATUS_ACTIVE = 3;
+  // The organization cannot transact. New organizations start in this state and must be activated.
   ORGANIZATION_STATUS_INACTIVE = 5;
 }

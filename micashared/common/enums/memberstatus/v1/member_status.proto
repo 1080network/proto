@@ -15,12 +15,17 @@ option java_outer_classname = "MemberStatusEnumProto";
 option java_package = "io.micashared.common.enums.v1";
 option objc_class_prefix = "MICA";
 
+// Lifecycle state of a network member (an Issuer or an Acceptor).
+//
 // State transition diagram:
 //   INACTIVE (initial state) -> ACTIVE
 //   ACTIVE -> INACTIVE
 enum MemberStatus {
   reserved 1, 2, 4;
+  // Not set.
   MEMBER_STATUS_UNSPECIFIED = 0;
+  // The member is active on the network.
   MEMBER_STATUS_ACTIVE = 3;
+  // The member is not active on the network.
   MEMBER_STATUS_INACTIVE = 5;
 }

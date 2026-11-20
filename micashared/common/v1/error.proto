@@ -15,12 +15,27 @@ option java_outer_classname = "ErrorProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// Details of why a call did not succeed. Responses that carry an `error` field also carry a `status` enum: check
+// `status` first to decide what to do, and treat `error` as supporting detail for logs and support requests. `error`
+// is normally set only when `status` is not a success value.
+//
+// A call can also fail at the gRPC level (for example `PERMISSION_DENIED`, `INVALID_ARGUMENT` or `UNAUTHENTICATED`).
+// In that case gRPC does not deliver a response body, so there is no `Error`; read the gRPC status code and message
+// instead.
 message Error {
+  // Human-readable description of the problem, intended for people rather than programs. The wording is not stable
+  // and may change between releases, so do not parse it or branch on it; use the response `status` or the gRPC status
+  // code instead.
   string message = 1;
 
+  // Correlation ID that identifies this request in Mica's logs. Quote it when reporting a problem to Mica. The same
+  // value is returned in the `x_cid` response header and trailer of every call. A caller may choose the value by
+  // sending a `cid` request metadata entry; otherwise Mica generates one.
   string cid = 2;
 
+  // Reserved for the type of Mica service that produced the error. Not currently populated.
   string service_type = 3;
 
+  // Reserved for the full gRPC method name that produced the error. Not currently populated.
   string full_method = 4;
 }

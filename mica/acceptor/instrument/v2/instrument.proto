@@ -1,0 +1,90 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.acceptor.instrument.v2;
+
+import "micashared/common/v1/error.proto";
+import "micashared/common/v1/instrument.proto";
+
+option go_package = "mica/acceptor/instrumentv2";
+option java_outer_classname = "InstrumentProto";
+option java_package = "io.mica.acceptor.instrument.v2";
+option objc_class_prefix = "MICA";
+
+message GetLinkRequest {
+  // The link_key returned when the link was completed. A malformed key is rejected with INVALID_ARGUMENT.
+  string link_key = 1;
+}
+
+message GetLinkResponse {
+  // The outcome of GetLink.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The link was found.
+    STATUS_SUCCESS = 1;
+    // No link has this key, for example because it was removed.
+    STATUS_LINK_NOT_FOUND = 2;
+  }
+  // The outcome of the request.
+  Status status = 1;
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+  // The link. Present when status is STATUS_SUCCESS.
+  Link link = 3;
+}
+
+message RemoveInstrumentLinkRequest {
+  // The link_key of the link to remove. A malformed key is rejected with INVALID_ARGUMENT.
+  string link_key = 1;
+}
+
+message RemoveInstrumentLinkResponse {
+  // The outcome. Exactly one is set unless the call fails with a gRPC status code (INTERNAL for an unexpected
+  // failure).
+  oneof result {
+    // The link was removed.
+    Success success = 1;
+    // The link was not removed.
+    Failure failure = 2;
+  }
+
+  // The link was removed and can no longer be used. Has no fields.
+  message Success {}
+
+  // Why the link was not removed.
+  message Failure {
+    // The reason, as a code you can act on.
+    FailureCode code = 1;
+    // A human-readable description of the failure.
+    string message = 2;
+  }
+
+  // Reasons a link could not be removed.
+  enum FailureCode {
+    // Not used.
+    FAILURE_CODE_UNSPECIFIED = 0;
+
+    // No link has this key, for example because it was already removed.
+    FAILURE_CODE_LINK_NOT_FOUND = 1;
+
+    // The link is in use by one or more payments that prevent its removal. Not currently returned.
+    FAILURE_CODE_LINK_IN_USE = 2;
+  }
+}
+
+// A link between the user and you, created by CompleteLinkingWithCode on AcceptorToMicaLinkService.
+message Link {
+  // The link_key of the link.
+  string key = 1;
+  // Details of the linked instrument for display: its name, type and icon. Empty for links completed with
+  // AcceptorToMicaLinkService, which link to a payment profile rather than an instrument.
+  micashared.common.v1.LinkedInstrumentData instrument_data = 2;
+}

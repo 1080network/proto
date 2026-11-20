@@ -17,10 +17,11 @@ option java_outer_classname = "DiscountProto";
 option java_package = "io.micashared.common.v1";
 option objc_class_prefix = "MICA";
 
+// Summary of the discounts applied to a transaction.
 message DiscountSummary {
-  // the total amount that was discounted
+  // Total amount discounted, as a decimal string in the currency of the transaction, for example "1.50".
   string discount_amount = 1;
 
-  // number of discounts applied 0 or more
+  // Number of discounts applied; 0 when none.
   int32 discounts_applied = 2 [(validate.rules).int32.gte = 0];
 }

@@ -1,0 +1,83 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.issuer.issuer.v2;
+
+import "google/protobuf/timestamp.proto";
+import "micashared/common/v1/bank_account_detail.proto";
+import "micashared/common/v1/error.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/issuer/issuerv2";
+option java_outer_classname = "IssuerProto";
+option java_package = "io.mica.issuer.issuer.v2";
+option objc_class_prefix = "MICA";
+
+// The Issuer's own member record at Mica, as returned by GetIssuer.
+message Issuer {
+  reserved 10;
+
+  // Mica's key for this Issuer member (30-50 characters).
+  string issuer_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // Record version, incremented by Mica on every change.
+  int64 version = 2 [(validate.rules).int64.gte = 0];
+
+  // When the Issuer record was created at Mica.
+  google.protobuf.Timestamp created = 3;
+
+  // When the Issuer record was last updated at Mica.
+  google.protobuf.Timestamp updated = 4;
+
+  // Display name of the Issuer.
+  string name = 5;
+
+  // The callback address (`<hostname>:<port>`) at which Mica calls the Issuer's IssuerFromMicaService. Set with
+  // IssuerAdministrationService.UpdateFromMicaClientCallbackAddress.
+  string issuer_url = 6;
+
+  // The Issuer's operating bank account used for settlement.
+  micashared.common.v1.BankAccountDetail operating_account = 8;
+
+  // The Issuer's bank account that receives revenue from settlement.
+  micashared.common.v1.BankAccountDetail revenue_account = 9;
+
+  // The network group this Issuer belongs to. Instrument links can only be completed between members of the same
+  // network group.
+  string network_group = 11;
+
+  // Names of the features enabled for this Issuer.
+  repeated string features = 12;
+}
+
+// Request for GetIssuer. The Issuer is identified by the client certificate, so no fields are needed.
+message GetIssuerRequest {}
+
+message GetIssuerResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    // The Issuer record is returned in `issuer`.
+    STATUS_SUCCESS = 1;
+    // The request failed; see `error`.
+    STATUS_ERROR = 2;
+    // No Issuer record exists for this instance.
+    STATUS_NOT_FOUND = 3;
+  }
+  Status status = 1;
+
+  // Details of the failure when `status` is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The Issuer record. Set only when `status` is STATUS_SUCCESS.
+  Issuer issuer = 3;
+}

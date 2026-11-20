@@ -1,0 +1,82 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.acceptor.acceptor.v2;
+
+import "google/protobuf/timestamp.proto";
+import "micashared/common/v1/address.proto";
+import "micashared/common/v1/error.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/acceptor/acceptorv2";
+option java_outer_classname = "AcceptorProto";
+option java_package = "io.mica.acceptor.acceptor.v2";
+option objc_class_prefix = "MICA";
+
+// An Acceptor member of the Mica network, as Mica holds it.
+message Acceptor {
+  // Mica's key for the Acceptor.
+  string acceptor_key = 1 [(validate.rules).string = {
+    min_len: 30,
+    max_len: 50
+  }];
+
+  // The version of this record. It increases with every change.
+  int64 version = 2 [(validate.rules).int64.gte = 0];
+
+  // When Mica created the record.
+  google.protobuf.Timestamp created = 3;
+
+  // When Mica last changed the record.
+  google.protobuf.Timestamp updated = 4;
+
+  // The Acceptor's name.
+  string name = 5;
+
+  // The Acceptor's tax identifier.
+  string tax_identifier = 6;
+
+  // The Acceptor's address.
+  micashared.common.v1.Address address = 7;
+
+  // The URL of the Acceptor's own service endpoint, if one is registered with Mica. May be empty.
+  string callback_address = 8;
+
+  // The network group the Acceptor belongs to.
+  string network_group = 9;
+
+  // The features enabled for the Acceptor, each as "type:config".
+  repeated string features = 10;
+}
+
+// Takes no fields: Mica returns the details of the calling Acceptor.
+message GetAcceptorRequest {}
+
+message GetAcceptorResponse {
+  // The outcome of GetAcceptor.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The Acceptor's details are in acceptor.
+    STATUS_SUCCESS = 1;
+    // The details could not be retrieved; error says why.
+    STATUS_ERROR = 2;
+    // Mica holds no record for this Acceptor.
+    STATUS_NOT_FOUND = 3;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The Acceptor's details. Present when status is STATUS_SUCCESS.
+  Acceptor acceptor = 3;
+}

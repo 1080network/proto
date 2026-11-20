@@ -1,0 +1,166 @@
+// Copyright (c) 2022-2024 Mica. All rights reserved. All software, including, without limitation, all source
+// code and object code, is the intellectual property of Mica, Inc. and is protected by copyright, trademark and
+// other intellectual property laws (collective "Mica Software"). You may not use, copy, reproduce, download, store,
+// post, broadcast, transmit, modify, sell or make available to the public content from the Mica Software without a
+// valid license or the prior written approval of Mica, Inc. Mica, its logos, slogans, taglines,
+// products, feature names, and other trademarks are trademarks of Mica, Inc. and may not be used without
+// permission.
+
+syntax = "proto3";
+
+package mica.acceptor.service.v2;
+
+import "google/protobuf/timestamp.proto";
+import "mica/common/v1/currency.proto";
+import "micashared/common/v1/error.proto";
+import "validate/validate.proto";
+
+option go_package = "mica/acceptor/servicev2";
+option java_outer_classname = "AcceptorToMicaWIPServiceProto";
+option java_package = "io.mica.acceptor.service.v2";
+option objc_class_prefix = "MICA";
+
+// Operations still in development. They may change without notice.
+service AcceptorToMicaWIPService {
+  // Work in progress. Creates a recurring payment: standing permission, within the terms you set, to take future
+  // payments from a user's linked payment profile. Pass a UUEK provisioned with ProvisionUUEKFromLink on
+  // AcceptorToMicaLinkService using the create_recurring_payment intent. Returns a recurring_payment_key for later
+  // calls. Creating a recurring payment moves no value; take each payment with ProvisionRecurringPaymentUUEK and
+  // ObtainValue.
+  rpc CreateRecurringPayment(CreateRecurringPaymentRequest) returns (CreateRecurringPaymentResponse) {}
+
+  // Work in progress. Retrieves a recurring payment by its recurring_payment_key. An unknown key is reported as the
+  // gRPC status NOT_FOUND.
+  rpc GetRecurringPayment(GetRecurringPaymentRequest) returns (GetRecurringPaymentResponse) {}
+
+  // Work in progress. Provisions a UUEK for taking one payment under a recurring payment; pass it to ObtainValue on
+  // AcceptorToMicaValueService. An unknown key is reported as the gRPC status NOT_FOUND, and a recurring payment that
+  // cannot currently be used, for example because its terms are used up, as PERMISSION_DENIED.
+  rpc ProvisionRecurringPaymentUUEK(ProvisionRecurringPaymentUUEKRequest) returns (ProvisionRecurringPaymentUUEKResponse) {}
+}
+
+
+// A recurring payment, as Mica holds it.
+message RecurringPayment {
+  // Mica's key for the recurring payment.
+  string recurring_payment_key = 1;
+
+  // The nickname given when the recurring payment was created.
+  string nickname = 2;
+
+  // The currency of the recurring payment, as an ISO 4217 code. Not currently populated by GetRecurringPayment.
+  mica.common.v1.Currency currency = 3 [(validate.rules).message = {required: true}];
+
+  // When Mica created the recurring payment.
+  google.protobuf.Timestamp created = 4;
+}
+
+// The limits that apply to a recurring payment.
+message RecurringPaymentTerms {
+  // The total amount that may be obtained under this recurring payment over its lifetime, as a decimal string in its
+  // currency.
+  string total_spend_limit = 1;
+}
+
+// Request for CreateRecurringPayment. A recurring payment belongs to a link between you and an Issuer, which in turn
+// refers to a user and one of their instruments.
+message CreateRecurringPaymentRequest {
+  reserved 5;
+
+  // The organization the recurring payment is for. Set one of these.
+  oneof organization_identifier {
+    // Mica's key for the organization. At most 50 characters.
+    string organization_key = 1 [(validate.rules).string = {max_len: 50}];
+
+    // Your own reference for the organization. At most 100 characters.
+    string organization_ref = 2 [(validate.rules).string = {max_len: 100}];
+  }
+
+  // A UUEK provisioned with ProvisionUUEKFromLink on AcceptorToMicaLinkService using the create_recurring_payment
+  // intent.
+  string uuek = 4;
+
+  // A name for the recurring payment, for your and the user's reference.
+  string nickname = 3;
+
+  // The currency of the recurring payment, as an ISO 4217 code. Required.
+  mica.common.v1.Currency currency = 7 [(validate.rules).message = {required: true}];
+
+  // The limits that apply to the recurring payment. Required.
+  RecurringPaymentTerms terms = 6 [(validate.rules).message.required = true];
+}
+
+message CreateRecurringPaymentResponse {
+  // The outcome of CreateRecurringPayment. A failure is reported as a gRPC status code rather than STATUS_ERROR.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The recurring payment was created.
+    STATUS_SUCCESS = 1;
+    // The recurring payment was not created.
+    STATUS_ERROR = 2;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // Mica's key for the new recurring payment.
+  string recurring_payment_key = 3;
+}
+
+message GetRecurringPaymentRequest {
+
+  // The recurring_payment_key returned by CreateRecurringPayment.
+  string recurring_payment_key = 1;
+
+}
+
+message GetRecurringPaymentResponse {
+  // The outcome of GetRecurringPayment. An unknown key is reported as the gRPC status NOT_FOUND rather than
+  // STATUS_NOT_FOUND.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The recurring payment was found.
+    STATUS_SUCCESS = 1;
+    // No recurring payment has this key.
+    STATUS_NOT_FOUND = 2;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // The recurring payment. Present when status is STATUS_SUCCESS.
+  RecurringPayment recurring_payment = 3;
+}
+
+message ProvisionRecurringPaymentUUEKRequest {
+  // The recurring_payment_key returned by CreateRecurringPayment.
+  string recurring_payment_key = 1;
+}
+
+message ProvisionRecurringPaymentUUEKResponse {
+
+  // The outcome of ProvisionRecurringPaymentUUEK. An unknown key is reported as the gRPC status NOT_FOUND rather
+  // than STATUS_NOT_FOUND.
+  enum Status {
+    // Not used.
+    STATUS_UNSPECIFIED = 0;
+    // The UUEK was provisioned.
+    STATUS_SUCCESS = 1;
+    // No recurring payment has this key.
+    STATUS_NOT_FOUND = 2;
+  }
+  // The outcome of the request.
+  Status status = 1;
+
+  // Details of the failure when status is not STATUS_SUCCESS.
+  micashared.common.v1.Error error = 2;
+
+  // A UUEK for taking a payment under the recurring payment. Present when status is STATUS_SUCCESS.
+  string uuek = 3;
+}
