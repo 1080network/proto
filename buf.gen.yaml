@@ -1,0 +1,100 @@
+# Code generation for the Mica client SDKs.
+#
+# One configuration drives every language. Generate everything with:
+#
+#   buf generate --path mica/issuer --path mica/acceptor --path mica/member \
+#                --path mica/common --path micashared
+#
+# or use ./generate.sh, which wraps the command above. Output lands in ./gen/<language>.
+#
+# Plugins are the hosted ones from the Buf Schema Registry, so only `buf` and network access
+# are needed. See docs/build-your-own-sdk.md for building from the protos with other tools.
+version: v2
+
+managed:
+  enabled: true
+  disable:
+    # The protos already declare an `io.mica...` Java package; keep it.
+    - file_option: java_package
+    - file_option: java_package_prefix
+    # Third-party protos keep their own Go packages (for validate, the protoc-gen-validate module).
+    - file_option: go_package_prefix
+      path: validate
+    - file_option: go_package_prefix
+      path: google
+  override:
+    # Go: the protos declare module-relative go_package values, so set real import paths. Each role
+    # is its own Go module, so a member only depends on the roles it uses; shared types live in
+    # `common`. Modules are published from github.com/1080network/golang.
+    - file_option: go_package_prefix
+      value: github.com/1080network/golang/common/v2
+    - file_option: go_package_prefix
+      path: mica/issuer
+      value: github.com/1080network/golang/issuer/v2
+    - file_option: go_package_prefix
+      path: mica/acceptor
+      value: github.com/1080network/golang/acceptor/v2
+
+plugins:
+  # Go
+  - remote: buf.build/protocolbuffers/go
+    out: gen/go
+    opt: paths=source_relative
+  - remote: buf.build/grpc/go
+    out: gen/go
+    opt: paths=source_relative
+
+  # Java and Kotlin (Kotlin is an extension over the Java classes)
+  - remote: buf.build/protocolbuffers/java
+    out: gen/java
+  - remote: buf.build/grpc/java
+    out: gen/java
+  - remote: buf.build/protocolbuffers/kotlin
+    out: gen/kotlin
+
+  # Python
+  - remote: buf.build/protocolbuffers/python
+    out: gen/python
+  - remote: buf.build/protocolbuffers/pyi
+    out: gen/python
+  - remote: buf.build/grpc/python
+    out: gen/python
+
+  # C#
+  - remote: buf.build/protocolbuffers/csharp
+    out: gen/csharp
+    opt: base_namespace=
+  - remote: buf.build/grpc/csharp
+    out: gen/csharp
+    opt: base_namespace=
+
+  # Node (TypeScript, @grpc/grpc-js)
+  - remote: buf.build/community/stephenh-ts-proto
+    out: gen/node
+    opt:
+      - outputServices=grpc-js
+      - esModuleInterop=true
+
+  # Rust (prost + tonic)
+  - remote: buf.build/community/neoeinstein-prost
+    out: gen/rust
+  - remote: buf.build/community/neoeinstein-tonic
+    out: gen/rust
+
+  # PHP
+  - remote: buf.build/protocolbuffers/php
+    out: gen/php
+  - remote: buf.build/grpc/php
+    out: gen/php
+
+  # Ruby
+  - remote: buf.build/protocolbuffers/ruby
+    out: gen/ruby
+  - remote: buf.build/grpc/ruby
+    out: gen/ruby
+
+  # C++
+  - remote: buf.build/protocolbuffers/cpp
+    out: gen/cpp
+  - remote: buf.build/grpc/cpp
+    out: gen/cpp
