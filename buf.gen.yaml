@@ -17,11 +17,11 @@ managed:
     # The protos already declare an `io.mica...` Java package; keep it.
     - file_option: java_package
     - file_option: java_package_prefix
-    # Third-party protos keep their own Go packages (for validate, the protoc-gen-validate module).
-    - file_option: go_package_prefix
-      path: validate
-    - file_option: go_package_prefix
-      path: google
+    # Third-party protos are left exactly as published, in every language: their generated code lives in
+    # libraries (for example protoc-gen-validate), so rewriting Go packages, Java class names or C#
+    # namespaces would point at code that doesn't exist.
+    - path: validate
+    - path: google
   override:
     # Go: the protos declare module-relative go_package values, so set real import paths. Each role
     # is its own Go module, so a member only depends on the roles it uses; shared types live in
