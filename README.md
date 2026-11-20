@@ -21,7 +21,7 @@ generate the code yourself, see [Building your own SDK](docs/build-your-own-sdk.
 
 - `mica/issuer`, `mica/acceptor`: the APIs for each role
 - `mica/member`, `mica/common`, `micashared`: shared by every role
-- `buf.gen.yaml`, `generate.sh`: generate client code for every supported language
+- `buf.gen.yaml`, `generate.sh`: generate client code for the supported languages (C++ is built from the protos with CMake instead, see the C++ SDK)
 - `docs/`: guides
 
 Releases are tagged `vX.Y.Z`, with pre-releases tagged `vX.Y.Z-preN`.
