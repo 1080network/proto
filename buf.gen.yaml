@@ -59,8 +59,12 @@ plugins:
   # or newer, so this works with protobuf 6 and 7 instead of forcing everyone onto the newest release.
   - remote: buf.build/protocolbuffers/python:v32.1
     out: gen/python
+    # The generated modules import validate_pb2, which isn't published anywhere, so generate the imported
+    # protos (validate/validate_pb2.py) alongside them.
+    include_imports: true
   - remote: buf.build/protocolbuffers/pyi:v32.1
     out: gen/python
+    include_imports: true
   - remote: buf.build/grpc/python
     out: gen/python
 
