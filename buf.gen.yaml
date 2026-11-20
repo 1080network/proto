@@ -100,11 +100,15 @@ plugins:
   # Ruby
   - remote: buf.build/protocolbuffers/ruby
     out: gen/ruby
+    # The generated code requires validate.proto's generated code, so generate it too
+    include_imports: true
   - remote: buf.build/grpc/ruby
     out: gen/ruby
 
   # C++
   - remote: buf.build/protocolbuffers/cpp
     out: gen/cpp
+    # The generated code requires validate.proto's generated code, so generate it too
+    include_imports: true
   - remote: buf.build/grpc/cpp
     out: gen/cpp
