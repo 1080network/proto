@@ -72,6 +72,8 @@ plugins:
   - remote: buf.build/protocolbuffers/csharp
     out: gen/csharp
     opt: base_namespace=
+    # The generated messages reference Validate.ValidateReflection, so generate the imported validate.proto too
+    include_imports: true
   - remote: buf.build/grpc/csharp
     out: gen/csharp
     opt: base_namespace=
